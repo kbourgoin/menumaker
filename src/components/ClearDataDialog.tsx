@@ -12,15 +12,30 @@ import {
 import { Button } from "@/components/ui/button";
 import { useDishes } from "@/hooks/useMeals";
 import { toast } from "sonner";
+import { clearAllData } from "@/utils/mealUtils"; // Import local storage cleanup function
 
 export function ClearDataDialog() {
   const { clearData } = useDishes();
   const [open, setOpen] = React.useState(false);
+  const [isClearing, setIsClearing] = React.useState(false);
 
-  const handleClearData = () => {
-    clearData();
-    setOpen(false);
-    toast.success("All dish data has been cleared");
+  const handleClearData = async () => {
+    try {
+      setIsClearing(true);
+      // Clear data from Supabase
+      await clearData();
+      
+      // Also clear any local storage data to prevent conflicts
+      clearAllData();
+      
+      setOpen(false);
+      toast.success("All dish data has been cleared");
+    } catch (error) {
+      console.error("Error clearing data:", error);
+      toast.error("Failed to clear data. Please try again.");
+    } finally {
+      setIsClearing(false);
+    }
   };
 
   return (
@@ -40,8 +55,12 @@ export function ClearDataDialog() {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleClearData}>
-            Clear All Data
+          <Button 
+            variant="destructive" 
+            onClick={handleClearData} 
+            disabled={isClearing}
+          >
+            {isClearing ? "Clearing..." : "Clear All Data"}
           </Button>
         </DialogFooter>
       </DialogContent>

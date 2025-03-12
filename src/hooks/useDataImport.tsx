@@ -179,13 +179,20 @@ export function useDataImport() {
 
   // Clear all data
   const clearData = async () => {
-    // Delete all data in reverse order of dependencies
-    await supabase.from('meal_history').delete().neq('id', '0');
-    await supabase.from('dishes').delete().neq('id', '0');
-    await supabase.from('cookbooks').delete().neq('id', '0');
-    
-    // Refresh queries
-    queryClient.invalidateQueries();
+    try {
+      // Delete all data in reverse order of dependencies
+      await supabase.from('meal_history').delete().neq('id', '0');
+      await supabase.from('dishes').delete().neq('id', '0');
+      await supabase.from('cookbooks').delete().neq('id', '0');
+      
+      // Invalidate ALL queries to ensure UI is refreshed
+      queryClient.invalidateQueries();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error clearing data:", error);
+      throw error;
+    }
   };
 
   return {
