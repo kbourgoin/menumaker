@@ -201,7 +201,16 @@ export const getMealStats = () => {
 
 // Import meal history from CSV data
 export const importMealHistory = (
-  entries: { date: string; dish: string; notes?: string }[]
+  entries: { 
+    date: string; 
+    dish: string; 
+    notes?: string;
+    source?: {
+      type: 'url' | 'book' | 'none';
+      value: string;
+      page?: number;
+    };
+  }[]
 ): { success: number; skipped: number } => {
   const meals = getMeals();
   const history = getMealHistory();
@@ -226,7 +235,7 @@ export const importMealHistory = (
         createdAt: entry.date, // Use the historical date as creation date
         timesCooked: 0,
         cuisines: ['Other'], // Default cuisine
-        source: {
+        source: entry.source || {
           type: 'none',
           value: ''
         }

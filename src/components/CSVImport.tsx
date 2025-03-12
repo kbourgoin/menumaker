@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMeals } from "@/hooks/useMeals";
 import { processCSVFile } from "@/utils/csvUtils";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -97,12 +97,15 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Import Meal History from CSV</DialogTitle>
+            <DialogDescription>
+              Upload a CSV file with your meal history to import it into the app.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <Alert>
               <AlertDescription>
-                Your CSV file should have columns for date and dish name. An optional third column can be used for notes.
+                Your CSV file should have columns for date, dish name, and notes (optional). The app will also extract source information if your dish name contains it in parentheses (e.g., "Mapo Tofu (RICE80)").
               </AlertDescription>
             </Alert>
             

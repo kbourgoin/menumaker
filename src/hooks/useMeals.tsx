@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Meal } from "@/types";
 import { 
@@ -58,7 +59,16 @@ export function useMeals() {
   };
 
   const importMealHistoryFromData = (
-    entries: { date: string; dish: string; notes?: string }[]
+    entries: { 
+      date: string; 
+      dish: string; 
+      notes?: string;
+      source?: {
+        type: 'url' | 'book' | 'none';
+        value: string;
+        page?: number;
+      };
+    }[]
   ) => {
     const result = importMealHistory(entries);
     // Refresh meals list to get updated data

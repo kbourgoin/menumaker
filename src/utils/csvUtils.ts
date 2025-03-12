@@ -9,7 +9,62 @@ interface CSVMealEntry {
   date: string;
   dish: string;
   notes?: string;
+  source?: {
+    type: 'url' | 'book' | 'none';
+    value: string;
+    page?: number;
+  };
 }
+
+/**
+ * Extract source information from dish name if it contains parentheses
+ * Example: "Mapo Tofu (RICE80)" -> { dish: "Mapo Tofu", source: { type: "book", value: "RICE", page: 80 } }
+ */
+export const extractSourceFromDish = (dish: string): { dishName: string; source?: { type: 'url' | 'book' | 'none'; value: string; page?: number } } => {
+  // Check if dish contains parentheses at the end
+  const matches = dish.match(/^(.*?)\s*\((.*?)\)$/);
+  
+  if (!matches) {
+    return { dishName: dish.trim() };
+  }
+  
+  const [_, dishName, sourceInfo] = matches;
+  
+  // Check if it's a book with page number (e.g., "RICE80")
+  const bookPageMatch = sourceInfo.match(/^([A-Za-z]+)(\d+)$/);
+  
+  if (bookPageMatch) {
+    const [__, bookName, pageNum] = bookPageMatch;
+    return { 
+      dishName: dishName.trim(),
+      source: {
+        type: 'book',
+        value: bookName,
+        page: parseInt(pageNum, 10)
+      }
+    };
+  }
+  
+  // Check if it's a URL source
+  if (sourceInfo.toLowerCase() === 'pdf' || sourceInfo.toLowerCase().includes('http')) {
+    return {
+      dishName: dishName.trim(),
+      source: {
+        type: 'url',
+        value: sourceInfo.toLowerCase() === 'pdf' ? 'PDF Document' : sourceInfo
+      }
+    };
+  }
+  
+  // If it's something else in parentheses, just treat it as a book
+  return {
+    dishName: dishName.trim(),
+    source: {
+      type: 'book',
+      value: sourceInfo.trim()
+    }
+  };
+};
 
 /**
  * Parse CSV data from a string
@@ -31,10 +86,14 @@ export const parseCSVData = (csvData: string): CSVMealEntry[] => {
       parsedDate = new Date();
     }
     
+    // Extract source information from dish name if available
+    const { dishName, source } = extractSourceFromDish(dish || 'Unknown meal');
+    
     return {
       date: parsedDate.toISOString(),
-      dish: dish || 'Unknown meal',
-      notes: notes || undefined
+      dish: dishName,
+      notes: notes || undefined,
+      source
     };
   }).filter(entry => entry.dish !== 'Unknown meal');
 };
