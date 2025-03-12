@@ -7,7 +7,7 @@ import { Calendar, Plus, Link, Trash } from "lucide-react";
 import CuisineTag from "./CuisineTag";
 import SourceLink from "./SourceLink";
 import { useMeals } from "@/hooks/useMeals";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMeals } from "@/hooks/useMeals";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Meal, CuisineType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showSourceFields, setShowSourceFields] = useState(
-    existingMeal?.source ? existingMeal.source.type !== "none" : false
+    existingMeal?.source ? (existingMeal.source.type === "url" || existingMeal.source.type === "book") : false
   );
   const [suggestions, setSuggestions] = useState<string[]>([]);
 

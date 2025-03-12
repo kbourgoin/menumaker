@@ -5,7 +5,7 @@ export interface Meal {
   createdAt: string;
   cuisines: string[];
   source?: {
-    type: 'url' | 'book';
+    type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
   };

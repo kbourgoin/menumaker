@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
@@ -9,7 +8,7 @@ import { format, addDays, startOfWeek } from "date-fns";
 import MealCard from "@/components/MealCard";
 import { Meal } from "@/types";
 import { Link } from "react-router-dom";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 const WeeklyMenu = () => {
   const { meals, isLoading, getWeeklyMealSuggestions } = useMeals();
@@ -17,7 +16,6 @@ const WeeklyMenu = () => {
   const [weeklyMeals, setWeeklyMeals] = useState<Meal[]>([]);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
   
-  // Generate the dates for the week
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
   useEffect(() => {
