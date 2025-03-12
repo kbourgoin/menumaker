@@ -8,6 +8,7 @@ import {
   BookOpen, 
   Plus 
 } from "lucide-react";
+import AddCookedDishDialog from "./AddCookedDishDialog";
 
 const Header = () => {
   const location = useLocation();
@@ -83,18 +84,17 @@ const Header = () => {
               </Button>
             </Link>
             
+            {/* Replace the Add Meal button with our new dialog */}
+            <AddCookedDishDialog />
+            
             <Link to="/add-meal">
               <Button 
-                variant={isActive("/add-meal") ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                className={`transition-all duration-300 ${
-                  isActive("/add-meal") 
-                    ? "bg-terracotta-500 hover:bg-terracotta-600" 
-                    : "border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50 hover:border-terracotta-300"
-                }`}
+                className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50 hover:border-terracotta-300"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Add Meal</span>
+                <span className="hidden sm:inline">New Dish</span>
               </Button>
             </Link>
           </nav>
