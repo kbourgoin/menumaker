@@ -31,7 +31,6 @@ export function useCookbooks() {
   };
 
   const getDishesByCookbook = async (cookbookId: string): Promise<Dish[]> => {
-    // Fix the infinite type instantiation by explicitly defining the field we're querying
     const { data, error } = await supabase
       .from('dishes')
       .select('*')
@@ -42,9 +41,58 @@ export function useCookbooks() {
     return data ? data.map(mapDishFromDB) : [];
   };
 
+  const createCookbook = async (cookbook: Omit<Cookbook, "id" | "createdAt">, userId: string): Promise<Cookbook> => {
+    // Ensure name is provided (required field)
+    if (!cookbook.name) {
+      throw new Error("Cookbook name is required");
+    }
+
+    const cookbookToInsert = {
+      name: cookbook.name,
+      author: cookbook.author || null,
+      description: cookbook.description || null,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase
+      .from('cookbooks')
+      .insert(cookbookToInsert)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return mapCookbookFromDB(data);
+  };
+
+  const updateCookbook = async (cookbook: Partial<Cookbook> & { id: string }, userId: string): Promise<Cookbook> => {
+    // Ensure we have at least an ID to update
+    if (!cookbook.id) {
+      throw new Error("Cookbook ID is required for updates");
+    }
+
+    const cookbookToUpdate = {
+      ...(cookbook.name && { name: cookbook.name }),
+      ...(cookbook.author !== undefined && { author: cookbook.author }),
+      ...(cookbook.description !== undefined && { description: cookbook.description }),
+      user_id: userId
+    };
+
+    const { data, error } = await supabase
+      .from('cookbooks')
+      .update(cookbookToUpdate)
+      .eq('id', cookbook.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return mapCookbookFromDB(data);
+  };
+
   return {
     getCookbooks,
     getCookbook,
-    getDishesByCookbook
+    getDishesByCookbook,
+    createCookbook,
+    updateCookbook
   };
 }

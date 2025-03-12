@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Cookbook } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ import { PencilIcon, Trash2Icon, PlusIcon, Book } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCookbooks } from "@/hooks/useCookbooks";
 import { useAuth } from "@/components/AuthProvider";
-import { supabase, mapCookbookToDB } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CookbookManager = () => {
@@ -40,7 +39,7 @@ const CookbookManager = () => {
   });
   const { toast } = useToast();
   const { session } = useAuth();
-  const { getCookbooks, getDishesByCookbook } = useCookbooks();
+  const { getCookbooks, getDishesByCookbook, createCookbook, updateCookbook } = useCookbooks();
   const queryClient = useQueryClient();
 
   // Use React Query to fetch cookbooks
@@ -57,19 +56,7 @@ const CookbookManager = () => {
         throw new Error("User not authenticated");
       }
       
-      const { data, error } = await supabase
-        .from('cookbooks')
-        .insert(
-          mapCookbookToDB({
-            ...cookbook,
-            user_id: session.user.id
-          })
-        )
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
+      return createCookbook(cookbook, session.user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cookbooks'] });
@@ -92,23 +79,12 @@ const CookbookManager = () => {
 
   // Mutation for updating a cookbook
   const updateCookbookMutation = useMutation({
-    mutationFn: async (cookbook: Partial<Cookbook> & { id: string, user_id?: string }) => {
+    mutationFn: async (cookbook: Partial<Cookbook> & { id: string }) => {
       if (!session?.user?.id) {
         throw new Error("User not authenticated");
       }
       
-      const { data, error } = await supabase
-        .from('cookbooks')
-        .update(mapCookbookToDB({
-          ...cookbook,
-          user_id: session.user.id
-        }))
-        .eq('id', cookbook.id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
+      return updateCookbook(cookbook, session.user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cookbooks'] });
