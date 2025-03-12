@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useDishes } from "@/hooks/useMeals";
 import { toast } from "sonner";
-import { clearAllData } from "@/utils/mealUtils"; // Import local storage cleanup function
+import { clearAllData } from "@/utils/storageUtils"; // Updated import path
 
 export function ClearDataDialog() {
   const { clearData } = useDishes();
