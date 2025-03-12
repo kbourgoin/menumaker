@@ -1,3 +1,4 @@
+
 import { Meal } from "@/types";
 
 // Get meals from localStorage or initialize with empty array
@@ -217,25 +218,35 @@ export const importMealHistory = (
   let successCount = 0;
   let skippedCount = 0;
   
+  // Group entries by dish name to handle duplicates
+  const entriesByDish: Record<string, typeof entries> = {};
+  
+  entries.forEach(entry => {
+    const dishLower = entry.dish.toLowerCase();
+    if (!entriesByDish[dishLower]) {
+      entriesByDish[dishLower] = [];
+    }
+    entriesByDish[dishLower].push(entry);
+  });
+  
   const updatedMeals = [...meals];
   const updatedHistory = [...history];
   
-  // Process each entry
-  entries.forEach((entry) => {
-    // Find or create meal
-    let meal = meals.find(m => 
-      m.name.toLowerCase() === entry.dish.toLowerCase()
-    );
+  // Process each unique dish
+  Object.entries(entriesByDish).forEach(([dishLower, dishEntries]) => {
+    // Find if this dish already exists in the database
+    let meal = meals.find(m => m.name.toLowerCase() === dishLower);
     
+    // If dish doesn't exist, create it once using the first entry's data
     if (!meal) {
-      // Create new meal if it doesn't exist
+      const firstEntry = dishEntries[0];
       meal = {
         id: generateId(),
-        name: entry.dish,
-        createdAt: entry.date, // Use the historical date as creation date
+        name: firstEntry.dish,
+        createdAt: firstEntry.date, // Use the earliest historical date as creation date
         timesCooked: 0,
         cuisines: ['Other'], // Default cuisine
-        source: entry.source || {
+        source: firstEntry.source || {
           type: 'none',
           value: ''
         }
@@ -243,36 +254,48 @@ export const importMealHistory = (
       updatedMeals.push(meal);
     }
     
-    // Create history entry
-    const historyEntry = {
-      date: entry.date,
-      mealId: meal.id,
-      notes: entry.notes
-    };
+    // Process all entries for this dish (different cooking dates)
+    let newCookCount = 0;
     
-    // Check if this exact entry already exists (avoid duplicates)
-    const duplicateEntry = history.some(h => 
-      h.mealId === historyEntry.mealId && 
-      h.date === historyEntry.date
-    );
-    
-    if (!duplicateEntry) {
-      updatedHistory.push(historyEntry);
+    dishEntries.forEach(entry => {
+      // Create history entry for each cooking date
+      const historyEntry = {
+        date: entry.date,
+        mealId: meal!.id,
+        notes: entry.notes
+      };
       
-      // Update meal's last made date and times cooked
-      const mealIndex = updatedMeals.findIndex(m => m.id === meal?.id);
-      if (mealIndex >= 0) {
-        // Only update lastMade if this date is more recent
-        if (!updatedMeals[mealIndex].lastMade || 
-            new Date(entry.date) > new Date(updatedMeals[mealIndex].lastMade!)) {
-          updatedMeals[mealIndex].lastMade = entry.date;
-        }
-        updatedMeals[mealIndex].timesCooked += 1;
+      // Check if this exact entry already exists (avoid duplicates)
+      const duplicateEntry = updatedHistory.some(h => 
+        h.mealId === historyEntry.mealId && 
+        h.date === historyEntry.date
+      );
+      
+      if (!duplicateEntry) {
+        updatedHistory.push(historyEntry);
+        newCookCount++;
+        successCount++;
+      } else {
+        skippedCount++;
       }
-      
-      successCount++;
-    } else {
-      skippedCount++;
+    });
+    
+    // Only update the meal record if we added new cooking instances
+    if (newCookCount > 0) {
+      // Find the meal in updatedMeals to update its stats
+      const mealIndex = updatedMeals.findIndex(m => m.id === meal!.id);
+      if (mealIndex >= 0) {
+        // Sort all entries for this dish by date
+        const sortedEntries = [...dishEntries].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
+        // Update lastMade to the most recent date
+        updatedMeals[mealIndex].lastMade = sortedEntries[0].date;
+        
+        // Increment timesCooked by the number of new entries
+        updatedMeals[mealIndex].timesCooked += newCookCount;
+      }
     }
   });
   
@@ -287,4 +310,34 @@ export const importMealHistory = (
 export const clearAllData = (): void => {
   localStorage.removeItem("meals");
   localStorage.removeItem("mealHistory");
+};
+
+// Helper function to generate a simple ID
+export const generateId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+};
+
+// Get stats about meals
+export const getMealStats = () => {
+  const meals = getMeals();
+  const history = getMealHistory();
+  
+  return {
+    totalMeals: meals.length,
+    totalTimesCooked: meals.reduce((sum, meal) => sum + meal.timesCooked, 0),
+    mostCooked: [...meals].sort((a, b) => b.timesCooked - a.timesCooked)[0],
+    cuisineBreakdown: meals.reduce((acc, meal) => {
+      meal.cuisines.forEach(cuisine => {
+        acc[cuisine] = (acc[cuisine] || 0) + 1;
+      });
+      return acc;
+    }, {} as Record<string, number>),
+    recentlyCooked: history
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5)
+      .map(h => ({
+        date: h.date,
+        meal: getMealById(h.mealId)
+      }))
+  };
 };
