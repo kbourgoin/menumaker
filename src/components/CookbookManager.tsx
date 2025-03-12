@@ -21,18 +21,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
-  getCookbooks, 
-  addCookbook, 
-  updateCookbook, 
-  deleteCookbook,
-  getDishesByBookId
-} from "@/utils/mealUtils";
 import { PencilIcon, Trash2Icon, PlusIcon, Book } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCookbooks } from "@/hooks/useCookbooks";
+import { useAuth } from "@/components/AuthProvider";
+import { supabase, mapCookbookToDB } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CookbookManager = () => {
-  const [cookbooks, setCookbooks] = useState<Cookbook[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -43,11 +39,114 @@ const CookbookManager = () => {
     description: "",
   });
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { getCookbooks, getDishesByCookbook } = useCookbooks();
+  const queryClient = useQueryClient();
 
-  // Load cookbooks from localStorage
-  useEffect(() => {
-    setCookbooks(getCookbooks());
-  }, []);
+  // Use React Query to fetch cookbooks
+  const { data: cookbooks = [], isLoading } = useQuery({
+    queryKey: ['cookbooks'],
+    queryFn: getCookbooks,
+    enabled: !!user
+  });
+
+  // Mutation for adding a cookbook
+  const addCookbookMutation = useMutation({
+    mutationFn: async (cookbook: Omit<Cookbook, "id" | "createdAt" | "user_id">) => {
+      const { data, error } = await supabase
+        .from('cookbooks')
+        .insert([
+          mapCookbookToDB({
+            ...cookbook,
+            user_id: user?.id
+          })
+        ])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cookbooks'] });
+      setIsAddDialogOpen(false);
+      setFormData({ name: "", author: "", description: "" });
+      
+      toast({
+        title: "Cookbook added",
+        description: `${formData.name} has been added to your cookbooks.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error adding cookbook",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation for updating a cookbook
+  const updateCookbookMutation = useMutation({
+    mutationFn: async (cookbook: Partial<Cookbook> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('cookbooks')
+        .update(mapCookbookToDB(cookbook))
+        .eq('id', cookbook.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cookbooks'] });
+      setIsEditDialogOpen(false);
+      setCurrentCookbook(null);
+      
+      toast({
+        title: "Cookbook updated",
+        description: `${formData.name} has been updated.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error updating cookbook",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation for deleting a cookbook
+  const deleteCookbookMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('cookbooks')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cookbooks'] });
+      setIsDeleteDialogOpen(false);
+      setCurrentCookbook(null);
+      
+      toast({
+        title: "Cookbook deleted",
+        description: `The cookbook has been deleted.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error deleting cookbook",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -67,19 +166,10 @@ const CookbookManager = () => {
       return;
     }
 
-    const updatedCookbooks = addCookbook({
+    addCookbookMutation.mutate({
       name: formData.name,
       author: formData.author || undefined,
       description: formData.description || undefined,
-    });
-
-    setCookbooks(updatedCookbooks);
-    setIsAddDialogOpen(false);
-    setFormData({ name: "", author: "", description: "" });
-    
-    toast({
-      title: "Cookbook added",
-      description: `${formData.name} has been added to your cookbooks.`,
     });
   };
 
@@ -95,47 +185,39 @@ const CookbookManager = () => {
       return;
     }
 
-    const updatedCookbooks = updateCookbook(currentCookbook.id, {
+    updateCookbookMutation.mutate({
+      id: currentCookbook.id,
       name: formData.name,
       author: formData.author || undefined,
       description: formData.description || undefined,
     });
-
-    setCookbooks(updatedCookbooks);
-    setIsEditDialogOpen(false);
-    setCurrentCookbook(null);
-    
-    toast({
-      title: "Cookbook updated",
-      description: `${formData.name} has been updated.`,
-    });
   };
 
-  const handleDeleteSubmit = () => {
+  const handleDeleteSubmit = async () => {
     if (!currentCookbook) return;
     
     // Check if cookbook has linked dishes
-    const linkedDishes = getDishesByBookId(currentCookbook.id);
-    
-    if (linkedDishes.length > 0) {
+    try {
+      const linkedDishes = await getDishesByCookbook(currentCookbook.id);
+      
+      if (linkedDishes.length > 0) {
+        toast({
+          title: "Cannot delete cookbook",
+          description: `This cookbook is linked to ${linkedDishes.length} dishes. Please unlink them first.`,
+          variant: "destructive",
+        });
+        setIsDeleteDialogOpen(false);
+        return;
+      }
+
+      deleteCookbookMutation.mutate(currentCookbook.id);
+    } catch (error) {
       toast({
-        title: "Cannot delete cookbook",
-        description: `This cookbook is linked to ${linkedDishes.length} dishes. Please unlink them first.`,
+        title: "Error checking linked dishes",
+        description: "Could not verify if cookbook has linked dishes.",
         variant: "destructive",
       });
-      setIsDeleteDialogOpen(false);
-      return;
     }
-
-    const updatedCookbooks = deleteCookbook(currentCookbook.id);
-    setCookbooks(updatedCookbooks);
-    setIsDeleteDialogOpen(false);
-    setCurrentCookbook(null);
-    
-    toast({
-      title: "Cookbook deleted",
-      description: `${currentCookbook.name} has been deleted.`,
-    });
   };
 
   const openEditDialog = (cookbook: Cookbook) => {
@@ -213,13 +295,23 @@ const CookbookManager = () => {
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddSubmit}>Add Cookbook</Button>
+              <Button 
+                onClick={handleAddSubmit}
+                disabled={addCookbookMutation.isPending}
+              >
+                {addCookbookMutation.isPending ? "Adding..." : "Add Cookbook"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {cookbooks.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center p-6 border rounded-lg">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta-500 mx-auto"></div>
+          <p className="text-muted-foreground mt-2">Loading cookbooks...</p>
+        </div>
+      ) : cookbooks.length === 0 ? (
         <div className="text-center p-6 border rounded-lg">
           <Book className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
           <p className="text-muted-foreground">
@@ -325,7 +417,12 @@ const CookbookManager = () => {
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleEditSubmit}>Update</Button>
+            <Button 
+              onClick={handleEditSubmit}
+              disabled={updateCookbookMutation.isPending}
+            >
+              {updateCookbookMutation.isPending ? "Updating..." : "Update"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -343,8 +440,12 @@ const CookbookManager = () => {
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteSubmit}>
-              Delete
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteSubmit}
+              disabled={deleteCookbookMutation.isPending}
+            >
+              {deleteCookbookMutation.isPending ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
