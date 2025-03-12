@@ -1,4 +1,3 @@
-
 import { Meal } from "@/types";
 
 // Get meals from localStorage or initialize with empty array
@@ -198,4 +197,79 @@ export const getMealStats = () => {
         meal: getMealById(h.mealId)
       }))
   };
+};
+
+// Import meal history from CSV data
+export const importMealHistory = (
+  entries: { date: string; dish: string; notes?: string }[]
+): { success: number; skipped: number } => {
+  const meals = getMeals();
+  const history = getMealHistory();
+  let successCount = 0;
+  let skippedCount = 0;
+  
+  const updatedMeals = [...meals];
+  const updatedHistory = [...history];
+  
+  // Process each entry
+  entries.forEach((entry) => {
+    // Find or create meal
+    let meal = meals.find(m => 
+      m.name.toLowerCase() === entry.dish.toLowerCase()
+    );
+    
+    if (!meal) {
+      // Create new meal if it doesn't exist
+      meal = {
+        id: generateId(),
+        name: entry.dish,
+        createdAt: entry.date, // Use the historical date as creation date
+        timesCooked: 0,
+        cuisines: ['Other'], // Default cuisine
+        source: {
+          type: 'none',
+          value: ''
+        }
+      };
+      updatedMeals.push(meal);
+    }
+    
+    // Create history entry
+    const historyEntry = {
+      date: entry.date,
+      mealId: meal.id,
+      notes: entry.notes
+    };
+    
+    // Check if this exact entry already exists (avoid duplicates)
+    const duplicateEntry = history.some(h => 
+      h.mealId === historyEntry.mealId && 
+      h.date === historyEntry.date
+    );
+    
+    if (!duplicateEntry) {
+      updatedHistory.push(historyEntry);
+      
+      // Update meal's last made date and times cooked
+      const mealIndex = updatedMeals.findIndex(m => m.id === meal?.id);
+      if (mealIndex >= 0) {
+        // Only update lastMade if this date is more recent
+        if (!updatedMeals[mealIndex].lastMade || 
+            new Date(entry.date) > new Date(updatedMeals[mealIndex].lastMade!)) {
+          updatedMeals[mealIndex].lastMade = entry.date;
+        }
+        updatedMeals[mealIndex].timesCooked += 1;
+      }
+      
+      successCount++;
+    } else {
+      skippedCount++;
+    }
+  });
+  
+  // Save updated data
+  saveMeals(updatedMeals);
+  saveMealHistory(updatedHistory);
+  
+  return { success: successCount, skipped: skippedCount };
 };

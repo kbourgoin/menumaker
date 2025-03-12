@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Meal } from "@/types";
 import { 
@@ -9,7 +8,8 @@ import {
   logMealCooked,
   getRandomMealSuggestions,
   getMealById,
-  getMealStats
+  getMealStats,
+  importMealHistory
 } from "@/utils/mealUtils";
 
 export function useMeals() {
@@ -57,6 +57,15 @@ export function useMeals() {
     return getMealStats();
   };
 
+  const importMealHistoryFromData = (
+    entries: { date: string; dish: string; notes?: string }[]
+  ) => {
+    const result = importMealHistory(entries);
+    // Refresh meals list to get updated data
+    setMeals(getMeals());
+    return result;
+  };
+
   return {
     meals,
     isLoading,
@@ -66,6 +75,7 @@ export function useMeals() {
     recordMealCooked,
     getWeeklyMealSuggestions,
     getMeal,
-    getStats
+    getStats,
+    importMealHistory: importMealHistoryFromData
   };
 }
