@@ -26,17 +26,26 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
   const { toast } = useToast();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
-  const handleDeleteDish = () => {
-    deleteDish(dish.id);
-    setIsDeleteDialogOpen(false);
-    
-    toast({
-      title: "Dish deleted",
-      description: `${dish.name} has been deleted from your dishes.`,
-    });
-    
-    if (onDeleted) {
-      onDeleted();
+  const handleDeleteDish = async () => {
+    try {
+      await deleteDish(dish.id);
+      setIsDeleteDialogOpen(false);
+      
+      toast({
+        title: "Dish deleted",
+        description: `${dish.name} has been deleted from your dishes.`,
+      });
+      
+      if (onDeleted) {
+        onDeleted();
+      }
+    } catch (error) {
+      console.error("Error deleting dish:", error);
+      toast({
+        title: "Error deleting dish",
+        description: "There was a problem deleting this dish. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -46,8 +55,9 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       return;
     }
     
-    // Use navigate instead of directly modifying location
+    // Navigate to the dish detail page
     e.preventDefault();
+    e.stopPropagation(); // Prevent bubbling to parent elements
     navigate(`/meal/${dish.id}`);
   };
   
@@ -133,12 +143,15 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
                   variant="ghost" 
                   size={compact ? "sm" : "default"} 
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
                 >
                   <Trash className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent onClick={(e) => e.stopPropagation()}>
                 <DialogHeader>
                   <DialogTitle>Delete {dish.name}</DialogTitle>
                 </DialogHeader>
@@ -146,12 +159,21 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
                   <p>Are you sure you want to delete this dish? This action cannot be undone.</p>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                  <Button 
+                    variant="outline" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsDeleteDialogOpen(false);
+                    }}
+                  >
                     Cancel
                   </Button>
                   <Button 
                     variant="destructive" 
-                    onClick={handleDeleteDish}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDish();
+                    }}
                   >
                     Delete
                   </Button>

@@ -4,7 +4,8 @@ import { Dish } from "@/types";
 import { 
   supabase, 
   mapDishFromDB, 
-  mapDishToDB
+  mapDishToDB,
+  mapMealHistoryFromDB
 } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -16,14 +17,20 @@ export function useDishes() {
   const { data: dishes = [] } = useQuery({
     queryKey: ['dishes'],
     queryFn: async (): Promise<Dish[]> => {
-      const { data, error } = await supabase
-        .from('dishes')
-        .select('*')
-        .order('name');
-      
-      if (error) throw error;
-      setIsLoading(false);
-      return data ? data.map(mapDishFromDB) : [];
+      try {
+        const { data, error } = await supabase
+          .from('dishes')
+          .select('*')
+          .order('name');
+        
+        if (error) throw error;
+        setIsLoading(false);
+        return data ? data.map(mapDishFromDB) : [];
+      } catch (error) {
+        console.error("Error fetching dishes:", error);
+        setIsLoading(false);
+        return [];
+      }
     }
   });
 
@@ -101,15 +108,48 @@ export function useDishes() {
   });
 
   // Get dish by ID
-  const getDish = async (id: string): Promise<Dish> => {
-    const { data, error } = await supabase
-      .from('dishes')
-      .select('*')
-      .eq('id', id)
-      .single();
+  const getDish = async (id: string): Promise<Dish | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('dishes')
+        .select('*')
+        .eq('id', id)
+        .single();
+        
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // PGRST116 is the error code for "Results contain 0 rows"
+          return null;
+        }
+        throw error;
+      }
       
-    if (error) throw error;
-    return mapDishFromDB(data);
+      return mapDishFromDB(data);
+    } catch (error) {
+      console.error("Error getting dish:", error);
+      throw error;
+    }
+  };
+
+  // Get meal history for a dish
+  const getMealHistoryForDish = async (dishId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('meal_history')
+        .select('*')
+        .eq('dishid', dishId)
+        .order('date', { ascending: false });
+        
+      if (error) throw error;
+      
+      return data.map(history => ({
+        date: history.date,
+        notes: history.notes
+      }));
+    } catch (error) {
+      console.error("Error getting meal history:", error);
+      return [];
+    }
   };
 
   return {
@@ -118,6 +158,7 @@ export function useDishes() {
     addDish: (dish: Omit<Dish, "id" | "createdAt" | "timesCooked" | "user_id">) => addDishMutation.mutateAsync(dish),
     updateDish: (id: string, updates: Partial<Dish>) => updateDishMutation.mutateAsync({ id, updates }),
     deleteDish: (id: string) => deleteDishMutation.mutateAsync(id),
-    getDish
+    getDish,
+    getMealHistoryForDish
   };
 }

@@ -23,34 +23,45 @@ const MealDetail = () => {
   const [history, setHistory] = useState<{date: string; notes?: string}[]>([]);
   const [activeTab, setActiveTab] = useState("details");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (id) {
-        try {
-          setIsLoading(true);
-          // Use await to properly resolve promises
-          const dishData = await getDish(id);
-          setDish(dishData);
-          
-          const historyData = await getMealHistoryForDish(id);
-          setHistory(historyData);
-        } catch (error) {
-          console.error("Error fetching dish:", error);
-          toast({
-            title: "Dish not found",
-            description: "The dish you're looking for doesn't exist.",
-            variant: "destructive",
-          });
-          navigate("/all-meals");
-        } finally {
-          setIsLoading(false);
+      if (!id) {
+        setError("No dish ID provided");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const dishData = await getDish(id);
+        if (!dishData) {
+          throw new Error("Dish not found");
         }
+        
+        setDish(dishData);
+        
+        const historyData = await getMealHistoryForDish(id);
+        setHistory(historyData);
+      } catch (error) {
+        console.error("Error fetching dish:", error);
+        setError("Failed to load dish details. Please try again later.");
+        
+        toast({
+          title: "Error loading dish",
+          description: "There was a problem loading this dish's details.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     
     fetchData();
-  }, [id, getDish, getMealHistoryForDish, navigate, toast]);
+  }, [id, getDish, getMealHistoryForDish, toast]);
 
   const handleBack = () => {
     navigate(-1);
@@ -78,8 +89,62 @@ const MealDetail = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Layout>
+        <div className="max-w-3xl mx-auto p-8">
+          <Button 
+            variant="ghost" 
+            onClick={handleBack} 
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Card className="p-6 text-center">
+            <CardContent className="pt-6">
+              <div className="text-destructive text-xl mb-4">Error</div>
+              <p>{error}</p>
+              <Button 
+                onClick={() => window.location.reload()}
+                className="mt-4"
+              >
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   if (!dish) {
-    return null;
+    return (
+      <Layout>
+        <div className="max-w-3xl mx-auto p-8">
+          <Button 
+            variant="ghost" 
+            onClick={handleBack} 
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Card className="p-6 text-center">
+            <CardContent className="pt-6">
+              <div className="text-warning text-xl mb-4">Dish Not Found</div>
+              <p>The dish you're looking for doesn't exist or has been deleted.</p>
+              <Button 
+                onClick={handleBack}
+                className="mt-4"
+              >
+                Go Back
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
   }
 
   return (
