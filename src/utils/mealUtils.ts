@@ -282,3 +282,9 @@ export const importMealHistory = (
   
   return { success: successCount, skipped: skippedCount };
 };
+
+// Clear all meal data from localStorage
+export const clearAllData = (): void => {
+  localStorage.removeItem("meals");
+  localStorage.removeItem("mealHistory");
+};

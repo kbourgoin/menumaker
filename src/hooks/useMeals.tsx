@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Meal } from "@/types";
 import { 
@@ -10,7 +9,8 @@ import {
   getRandomMealSuggestions,
   getMealById,
   getMealStats,
-  importMealHistory
+  importMealHistory,
+  clearAllData
 } from "@/utils/mealUtils";
 
 export function useMeals() {
@@ -76,6 +76,11 @@ export function useMeals() {
     return result;
   };
 
+  const clearData = () => {
+    clearAllData();
+    setMeals([]);
+  };
+
   return {
     meals,
     isLoading,
@@ -86,6 +91,7 @@ export function useMeals() {
     getWeeklyMealSuggestions,
     getMeal,
     getStats,
-    importMealHistory: importMealHistoryFromData
+    importMealHistory: importMealHistoryFromData,
+    clearData
   };
 }
