@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -43,7 +44,6 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const [showSourceFields, setShowSourceFields] = useState(
     existingDish?.source ? (existingDish.source.type === "url" || existingDish.source.type === "book") : false
   );
-  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,22 +63,6 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
     // Set show source fields based on source type
     setShowSourceFields(watchSourceType !== "none");
   }, [watchSourceType]);
-
-  useEffect(() => {
-    // Generate suggestions based on existing dishes
-    if (watchName.length >= 2) {
-      const filteredSuggestions = dishes
-        .filter(dish => 
-          dish.name.toLowerCase().includes(watchName.toLowerCase()) &&
-          dish.name.toLowerCase() !== watchName.toLowerCase()
-        )
-        .map(dish => dish.name);
-      
-      setSuggestions([...new Set(filteredSuggestions)].slice(0, 5));
-    } else {
-      setSuggestions([]);
-    }
-  }, [watchName, dishes]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     try {
@@ -145,31 +129,11 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
             <FormItem>
               <FormLabel>Dish Name</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <Input 
-                    {...field} 
-                    placeholder="Enter dish name" 
-                    className="w-full"
-                  />
-                  {suggestions.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
-                      <ul className="py-1 text-sm">
-                        {suggestions.map((suggestion) => (
-                          <li 
-                            key={suggestion}
-                            className="px-3 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => {
-                              form.setValue("name", suggestion);
-                              setSuggestions([]);
-                            }}
-                          >
-                            {suggestion}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                <Input 
+                  {...field} 
+                  placeholder="Enter dish name" 
+                  className="w-full"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
