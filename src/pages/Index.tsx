@@ -11,44 +11,37 @@ import DishCard from "@/components/MealCard";
 import { Dish } from "@/types";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import AddCookedDishDialog from "@/components/AddCookedDishDialog";
+import { useQuery } from "@tanstack/react-query";
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#F9F871', '#6A0572', '#AB83A1', '#15616D'];
 
 const Home = () => {
   const { getWeeklyDishSuggestions, getStats } = useDishes();
   const { toast } = useToast();
-  const [suggestedDishes, setSuggestedDishes] = useState<Dish[]>([]);
-  const [stats, setStats] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-        // Use Promise.all and await to properly resolve promises
-        const [suggestions, statsData] = await Promise.all([
-          getWeeklyDishSuggestions(3),
-          getStats()
-        ]);
-        
-        setSuggestedDishes(suggestions);
-        setStats(statsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    fetchData();
-  }, [getWeeklyDishSuggestions, getStats]);
+  // Use React Query for suggestion data
+  const { data: suggestedDishes = [], isLoading: suggestionsLoading, refetch: refetchSuggestions } = 
+    useQuery({
+      queryKey: ['suggestedDishes'],
+      queryFn: () => getWeeklyDishSuggestions(3),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  
+  // Use React Query for stats data
+  const { data: stats, isLoading: statsLoading } = 
+    useQuery({
+      queryKey: ['dashboardStats'],
+      queryFn: getStats,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
 
+  const isLoading = suggestionsLoading || statsLoading;
+  
   const handleSuggestMoreDishes = async () => {
     try {
-      setIsLoading(true);
-      // Use await to properly resolve the promise
-      const newSuggestions = await getWeeklyDishSuggestions(3);
-      setSuggestedDishes(newSuggestions);
+      setIsRefreshing(true);
+      await refetchSuggestions();
       
       toast({
         title: "New suggestions generated",
@@ -62,7 +55,7 @@ const Home = () => {
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -77,8 +70,8 @@ const Home = () => {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto">
+        {/* Quick actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {/* Quick actions */}
           <Card className="md:col-span-2 animate-slide-down delay-75">
             <CardHeader>
               <CardTitle className="text-xl">Quick Actions</CardTitle>
@@ -206,7 +199,7 @@ const Home = () => {
               variant="outline" 
               size="sm" 
               onClick={handleSuggestMoreDishes}
-              disabled={isLoading}
+              disabled={isRefreshing || isLoading}
               className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
             >
               <Shuffle className="mr-2 h-4 w-4" />
