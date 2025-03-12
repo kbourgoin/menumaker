@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useDishes } from "@/hooks/useMeals";
 import { processCSVFile, parseCSVLine } from "@/utils/csvUtils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -8,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload } from "lucide-react";
+import { useDataImport } from "@/hooks/useDataImport";
 
 interface CSVImportProps {
   onImportComplete?: () => void;
 }
 
 const CSVImport = ({ onImportComplete }: CSVImportProps) => {
-  const { importMealHistory } = useDishes();
+  const { importMealHistory } = useDataImport();
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);

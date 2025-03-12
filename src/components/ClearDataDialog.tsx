@@ -14,7 +14,7 @@ import { useDataImport } from "@/hooks/useDataImport";
 import { toast } from "sonner";
 
 export function ClearDataDialog() {
-  const { clearData } = useDataImport(); // Import directly from useDataImport instead of using useDishes
+  const { clearData } = useDataImport();
   const [open, setOpen] = React.useState(false);
   const [isClearing, setIsClearing] = React.useState(false);
 
