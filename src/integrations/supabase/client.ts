@@ -54,7 +54,7 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
   cuisines: dish.cuisines,
   source: dish.source as any,
   lastMade: dish.lastmade || undefined,
-  timesCooked: dish.timescooked,
+  timesCooked: dish.timescooked || 0, // Ensure we handle null/undefined values
   user_id: dish.user_id
 });
 
@@ -71,7 +71,7 @@ export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Ta
     cuisines: dish.cuisines,
     source: dish.source as any,
     lastmade: dish.lastMade,
-    timescooked: dish.timesCooked,
+    timescooked: dish.timesCooked, // Lowercase to match DB schema
     user_id: dish.user_id
   };
 };

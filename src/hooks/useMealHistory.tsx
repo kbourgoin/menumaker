@@ -1,4 +1,3 @@
-
 import { 
   supabase, 
   mapMealHistoryFromDB, 
@@ -35,16 +34,12 @@ export function useMealHistory() {
       const { error: dishError } = await supabase
         .from('dishes')
         .update({ 
-          lastmade: date 
+          lastmade: date,
+          timescooked: () => `timescooked + 1` // Increment the times cooked directly
         })
         .eq('id', dishId);
       
       if (dishError) throw dishError;
-      
-      // Use RPC to increment the times cooked counter
-      const { error: rpcError } = await supabase.rpc('increment_times_cooked', { dish_id: dishId });
-      
-      if (rpcError) throw rpcError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });

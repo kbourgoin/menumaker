@@ -84,6 +84,8 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
     }
   };
 
+  console.log(`Rendering dish card for ${dish.name} with times cooked:`, dish.timesCooked);
+
   return (
     <Card 
       className="transition-all duration-300 hover:shadow-md overflow-hidden group flex flex-col h-full" 
@@ -114,7 +116,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
               <Calendar className="w-3.5 h-3.5 mr-1" />
               <span>Last made: {formatDate(dish.lastMade)} {dish.lastMade && `(${formatTimeAgo(dish.lastMade)})`}</span>
             </div>
-            <div className="mt-1">Made {dish.timesCooked} {dish.timesCooked === 1 ? "time" : "times"}</div>
+            <div className="mt-1">Made {dish.timesCooked || 0} {dish.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
           {/* Placeholder div to ensure consistent height when no source */}
