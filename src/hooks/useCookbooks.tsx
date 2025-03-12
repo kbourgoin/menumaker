@@ -31,10 +31,11 @@ export function useCookbooks() {
   };
 
   const getDishesByCookbook = async (cookbookId: string): Promise<Dish[]> => {
+    // Fix the infinite type instantiation by explicitly defining the field we're querying
     const { data, error } = await supabase
       .from('dishes')
       .select('*')
-      .eq('source->bookId', cookbookId)
+      .eq('source->>bookId', cookbookId)
       .order('name');
       
     if (error) throw error;
