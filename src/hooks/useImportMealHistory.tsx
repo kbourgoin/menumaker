@@ -97,7 +97,6 @@ export function useImportMealHistory() {
           .insert({
             name: firstEntry.dish,
             createdat: firstEntry.date,
-            timescooked: 0,
             cuisines: ['Other'],
             source,
             user_id
@@ -142,37 +141,16 @@ export function useImportMealHistory() {
           }
         }
         
-        // Update dish stats if needed
-        if (newCookCount > 0) {
-          // Find the most recent entry
-          const sortedEntries = [...dishEntries].sort((a, b) => 
-            new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-          
-          // Update the lastmade date
-          await supabase
-            .from('dishes')
-            .update({
-              lastmade: sortedEntries[0].date,
-            })
-            .eq('id', dishId);
-            
-          // Increment the timescooked using RPC
-          if (newCookCount === 1) {
-            await supabase.rpc('increment_times_cooked', { dish_id: dishId });
-          } else {
-            await supabase.rpc('increment_by', { 
-              dish_id: dishId, 
-              increment_amount: newCookCount 
-            });
-          }
-        }
+        // We don't need to update dish stats anymore since they're derived
+        // from meal history data. The timesCooked and lastMade fields 
+        // have been removed from the dishes table.
       }
     }
     
     // Refresh data
     queryClient.invalidateQueries({ queryKey: ['dishes'] });
     queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
     
     return { success: successCount, skipped: skippedCount };
   };
