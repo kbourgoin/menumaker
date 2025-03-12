@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
   List, 
-  BookOpen, 
+  Settings,
   Utensils 
 } from "lucide-react";
 import AddCookedDishDialog from "./AddCookedDishDialog";
@@ -34,7 +34,7 @@ const Header = () => {
       <div className="container px-4 mx-auto">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <BookOpen className="w-8 h-8 text-terracotta-500" />
+            <Utensils className="w-8 h-8 text-terracotta-500" />
             <h1 className="text-xl md:text-2xl font-serif tracking-tight">Family Meals</h1>
           </Link>
           
@@ -84,7 +84,21 @@ const Header = () => {
               </Button>
             </Link>
             
-            {/* Renamed to Cook Dish and removed New Dish button */}
+            <Link to="/settings">
+              <Button 
+                variant={isActive("/settings") ? "secondary" : "ghost"} 
+                size="sm"
+                className={`transition-all duration-300 ${
+                  isActive("/settings") 
+                    ? "bg-terracotta-100 text-terracotta-500" 
+                    : "hover:bg-terracotta-50 hover:text-terracotta-500"
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Button>
+            </Link>
+            
             <AddCookedDishDialog />
           </nav>
         </div>

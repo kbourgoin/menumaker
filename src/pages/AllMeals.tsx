@@ -4,10 +4,8 @@ import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useMeals";
 import DishCard from "@/components/MealCard";
 import { Input } from "@/components/ui/input";
-import CSVImport from "@/components/CSVImport";
-import { ClearDataDialog } from "@/components/ClearDataDialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Utensils } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AllDishes = () => {
@@ -27,16 +25,12 @@ const AllDishes = () => {
       <div className="mb-8 animate-slide-down">
         <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
           <h1 className="text-3xl font-serif font-medium">All Dishes</h1>
-          <div className="flex gap-2">
-            <CSVImport />
-            <ClearDataDialog />
-            <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
-              <Link to="/add-meal">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Dish
-              </Link>
-            </Button>
-          </div>
+          <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
+            <Link to="/add-meal">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Dish
+            </Link>
+          </Button>
         </div>
         
         <div className="relative mb-8">
