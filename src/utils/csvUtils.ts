@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for CSV import
  */
@@ -66,6 +67,16 @@ export const extractSourceFromDish = (dish: string): { dishName: string; source?
 };
 
 /**
+ * Remove double quotes from a string if it's surrounded by them
+ */
+export const removeDoubleQuotes = (str: string): string => {
+  if (str.startsWith('"') && str.endsWith('"')) {
+    return str.substring(1, str.length - 1);
+  }
+  return str;
+};
+
+/**
  * Parse CSV data from a string
  * Expected format: date,dish,notes (optional)
  */
@@ -85,13 +96,19 @@ export const parseCSVData = (csvData: string): CSVDishEntry[] => {
       parsedDate = new Date();
     }
     
+    // Remove double quotes from dish name if present
+    const cleanedDish = removeDoubleQuotes(dish || 'Unknown meal');
+    
     // Extract source information from dish name if available
-    const { dishName, source } = extractSourceFromDish(dish || 'Unknown meal');
+    const { dishName, source } = extractSourceFromDish(cleanedDish);
+    
+    // Also remove double quotes from notes if present
+    const cleanedNotes = notes ? removeDoubleQuotes(notes) : undefined;
     
     return {
       date: parsedDate.toISOString(),
       dish: dishName,
-      notes: notes || undefined,
+      notes: cleanedNotes,
       source
     };
   }).filter(entry => entry.dish !== 'Unknown meal');

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useDishes } from "@/hooks/useMeals";
 import { processCSVFile } from "@/utils/csvUtils";
@@ -103,7 +104,9 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
           <div className="space-y-4 py-4">
             <Alert>
               <AlertDescription>
-                Your CSV file should have columns for date, dish name, and notes (optional). The app will also extract source information if your dish name contains it in parentheses (e.g., "Mapo Tofu (RICE80)").
+                Your CSV file should have columns for date, dish name, and notes (optional). 
+                The app will automatically remove double quotes around dish names.
+                The app will also extract source information if your dish name contains it in parentheses (e.g., "Mapo Tofu (RICE80)").
               </AlertDescription>
             </Alert>
             
