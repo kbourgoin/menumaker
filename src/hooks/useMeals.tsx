@@ -11,7 +11,8 @@ import {
   getDishById,
   getDishStats,
   importMealHistory,
-  clearAllData
+  clearAllData,
+  getMealHistory
 } from "@/utils/mealUtils";
 
 export function useDishes() {
@@ -59,6 +60,17 @@ export function useDishes() {
     return getDishStats();
   };
 
+  const getMealHistoryForDish = (dishId: string) => {
+    const history = getMealHistory();
+    return history
+      .filter(entry => entry.dishId === dishId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map(entry => ({
+        date: entry.date,
+        notes: entry.notes
+      }));
+  };
+
   const importMealHistoryFromData = (
     entries: { 
       date: string; 
@@ -92,6 +104,7 @@ export function useDishes() {
     getWeeklyDishSuggestions,
     getDish,
     getStats,
+    getMealHistoryForDish,
     importMealHistory: importMealHistoryFromData,
     clearData
   };

@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ interface DishCardProps {
 }
 
 const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: DishCardProps) => {
+  const navigate = useNavigate();
   const { recordDishCooked, deleteDish } = useDishes();
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
@@ -50,6 +51,13 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       onDeleted();
     }
   };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    navigate(`/meal/${dish.id}`);
+  };
   
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Never";
@@ -72,7 +80,10 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
   };
 
   return (
-    <Card className="transition-all duration-300 hover:shadow-md overflow-hidden group">
+    <Card 
+      className="transition-all duration-300 hover:shadow-md overflow-hidden group cursor-pointer" 
+      onClick={handleCardClick}
+    >
       <CardHeader className={compact ? "pb-2 pt-4 px-4" : "pb-4"}>
         <CardTitle className={`line-clamp-1 text-lg ${compact ? "text-base" : "text-xl"}`}>
           {dish.name}

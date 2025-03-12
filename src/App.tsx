@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AllDishes from "./pages/AllMeals";
 import AddDish from "./pages/AddMeal";
 import WeeklyMenu from "./pages/WeeklyMenu";
+import MealDetail from "./pages/MealDetail";
 import NotFound from "./pages/NotFound";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/all-meals" element={<AllDishes />} />
             <Route path="/add-meal" element={<AddDish />} />
             <Route path="/weekly-menu" element={<WeeklyMenu />} />
+            <Route path="/meal/:id" element={<MealDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
