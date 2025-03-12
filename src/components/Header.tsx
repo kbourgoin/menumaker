@@ -79,7 +79,7 @@ const Header = () => {
                 }`}
               >
                 <List className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">All Meals</span>
+                <span className="hidden sm:inline">All Dishes</span>
               </Button>
             </Link>
             
