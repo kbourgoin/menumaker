@@ -4,10 +4,11 @@ import Layout from "@/components/Layout";
 import CSVImport from "@/components/CSVImport";
 import { ClearDataDialog } from "@/components/ClearDataDialog";
 import CookbookManager from "@/components/CookbookManager";
+import AccountSettings from "@/components/AccountSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Settings as SettingsIcon, BookOpen } from "lucide-react";
+import { Settings as SettingsIcon, BookOpen, UserCog } from "lucide-react";
 
 const Settings = () => {
   return (
@@ -21,7 +22,7 @@ const Settings = () => {
         <Tabs defaultValue="data" className="w-full">
           <TabsList>
             <TabsTrigger value="data">Data Management</TabsTrigger>
-            <TabsTrigger value="account" disabled>Account</TabsTrigger>
+            <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="preferences" disabled>Preferences</TabsTrigger>
           </TabsList>
           
@@ -68,14 +69,17 @@ const Settings = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="account">
+          <TabsContent value="account" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Account Settings</CardTitle>
                 <CardDescription>
-                  Manage your account preferences (coming soon)
+                  Manage your account information and credentials
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <AccountSettings />
+              </CardContent>
             </Card>
           </TabsContent>
           
