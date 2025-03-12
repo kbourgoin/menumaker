@@ -5,6 +5,7 @@ import { useMeals } from "@/hooks/useMeals";
 import MealCard from "@/components/MealCard";
 import { Input } from "@/components/ui/input";
 import CSVImport from "@/components/CSVImport";
+import { ClearDataDialog } from "@/components/ClearDataDialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -28,6 +29,7 @@ const AllMeals = () => {
           <h1 className="text-3xl font-serif font-medium">All Meals</h1>
           <div className="flex gap-2">
             <CSVImport />
+            <ClearDataDialog />
             <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
               <Link to="/add-meal">
                 <Plus className="h-4 w-4 mr-2" />
