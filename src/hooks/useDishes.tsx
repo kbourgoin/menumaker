@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dish } from "@/types";
 import { 
@@ -18,14 +17,40 @@ export function useDishes() {
     queryKey: ['dishes'],
     queryFn: async (): Promise<Dish[]> => {
       try {
-        const { data, error } = await supabase
+        // First get the dishes
+        const { data: dishesData, error: dishesError } = await supabase
           .from('dishes')
           .select('*')
           .order('name');
         
-        if (error) throw error;
+        if (dishesError) throw dishesError;
+        
+        // For each dish, get the count of meal history entries
+        const dishesWithCounts = await Promise.all(
+          dishesData.map(async (dish) => {
+            const { count, error: countError } = await supabase
+              .from('meal_history')
+              .select('*', { count: 'exact', head: true })
+              .eq('dishid', dish.id);
+            
+            if (countError) {
+              console.error("Error getting count for dish:", countError);
+              return mapDishFromDB({
+                ...dish,
+                timescooked: 0
+              });
+            }
+            
+            // Map the dish with the accurate count
+            return mapDishFromDB({
+              ...dish,
+              timescooked: count || 0
+            });
+          })
+        );
+        
         setIsLoading(false);
-        return data ? data.map(mapDishFromDB) : [];
+        return dishesWithCounts;
       } catch (error) {
         console.error("Error fetching dishes:", error);
         setIsLoading(false);

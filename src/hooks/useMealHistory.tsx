@@ -4,7 +4,7 @@ import {
   mapMealHistoryFromDB, 
   mapMealHistoryToDB 
 } from "@/integrations/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 export function useMealHistory() {
   const queryClient = useQueryClient();
@@ -19,7 +19,7 @@ export function useMealHistory() {
       
       // Add to meal history
       const historyEntry = {
-        dishid: dishId, // Ensure required field is present
+        dishid: dishId,
         date,
         notes,
         user_id
@@ -31,28 +31,15 @@ export function useMealHistory() {
       
       if (historyError) throw historyError;
       
-      // First get the current times cooked value
-      const { data: dish, error: fetchError } = await supabase
-        .from('dishes')
-        .select('timescooked')
-        .eq('id', dishId)
-        .single();
-        
-      if (fetchError) throw fetchError;
-      
-      // Calculate new count
-      const newCount = (dish?.timescooked || 0) + 1;
-      
-      // Update dish data (set lastMade and increment timesCooked)
+      // Update the lastmade date in the dish
       const { error: dishError } = await supabase
         .from('dishes')
-        .update({ 
-          lastmade: date,
-          timescooked: newCount // Now using a number value directly
-        })
+        .update({ lastmade: date })
         .eq('id', dishId);
       
       if (dishError) throw dishError;
+
+      // We don't need to update timescooked anymore as we'll calculate it based on meal_history
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
@@ -75,9 +62,21 @@ export function useMealHistory() {
     }));
   };
 
+  // Get count of entries for a dish
+  const getTimesCooked = async (dishId: string) => {
+    const { count, error } = await supabase
+      .from('meal_history')
+      .select('*', { count: 'exact', head: true })
+      .eq('dishid', dishId);
+      
+    if (error) throw error;
+    return count || 0;
+  };
+
   return {
     recordDishCooked: (dishId: string, date?: string, notes?: string) => 
       recordDishCookedMutation.mutateAsync({ dishId, date, notes }),
-    getMealHistoryForDish
+    getMealHistoryForDish,
+    getTimesCooked
   };
 }

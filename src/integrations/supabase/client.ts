@@ -54,7 +54,7 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
   cuisines: dish.cuisines,
   source: dish.source as any,
   lastMade: dish.lastmade || undefined,
-  timesCooked: dish.timescooked || 0, // Ensure we handle null/undefined values
+  timesCooked: typeof dish.timescooked === 'number' ? dish.timescooked : 0, // Ensure we handle numeric values properly
   user_id: dish.user_id
 });
 
