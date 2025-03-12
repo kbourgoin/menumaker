@@ -77,6 +77,37 @@ export const removeDoubleQuotes = (str: string): string => {
 };
 
 /**
+ * More robust CSV parsing that handles quoted fields with commas
+ */
+export const parseCSVLine = (line: string): string[] => {
+  const result: string[] = [];
+  let currentField = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      // Toggle quote state
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      // End of field, not inside quotes
+      result.push(currentField);
+      currentField = '';
+    } else {
+      // Regular character, add to current field
+      currentField += char;
+    }
+  }
+  
+  // Add the last field
+  result.push(currentField);
+  
+  // Clean up each field
+  return result.map(field => field.trim());
+};
+
+/**
  * Parse CSV data from a string
  * Expected format: date,dish,notes (optional)
  */
@@ -87,7 +118,8 @@ export const parseCSVData = (csvData: string): CSVDishEntry[] => {
   const startIndex = lines[0].toLowerCase().includes('date') ? 1 : 0;
   
   return lines.slice(startIndex).map(line => {
-    const [date, dish, notes] = line.split(',').map(item => item.trim());
+    // Use the more robust CSV parsing function that handles quoted fields
+    const [date, dish, notes] = parseCSVLine(line);
     
     // Validate date
     let parsedDate = new Date(date);

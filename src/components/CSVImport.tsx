@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useDishes } from "@/hooks/useMeals";
-import { processCSVFile } from "@/utils/csvUtils";
+import { processCSVFile, parseCSVLine } from "@/utils/csvUtils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -41,7 +41,8 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
       reader.onload = (event) => {
         const csvData = event.target?.result as string;
         const lines = csvData.split(/\r?\n/).slice(0, 5);
-        setPreviewData(lines.map(line => line.split(',').map(cell => cell.trim())));
+        // Use the improved CSV parsing for preview data as well
+        setPreviewData(lines.map(line => parseCSVLine(line)));
       };
       reader.readAsText(selectedFile);
     } catch (error) {
