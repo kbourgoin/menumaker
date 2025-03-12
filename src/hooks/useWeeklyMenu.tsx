@@ -8,12 +8,33 @@ export function useWeeklyMenu() {
   const { data: allDishes = [] } = useQuery({
     queryKey: ['dishes'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch dishes
+      const { data: dishesData, error: dishesError } = await supabase
         .from('dishes')
         .select('*');
       
-      if (error) throw error;
-      return data.map(mapDishFromDB);
+      if (dishesError) throw dishesError;
+      
+      // Fetch meal history for all dishes
+      const { data: historyData, error: historyError } = await supabase
+        .from('meal_history')
+        .select('*');
+        
+      if (historyError) throw historyError;
+      
+      // Group meal history by dish ID
+      const historyByDishId: Record<string, any[]> = {};
+      historyData.forEach(entry => {
+        if (!historyByDishId[entry.dishid]) {
+          historyByDishId[entry.dishid] = [];
+        }
+        historyByDishId[entry.dishid].push(entry);
+      });
+      
+      // Map dishes with their meal history data
+      return dishesData.map(dish => 
+        mapDishFromDB(dish, historyByDishId[dish.id] || [])
+      );
     }
   });
 

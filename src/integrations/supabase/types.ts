@@ -41,30 +41,24 @@ export type Database = {
           createdat: string
           cuisines: string[]
           id: string
-          lastmade: string | null
           name: string
           source: Json | null
-          timescooked: number
           user_id: string
         }
         Insert: {
           createdat?: string
           cuisines?: string[]
           id?: string
-          lastmade?: string | null
           name: string
           source?: Json | null
-          timescooked?: number
           user_id: string
         }
         Update: {
           createdat?: string
           cuisines?: string[]
           id?: string
-          lastmade?: string | null
           name?: string
           source?: Json | null
-          timescooked?: number
           user_id?: string
         }
         Relationships: []

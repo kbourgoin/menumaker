@@ -17,7 +17,7 @@ export function useMealHistory() {
       
       if (!user_id) throw new Error("User not authenticated");
       
-      // Add to meal history
+      // Add to meal history only
       const historyEntry = {
         dishid: dishId,
         date,
@@ -25,25 +25,18 @@ export function useMealHistory() {
         user_id
       };
       
-      const { error: historyError } = await supabase
+      const { error } = await supabase
         .from('meal_history')
         .insert(historyEntry);
       
-      if (historyError) throw historyError;
+      if (error) throw error;
       
-      // Update the lastmade date in the dish
-      const { error: dishError } = await supabase
-        .from('dishes')
-        .update({ lastmade: date })
-        .eq('id', dishId);
-      
-      if (dishError) throw dishError;
-
-      // We don't need to update timescooked anymore as we'll calculate it based on meal_history
+      // No need to update lastmade or timescooked in the dish table anymore
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
   });
 

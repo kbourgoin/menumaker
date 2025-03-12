@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dish } from "@/types";
 import { 
@@ -25,32 +26,29 @@ export function useDishes() {
         
         if (dishesError) throw dishesError;
         
-        // For each dish, get the count of meal history entries
-        const dishesWithCounts = await Promise.all(
-          dishesData.map(async (dish) => {
-            const { count, error: countError } = await supabase
-              .from('meal_history')
-              .select('*', { count: 'exact', head: true })
-              .eq('dishid', dish.id);
-            
-            if (countError) {
-              console.error("Error getting count for dish:", countError);
-              return mapDishFromDB({
-                ...dish,
-                timescooked: 0
-              });
-            }
-            
-            // Map the dish with the accurate count
-            return mapDishFromDB({
-              ...dish,
-              timescooked: count || 0
-            });
-          })
+        // Fetch meal history for all dishes
+        const { data: historyData, error: historyError } = await supabase
+          .from('meal_history')
+          .select('*');
+          
+        if (historyError) throw historyError;
+        
+        // Group meal history by dish ID
+        const historyByDishId: Record<string, any[]> = {};
+        historyData.forEach(entry => {
+          if (!historyByDishId[entry.dishid]) {
+            historyByDishId[entry.dishid] = [];
+          }
+          historyByDishId[entry.dishid].push(entry);
+        });
+        
+        // Map dishes with their meal history data
+        const mappedDishes = dishesData.map(dish => 
+          mapDishFromDB(dish, historyByDishId[dish.id] || [])
         );
         
         setIsLoading(false);
-        return dishesWithCounts;
+        return mappedDishes;
       } catch (error) {
         console.error("Error fetching dishes:", error);
         setIsLoading(false);
@@ -147,7 +145,18 @@ export function useDishes() {
       }
       
       if (data) {
-        return mapDishFromDB(data);
+        // Fetch meal history for this dish
+        const { data: historyData, error: historyError } = await supabase
+          .from('meal_history')
+          .select('*')
+          .eq('dishid', id);
+          
+        if (historyError) {
+          console.error("Error fetching meal history:", historyError);
+          return mapDishFromDB(data); // Return dish without history data
+        }
+        
+        return mapDishFromDB(data, historyData);
       }
       
       console.log("No dish found with ID:", id);

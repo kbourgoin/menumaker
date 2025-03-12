@@ -14,18 +14,38 @@ export function useStats() {
           .select('*');
           
         if (dishesError) throw dishesError;
-        const dishes = dishesData.map(mapDishFromDB);
+        
+        // Fetch meal history data
+        const { data: historyData, error: historyError } = await supabase
+          .from('meal_history')
+          .select('*');
+          
+        if (historyError) throw historyError;
+        
+        // Group meal history by dish ID
+        const historyByDishId: Record<string, any[]> = {};
+        historyData.forEach(entry => {
+          if (!historyByDishId[entry.dishid]) {
+            historyByDishId[entry.dishid] = [];
+          }
+          historyByDishId[entry.dishid].push(entry);
+        });
+        
+        // Map dishes with their meal history data
+        const dishes = dishesData.map(dish => 
+          mapDishFromDB(dish, historyByDishId[dish.id] || [])
+        );
         
         // Fetch recent meal history
-        const { data: historyData, error: historyError } = await supabase
+        const { data: recentHistoryData, error: recentHistoryError } = await supabase
           .from('meal_history')
           .select('*, dishes(*)') // Join with dishes to get dish details
           .order('date', { ascending: false })
           .limit(5);
           
-        if (historyError) throw historyError;
+        if (recentHistoryError) throw recentHistoryError;
         
-        // Get most cooked dish
+        // Find dish with highest timesCooked
         const mostCooked = [...dishes].sort((a, b) => b.timesCooked - a.timesCooked)[0];
         
         // Get cuisine breakdown
@@ -37,15 +57,15 @@ export function useStats() {
         }, {});
         
         // Transform recent history to include dish data
-        const recentlyCooked = historyData.map(entry => ({
+        const recentlyCooked = recentHistoryData.map(entry => ({
           date: entry.date,
-          dish: entry.dishes ? mapDishFromDB(entry.dishes) : null,
+          dish: entry.dishes ? mapDishFromDB(entry.dishes, historyByDishId[entry.dishes.id] || []) : null,
           notes: entry.notes
         }));
         
         return {
           totalDishes: dishes.length,
-          totalTimesCooked: dishes.reduce((sum, dish) => sum + dish.timesCooked, 0),
+          totalTimesCooked: historyData.length, // Total count of meal history entries
           mostCooked,
           cuisineBreakdown,
           recentlyCooked

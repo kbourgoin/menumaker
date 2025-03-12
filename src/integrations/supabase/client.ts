@@ -47,16 +47,36 @@ export type Cookbook = {
 };
 
 // Mapping functions to convert between database and client formats
-export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row']): Dish => ({
-  id: dish.id,
-  name: dish.name,
-  createdAt: dish.createdat,
-  cuisines: dish.cuisines,
-  source: dish.source as any,
-  lastMade: dish.lastmade || undefined,
-  timesCooked: typeof dish.timescooked === 'number' ? dish.timescooked : 0, // Ensure we handle numeric values properly
-  user_id: dish.user_id
-});
+export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'], mealHistory?: any[]): Dish => {
+  // Default values for derived fields
+  let timesCooked = 0;
+  let lastMade: string | undefined = undefined;
+  
+  // If meal history is provided, use it to calculate timesCooked and lastMade
+  if (mealHistory && mealHistory.length > 0) {
+    timesCooked = mealHistory.length;
+    
+    // Find the most recent meal date
+    const sortedDates = [...mealHistory].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    if (sortedDates.length > 0) {
+      lastMade = sortedDates[0].date;
+    }
+  }
+  
+  return {
+    id: dish.id,
+    name: dish.name,
+    createdAt: dish.createdat,
+    cuisines: dish.cuisines,
+    source: dish.source as any,
+    lastMade,  // Derived value
+    timesCooked, // Derived value
+    user_id: dish.user_id
+  };
+};
 
 export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Tables']['dishes']['Insert']> => {
   // Ensure required fields are present when inserting a new dish
@@ -70,8 +90,6 @@ export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Ta
     createdat: dish.createdAt,
     cuisines: dish.cuisines,
     source: dish.source as any,
-    lastmade: dish.lastMade,
-    timescooked: dish.timesCooked, // Lowercase to match DB schema
     user_id: dish.user_id
   };
 };
