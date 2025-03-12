@@ -10,17 +10,17 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useMeals } from "@/hooks/useMeals";
+import { useDishes } from "@/hooks/useMeals";
 import { toast } from "sonner";
 
 export function ClearDataDialog() {
-  const { clearData } = useMeals();
+  const { clearData } = useDishes();
   const [open, setOpen] = React.useState(false);
 
   const handleClearData = () => {
     clearData();
     setOpen(false);
-    toast.success("All meal data has been cleared");
+    toast.success("All dish data has been cleared");
   };
 
   return (
@@ -32,7 +32,7 @@ export function ClearDataDialog() {
         <DialogHeader>
           <DialogTitle>Clear All Data</DialogTitle>
           <DialogDescription>
-            This will delete all meals and meal history from the app.
+            This will delete all dishes and dish history from the app.
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
