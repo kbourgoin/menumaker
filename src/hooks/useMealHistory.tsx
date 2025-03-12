@@ -1,3 +1,4 @@
+
 import { 
   supabase, 
   mapMealHistoryFromDB, 
@@ -30,12 +31,24 @@ export function useMealHistory() {
       
       if (historyError) throw historyError;
       
-      // Update dish data (increment timesCooked and update lastMade)
+      // First get the current times cooked value
+      const { data: dish, error: fetchError } = await supabase
+        .from('dishes')
+        .select('timescooked')
+        .eq('id', dishId)
+        .single();
+        
+      if (fetchError) throw fetchError;
+      
+      // Calculate new count
+      const newCount = (dish?.timescooked || 0) + 1;
+      
+      // Update dish data (set lastMade and increment timesCooked)
       const { error: dishError } = await supabase
         .from('dishes')
         .update({ 
           lastmade: date,
-          timescooked: () => `timescooked + 1` // Increment the times cooked directly
+          timescooked: newCount // Now using a number value directly
         })
         .eq('id', dishId);
       
