@@ -40,11 +40,8 @@ export function useMealHistory() {
         
       if (fetchError) throw fetchError;
       
-      // Calculate new count - ensure we're handling null/undefined properly
-      const currentCount = typeof dish?.timescooked === 'number' ? dish.timescooked : 0;
-      const newCount = currentCount + 1;
-      
-      console.log(`Updating dish ${dishId} - Current count: ${currentCount}, New count: ${newCount}`);
+      // Calculate new count
+      const newCount = (dish?.timescooked || 0) + 1;
       
       // Update dish data (set lastMade and increment timesCooked)
       const { error: dishError } = await supabase
@@ -56,15 +53,6 @@ export function useMealHistory() {
         .eq('id', dishId);
       
       if (dishError) throw dishError;
-      
-      // Verify the update worked
-      const { data: updatedDish } = await supabase
-        .from('dishes')
-        .select('timescooked')
-        .eq('id', dishId)
-        .single();
-        
-      console.log(`Verification - Updated dish count: ${updatedDish?.timescooked}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
