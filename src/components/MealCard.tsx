@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Link, Trash } from "lucide-react";
+import { Calendar, Trash } from "lucide-react";
 import CuisineTag from "./CuisineTag";
 import SourceLink from "./SourceLink";
 import { useDishes } from "@/hooks/useMeals";
@@ -69,7 +69,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
 
   return (
     <Card 
-      className="transition-all duration-300 hover:shadow-md overflow-hidden group cursor-pointer" 
+      className="transition-all duration-300 hover:shadow-md overflow-hidden group cursor-pointer flex flex-col h-full" 
       onClick={handleCardClick}
     >
       <CardHeader className={compact ? "pb-2 pt-4 px-4" : "pb-4"}>
@@ -78,7 +78,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
         </CardTitle>
       </CardHeader>
       
-      <CardContent className={compact ? "pb-2 px-4" : "pb-6"}>
+      <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
         <div className="space-y-3">
           {!compact && (
             <div className="flex flex-wrap gap-1.5">
@@ -100,6 +100,11 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
             <div className="mt-1">Made {dish.timesCooked} {dish.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
+          {/* Placeholder div to ensure consistent height when no source */}
+          {(!dish.source || dish.source.type === 'none') && !compact && (
+            <div className="mt-2 h-6"></div>
+          )}
+          
           {dish.source && dish.source.type !== 'none' && !compact && (
             <div className="mt-2">
               <SourceLink source={dish.source} />
@@ -109,7 +114,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       </CardContent>
       
       {showActions && (
-        <CardFooter className={`border-t ${compact ? "pt-2 pb-3 px-4" : "pt-3"}`}>
+        <CardFooter className={`border-t mt-auto ${compact ? "pt-2 pb-3 px-4" : "pt-3"}`}>
           <div className="flex justify-between w-full">
             <CookDishDialog 
               dish={dish}
