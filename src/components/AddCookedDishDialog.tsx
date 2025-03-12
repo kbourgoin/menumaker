@@ -90,7 +90,7 @@ export default function AddCookedDishDialog() {
           className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50 hover:border-terracotta-300"
         >
           <Utensils className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">Add Cooked Dish</span>
+          <span className="hidden sm:inline">Cook Dish</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

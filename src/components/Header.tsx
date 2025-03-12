@@ -6,7 +6,7 @@ import {
   Calendar, 
   List, 
   BookOpen, 
-  Plus 
+  Utensils 
 } from "lucide-react";
 import AddCookedDishDialog from "./AddCookedDishDialog";
 
@@ -84,19 +84,8 @@ const Header = () => {
               </Button>
             </Link>
             
-            {/* Replace the Add Meal button with our new dialog */}
+            {/* Renamed to Cook Dish and removed New Dish button */}
             <AddCookedDishDialog />
-            
-            <Link to="/add-meal">
-              <Button 
-                variant="outline"
-                size="sm"
-                className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50 hover:border-terracotta-300"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">New Dish</span>
-              </Button>
-            </Link>
           </nav>
         </div>
       </div>
