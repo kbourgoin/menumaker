@@ -84,6 +84,8 @@ const Header = () => {
               </Button>
             </Link>
             
+            <AddCookedDishDialog />
+            
             <Link to="/settings">
               <Button 
                 variant={isActive("/settings") ? "secondary" : "ghost"} 
@@ -98,8 +100,6 @@ const Header = () => {
                 <span className="hidden sm:inline">Settings</span>
               </Button>
             </Link>
-            
-            <AddCookedDishDialog />
           </nav>
         </div>
       </div>
