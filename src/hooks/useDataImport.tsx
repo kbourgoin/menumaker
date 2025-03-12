@@ -7,7 +7,10 @@ export function useDataImport() {
   const { clearData } = useClearData();
 
   return {
-    importMealHistory,
+    importMealHistory: (
+      entries: Parameters<typeof importMealHistory>[0], 
+      onProgress?: Parameters<typeof importMealHistory>[1]
+    ) => importMealHistory(entries, onProgress),
     clearData
   };
 }
