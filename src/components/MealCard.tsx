@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,9 +41,13 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) {
+    // Only navigate if the click wasn't on a button, dialog, or interactive element
+    if ((e.target as HTMLElement).closest('button, a, [role="dialog"]')) {
       return;
     }
+    
+    // Use navigate instead of directly modifying location
+    e.preventDefault();
     navigate(`/meal/${dish.id}`);
   };
   
