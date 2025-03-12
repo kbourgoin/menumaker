@@ -23,6 +23,11 @@ export const saveMealHistory = (history: { date: string; mealId: string; notes?:
   localStorage.setItem("mealHistory", JSON.stringify(history));
 };
 
+// Helper function to generate a simple ID
+export const generateId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
+};
+
 // Add a new meal and return the updated list
 export const addMeal = (meal: Omit<Meal, "id" | "createdAt" | "timesCooked">): Meal[] => {
   const meals = getMeals();
@@ -170,11 +175,6 @@ export const deleteMeal = (id: string): Meal[] => {
   return updatedMeals;
 };
 
-// Helper function to generate a simple ID
-export const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
-};
-
 // Get stats about meals
 export const getMealStats = () => {
   const meals = getMeals();
@@ -310,34 +310,4 @@ export const importMealHistory = (
 export const clearAllData = (): void => {
   localStorage.removeItem("meals");
   localStorage.removeItem("mealHistory");
-};
-
-// Helper function to generate a simple ID
-export const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
-};
-
-// Get stats about meals
-export const getMealStats = () => {
-  const meals = getMeals();
-  const history = getMealHistory();
-  
-  return {
-    totalMeals: meals.length,
-    totalTimesCooked: meals.reduce((sum, meal) => sum + meal.timesCooked, 0),
-    mostCooked: [...meals].sort((a, b) => b.timesCooked - a.timesCooked)[0],
-    cuisineBreakdown: meals.reduce((acc, meal) => {
-      meal.cuisines.forEach(cuisine => {
-        acc[cuisine] = (acc[cuisine] || 0) + 1;
-      });
-      return acc;
-    }, {} as Record<string, number>),
-    recentlyCooked: history
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5)
-      .map(h => ({
-        date: h.date,
-        meal: getMealById(h.mealId)
-      }))
-  };
 };
