@@ -6,7 +6,10 @@ import { useCookbooks } from "./useCookbooks";
 import { useStats } from "./useStats";
 import { useDataImport } from "./useDataImport";
 
-// This is a composite hook that combines all meal-related functionality
+/**
+ * This is a composite hook that combines all meal-related functionality.
+ * It imports from individual hook files and provides a unified API.
+ */
 export function useDishes() {
   const dishesHook = useDishesHook();
   const mealHistoryHook = useMealHistory();
