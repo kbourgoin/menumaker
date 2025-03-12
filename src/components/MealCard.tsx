@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
@@ -50,7 +49,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only navigate if the click wasn't on a button, dialog, or interactive element
     if (
       (e.target as HTMLElement).closest('button') || 
       (e.target as HTMLElement).closest('a') || 
@@ -59,7 +57,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       return;
     }
     
-    // Navigate to the dish detail page
     e.preventDefault();
     navigate(`/meal/${dish.id}`);
   };
@@ -84,7 +81,8 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
     }
   };
 
-  console.log(`Rendering dish card for ${dish.name} with times cooked:`, dish.timesCooked);
+  console.log(`Rendering dish card for ${dish.name}:`, dish);
+  console.log(`Times cooked value for ${dish.name}:`, dish.timesCooked);
 
   return (
     <Card 
@@ -119,7 +117,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
             <div className="mt-1">Made {dish.timesCooked || 0} {dish.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
-          {/* Placeholder div to ensure consistent height when no source */}
           {(!dish.source || dish.source.type === 'none') && !compact && (
             <div className="mt-2 h-6"></div>
           )}

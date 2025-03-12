@@ -24,6 +24,10 @@ export function useDishes() {
           .order('name');
         
         if (error) throw error;
+        
+        // Log the raw data to help debug
+        console.log("Raw dishes data from Supabase:", data);
+        
         setIsLoading(false);
         return data ? data.map(mapDishFromDB) : [];
       } catch (error) {
