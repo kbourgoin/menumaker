@@ -1,16 +1,17 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Link, Trash } from "lucide-react";
+import { Calendar, Link, Trash } from "lucide-react";
 import CuisineTag from "./CuisineTag";
 import SourceLink from "./SourceLink";
 import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import CookDishDialog from "./CookDishDialog";
 
 interface DishCardProps {
   dish: Dish;
@@ -21,22 +22,9 @@ interface DishCardProps {
 
 const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: DishCardProps) => {
   const navigate = useNavigate();
-  const { recordDishCooked, deleteDish } = useDishes();
+  const { deleteDish } = useDishes();
   const { toast } = useToast();
-  const [notes, setNotes] = useState("");
-  const [isAddingMeal, setIsAddingMeal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
-  const handleLogMeal = () => {
-    recordDishCooked(dish.id, new Date().toISOString(), notes || undefined);
-    setNotes("");
-    setIsAddingMeal(false);
-    
-    toast({
-      title: "Meal logged",
-      description: `${dish.name} has been added to your meal history.`,
-    });
-  };
   
   const handleDeleteDish = () => {
     deleteDish(dish.id);
@@ -123,40 +111,12 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       {showActions && (
         <CardFooter className={`border-t ${compact ? "pt-2 pb-3 px-4" : "pt-3"}`}>
           <div className="flex justify-between w-full">
-            <Dialog open={isAddingMeal} onOpenChange={setIsAddingMeal}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size={compact ? "sm" : "default"} className="text-terracotta-500 border-terracotta-200 hover:bg-terracotta-50 hover:text-terracotta-600">
-                  <Plus className="mr-1 h-4 w-4" />
-                  <span>{compact ? "Add" : "Cook This"}</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Log {dish.name}</DialogTitle>
-                </DialogHeader>
-                <div className="py-4">
-                  <div className="space-y-2">
-                    <label htmlFor="notes" className="text-sm font-medium">
-                      Notes (optional)
-                    </label>
-                    <Textarea
-                      id="notes"
-                      placeholder="Any variations or notes about this meal..."
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddingMeal(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleLogMeal} className="bg-terracotta-500 hover:bg-terracotta-600">
-                    Log Meal
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <CookDishDialog 
+              dish={dish}
+              variant="outline"
+              size={compact ? "sm" : "default"}
+              compact={compact}
+            />
             
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <DialogTrigger asChild>
@@ -164,6 +124,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
                   variant="ghost" 
                   size={compact ? "sm" : "default"} 
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Trash className="h-4 w-4" />
                 </Button>

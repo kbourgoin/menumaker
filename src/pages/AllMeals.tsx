@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import CSVImport from "@/components/CSVImport";
 import { ClearDataDialog } from "@/components/ClearDataDialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AllDishes = () => {
