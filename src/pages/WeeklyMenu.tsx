@@ -38,6 +38,7 @@ const WeeklyMenu = () => {
     
     try {
       setIsGenerating(true);
+      // Use await to properly resolve the promise
       const suggestions = await getWeeklyDishSuggestions(7);
       setWeeklyDishes(suggestions);
       

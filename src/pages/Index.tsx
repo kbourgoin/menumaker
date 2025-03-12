@@ -25,6 +25,7 @@ const Home = () => {
     async function fetchData() {
       try {
         setIsLoading(true);
+        // Use Promise.all and await to properly resolve promises
         const [suggestions, statsData] = await Promise.all([
           getWeeklyDishSuggestions(3),
           getStats()
@@ -45,6 +46,7 @@ const Home = () => {
   const handleSuggestMoreDishes = async () => {
     try {
       setIsLoading(true);
+      // Use await to properly resolve the promise
       const newSuggestions = await getWeeklyDishSuggestions(3);
       setSuggestedDishes(newSuggestions);
       

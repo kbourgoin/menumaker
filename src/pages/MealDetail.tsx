@@ -29,6 +29,7 @@ const MealDetail = () => {
       if (id) {
         try {
           setIsLoading(true);
+          // Use await to properly resolve promises
           const dishData = await getDish(id);
           setDish(dishData);
           
