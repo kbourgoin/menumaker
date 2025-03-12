@@ -10,12 +10,11 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useDishes } from "@/hooks/useMeals";
+import { useDataImport } from "@/hooks/useDataImport";
 import { toast } from "sonner";
-import { clearAllData } from "@/utils/storageUtils"; // Updated import path
 
 export function ClearDataDialog() {
-  const { clearData } = useDishes();
+  const { clearData } = useDataImport(); // Import directly from useDataImport instead of using useDishes
   const [open, setOpen] = React.useState(false);
   const [isClearing, setIsClearing] = React.useState(false);
 
@@ -23,13 +22,14 @@ export function ClearDataDialog() {
     try {
       setIsClearing(true);
       // Clear data from Supabase
-      await clearData();
+      const result = await clearData();
       
-      // Also clear any local storage data to prevent conflicts
-      clearAllData();
-      
-      setOpen(false);
-      toast.success("All dish data has been cleared");
+      if (result.success) {
+        setOpen(false);
+        toast.success("All dish data has been cleared from the database");
+      } else {
+        toast.error("Failed to clear data. Please try again.");
+      }
     } catch (error) {
       console.error("Error clearing data:", error);
       toast.error("Failed to clear data. Please try again.");
@@ -47,7 +47,7 @@ export function ClearDataDialog() {
         <DialogHeader>
           <DialogTitle>Clear All Data</DialogTitle>
           <DialogDescription>
-            This will delete all dishes and dish history from the app.
+            This will delete all dishes and dish history from the database.
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
