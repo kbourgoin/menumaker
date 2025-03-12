@@ -8,6 +8,7 @@ import {
   mapMealHistoryFromDB
 } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getDishById as getLocalDish } from "@/utils/dishUtils";
 
 export function useDishes() {
   const [isLoading, setIsLoading] = useState(true);
@@ -107,27 +108,36 @@ export function useDishes() {
     }
   });
 
-  // Get dish by ID
+  // Get dish by ID with a local data fallback mechanism
   const getDish = async (id: string): Promise<Dish | null> => {
     try {
+      // First try to fetch from Supabase
       const { data, error } = await supabase
         .from('dishes')
         .select('*')
         .eq('id', id)
-        .single();
-        
+        .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no results
+      
       if (error) {
-        if (error.code === 'PGRST116') {
-          // PGRST116 is the error code for "Results contain 0 rows"
-          return null;
-        }
+        console.error("Supabase error fetching dish:", error);
         throw error;
       }
       
-      return mapDishFromDB(data);
+      if (data) {
+        return mapDishFromDB(data);
+      }
+      
+      // If we reach here, no data from Supabase - try local storage as fallback
+      console.log("No data from Supabase, trying localStorage fallback");
+      const localDish = getLocalDish(id);
+      return localDish || null;
     } catch (error) {
       console.error("Error getting dish:", error);
-      throw error;
+      
+      // On error, try local storage as fallback
+      console.log("Fetching from Supabase failed, trying localStorage fallback");
+      const localDish = getLocalDish(id);
+      return localDish || null;
     }
   };
 

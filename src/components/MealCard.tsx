@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,13 +51,16 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Only navigate if the click wasn't on a button, dialog, or interactive element
-    if ((e.target as HTMLElement).closest('button, a, [role="dialog"]')) {
+    if (
+      (e.target as HTMLElement).closest('button') || 
+      (e.target as HTMLElement).closest('a') || 
+      (e.target as HTMLElement).closest('[role="dialog"]')
+    ) {
       return;
     }
     
     // Navigate to the dish detail page
     e.preventDefault();
-    e.stopPropagation(); // Prevent bubbling to parent elements
     navigate(`/meal/${dish.id}`);
   };
   
@@ -83,7 +86,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
 
   return (
     <Card 
-      className="transition-all duration-300 hover:shadow-md overflow-hidden group cursor-pointer flex flex-col h-full" 
+      className="transition-all duration-300 hover:shadow-md overflow-hidden group flex flex-col h-full" 
       onClick={handleCardClick}
     >
       <CardHeader className={compact ? "pb-2 pt-4 px-4" : "pb-4"}>
@@ -145,7 +148,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
                   onClick={(e) => {
                     e.stopPropagation();
-                    e.preventDefault();
                   }}
                 >
                   <Trash className="h-4 w-4" />

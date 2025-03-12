@@ -8,7 +8,7 @@ import DishForm from "@/components/MealForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Clock, MessageSquare } from "lucide-react";
+import { ArrowLeft, Clock, MessageSquare, RefreshCw } from "lucide-react";
 import CuisineTag from "@/components/CuisineTag";
 import SourceLink from "@/components/SourceLink";
 import { useToast } from "@/hooks/use-toast";
@@ -24,47 +24,67 @@ const MealDetail = () => {
   const [activeTab, setActiveTab] = useState("details");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!id) {
-        setError("No dish ID provided");
+  const fetchData = async () => {
+    if (!id) {
+      setError("No dish ID provided");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log("Fetching dish with ID:", id);
+      
+      const dishData = await getDish(id);
+      
+      if (!dishData) {
+        console.log("No dish found for ID:", id);
+        setDish(null);
+        setError("Dish not found");
         setIsLoading(false);
         return;
       }
-
+      
+      console.log("Dish loaded successfully:", dishData);
+      setDish(dishData);
+      
       try {
-        setIsLoading(true);
-        setError(null);
-        
-        const dishData = await getDish(id);
-        if (!dishData) {
-          throw new Error("Dish not found");
-        }
-        
-        setDish(dishData);
-        
         const historyData = await getMealHistoryForDish(id);
         setHistory(historyData);
-      } catch (error) {
-        console.error("Error fetching dish:", error);
-        setError("Failed to load dish details. Please try again later.");
-        
-        toast({
-          title: "Error loading dish",
-          description: "There was a problem loading this dish's details.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
+      } catch (historyError) {
+        console.error("Error fetching meal history:", historyError);
+        setHistory([]);
+        // Don't fail the whole page for history errors
       }
-    };
-    
+    } catch (fetchError) {
+      console.error("Error fetching dish:", fetchError);
+      setError("Failed to load dish details. Please try again later.");
+      
+      toast({
+        title: "Error loading dish",
+        description: "There was a problem loading this dish's details.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [id, getDish, getMealHistoryForDish, toast]);
+  }, [id]);
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchData();
   };
 
   const formatDate = (dateString: string) => {
@@ -105,12 +125,30 @@ const MealDetail = () => {
             <CardContent className="pt-6">
               <div className="text-destructive text-xl mb-4">Error</div>
               <p>{error}</p>
-              <Button 
-                onClick={() => window.location.reload()}
-                className="mt-4"
-              >
-                Try Again
-              </Button>
+              <div className="flex justify-center mt-6 space-x-4">
+                <Button 
+                  onClick={handleRefresh}
+                  variant="outline"
+                  disabled={isRefreshing}
+                >
+                  {isRefreshing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Refreshing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Try Again
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  onClick={handleBack}
+                >
+                  Go Back
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
