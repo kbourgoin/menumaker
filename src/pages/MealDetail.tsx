@@ -12,33 +12,44 @@ import { ArrowLeft, Clock, MessageSquare } from "lucide-react";
 import CuisineTag from "@/components/CuisineTag";
 import SourceLink from "@/components/SourceLink";
 import { useToast } from "@/hooks/use-toast";
+import { Dish } from "@/types";
 
 const MealDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getDish, getMealHistoryForDish } = useDishes();
   const { toast } = useToast();
-  const [dish, setDish] = useState(id ? getDish(id) : null);
+  const [dish, setDish] = useState<Dish | null>(null);
   const [history, setHistory] = useState<{date: string; notes?: string}[]>([]);
   const [activeTab, setActiveTab] = useState("details");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      const dishData = getDish(id);
-      if (dishData) {
-        setDish(dishData);
-        const historyData = getMealHistoryForDish(id);
-        setHistory(historyData);
-      } else {
-        toast({
-          title: "Dish not found",
-          description: "The dish you're looking for doesn't exist.",
-          variant: "destructive",
-        });
-        navigate("/all-meals");
+    const fetchData = async () => {
+      if (id) {
+        try {
+          setIsLoading(true);
+          const dishData = await getDish(id);
+          setDish(dishData);
+          
+          const historyData = await getMealHistoryForDish(id);
+          setHistory(historyData);
+        } catch (error) {
+          console.error("Error fetching dish:", error);
+          toast({
+            title: "Dish not found",
+            description: "The dish you're looking for doesn't exist.",
+            variant: "destructive",
+          });
+          navigate("/all-meals");
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
-  }, [id, getDish, navigate, toast]);
+    };
+    
+    fetchData();
+  }, [id, getDish, getMealHistoryForDish, navigate, toast]);
 
   const handleBack = () => {
     navigate(-1);
@@ -52,6 +63,19 @@ const MealDetail = () => {
       return "Invalid date";
     }
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="max-w-3xl mx-auto animate-pulse p-8">
+          <div className="h-6 bg-gray-200 rounded mb-4 w-24"></div>
+          <div className="h-12 bg-gray-200 rounded mb-4"></div>
+          <div className="h-24 bg-gray-200 rounded mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!dish) {
     return null;
@@ -100,15 +124,19 @@ const MealDetail = () => {
             <Card className="p-6">
               <DishForm 
                 existingDish={dish} 
-                onSuccess={() => {
+                onSuccess={async () => {
                   toast({
                     title: "Dish updated",
                     description: "The dish has been updated successfully.",
                   });
                   // Refresh data
                   if (id) {
-                    const updatedDish = getDish(id);
-                    if (updatedDish) setDish(updatedDish);
+                    try {
+                      const updatedDish = await getDish(id);
+                      setDish(updatedDish);
+                    } catch (error) {
+                      console.error("Error refreshing dish data:", error);
+                    }
                   }
                 }} 
               />

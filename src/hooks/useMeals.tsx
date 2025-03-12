@@ -34,12 +34,19 @@ export function useDishes() {
   // Mutation to add a new dish
   const addDishMutation = useMutation({
     mutationFn: async (dish: Omit<Dish, "id" | "createdAt" | "timesCooked" | "user_id">) => {
-      const newDish = mapDishToDB({
-        ...dish,
-        timesCooked: 0,
-        createdAt: new Date().toISOString(),
-        user_id: (await supabase.auth.getUser()).data.user?.id
-      });
+      const user = await supabase.auth.getUser();
+      const user_id = user.data.user?.id;
+      
+      if (!user_id) throw new Error("User not authenticated");
+      
+      const newDish = {
+        name: dish.name, // Ensure required field is present
+        cuisines: dish.cuisines || ['Other'],
+        timescooked: 0,
+        createdat: new Date().toISOString(),
+        source: dish.source,
+        user_id
+      };
       
       const { data, error } = await supabase
         .from('dishes')
@@ -58,9 +65,13 @@ export function useDishes() {
   // Mutation to update a dish
   const updateDishMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string, updates: Partial<Dish> }) => {
+      // Convert client model to DB model
+      const dbUpdates = mapDishToDB(updates);
+      delete dbUpdates.id; // Don't try to update the ID
+      
       const { error } = await supabase
         .from('dishes')
-        .update(mapDishToDB(updates))
+        .update(dbUpdates)
         .eq('id', id);
         
       if (error) throw error;
@@ -96,15 +107,18 @@ export function useDishes() {
   // Mutation to record a dish was cooked
   const recordDishCookedMutation = useMutation({
     mutationFn: async ({ dishId, date = new Date().toISOString(), notes }: { dishId: string, date?: string, notes?: string }) => {
-      const user_id = (await supabase.auth.getUser()).data.user?.id;
+      const user = await supabase.auth.getUser();
+      const user_id = user.data.user?.id;
+      
+      if (!user_id) throw new Error("User not authenticated");
       
       // Add to meal history
-      const historyEntry = mapMealHistoryToDB({
-        dishId,
+      const historyEntry = {
+        dishid: dishId, // Ensure required field is present
         date,
         notes,
         user_id
-      });
+      };
       
       const { error: historyError } = await supabase
         .from('meal_history')
@@ -283,7 +297,11 @@ export function useDishes() {
       };
     }[]
   ) => {
-    const user_id = (await supabase.auth.getUser()).data.user?.id;
+    const user = await supabase.auth.getUser();
+    const user_id = user.data.user?.id;
+    
+    if (!user_id) throw new Error("User not authenticated");
+    
     let successCount = 0;
     let skippedCount = 0;
     
@@ -409,13 +427,19 @@ export function useDishes() {
             new Date(b.date).getTime() - new Date(a.date).getTime()
           );
           
+          // Use a proper RPC call for increment_by function
           await supabase
             .from('dishes')
             .update({
               lastmade: sortedEntries[0].date,
-              timescooked: supabase.rpc('increment_by', { dish_id: dishId, increment_amount: newCookCount })
             })
             .eq('id', dishId);
+            
+          // Increment the timescooked separately using RPC
+          await supabase.rpc('increment_by', { 
+            dish_id: dishId, 
+            increment_amount: newCookCount 
+          });
         }
       }
     }

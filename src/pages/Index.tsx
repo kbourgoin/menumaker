@@ -1,319 +1,306 @@
-import { useEffect, useState } from "react";
+
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Check, ChevronRight, Clock, Edit, Plus, Shuffle, Utensils } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useMeals";
-import { format, parseISO, startOfWeek, endOfWeek } from "date-fns";
-import { Calendar, Plus, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 import DishCard from "@/components/MealCard";
-import { Link } from "react-router-dom";
-import CuisineTag from "@/components/CuisineTag";
+import { Dish } from "@/types";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import AddCookedDishDialog from "@/components/AddCookedDishDialog";
 
-const Index = () => {
-  const { dishes, isLoading, getStats, getWeeklyDishSuggestions } = useDishes();
+const COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#F9F871', '#6A0572', '#AB83A1', '#15616D'];
+
+const Home = () => {
+  const { getWeeklyDishSuggestions, getStats } = useDishes();
+  const { toast } = useToast();
+  const [suggestedDishes, setSuggestedDishes] = useState<Dish[]>([]);
   const [stats, setStats] = useState<any>(null);
-  const [weeklyDishes, setWeeklyDishes] = useState<any[]>([]);
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (!isLoading) {
-      setStats(getStats());
-      setWeeklyDishes(getWeeklyDishSuggestions(4));
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        const [suggestions, statsData] = await Promise.all([
+          getWeeklyDishSuggestions(3),
+          getStats()
+        ]);
+        
+        setSuggestedDishes(suggestions);
+        setStats(statsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [isLoading, dishes]);
+    
+    fetchData();
+  }, [getWeeklyDishSuggestions, getStats]);
 
-  const formatDateRange = () => {
-    const startDate = startOfWeek(new Date());
-    const endDate = endOfWeek(new Date());
-    return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
+  const handleSuggestMoreDishes = async () => {
+    try {
+      setIsLoading(true);
+      const newSuggestions = await getWeeklyDishSuggestions(3);
+      setSuggestedDishes(newSuggestions);
+      
+      toast({
+        title: "New suggestions generated",
+        description: "Here are some fresh dish ideas for you to cook."
+      });
+    } catch (error) {
+      console.error("Error generating suggestions:", error);
+      toast({
+        title: "Error generating suggestions",
+        description: "There was a problem generating new suggestions.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getTopCuisines = () => {
-    if (!stats?.cuisineBreakdown) return [];
-    
-    const sortedCuisines = Object.entries(stats.cuisineBreakdown)
-      .sort((a: any, b: any) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([cuisine, count]) => ({
-        name: cuisine,
-        value: count,
-      }));
-    
-    return sortedCuisines;
-  };
-  
-  const COLORS = [
-    '#B85C43', 
-    '#7B9170', 
-    '#FFD08A', 
-    '#D49F92', 
-    '#B3C2AB'
-  ];
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center h-[60vh]">
-          <div className="animate-pulse text-lg">Loading your meal data...</div>
-        </div>
-      </Layout>
-    );
-  }
+  // Prepare data for pie chart
+  const pieData = stats && stats.cuisineBreakdown
+    ? Object.entries(stats.cuisineBreakdown)
+        .map(([name, value]) => ({ name, value }))
+        .filter(item => (item.value as number) > 0)
+        .sort((a, b) => (b.value as number) - (a.value as number))
+    : [];
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 text-center animate-slide-down">
-          <h1 className="text-4xl font-serif font-medium mb-2">Family Meal Memories</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Track, discover and reminisce about your family's favorite dishes throughout the years.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {/* Quick Stats Card */}
-          <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 animate-fade-in">
-            <CardHeader className="bg-gradient-to-r from-terracotta-100 to-terracotta-50 pb-4">
-              <CardTitle className="text-terracotta-500 flex items-center">
-                <BookOpen className="mr-2 h-5 w-5" />
-                Your Dish Collection
-              </CardTitle>
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Quick actions */}
+          <Card className="md:col-span-2 animate-slide-down delay-75">
+            <CardHeader>
+              <CardTitle className="text-xl">Quick Actions</CardTitle>
+              <CardDescription>Get started with these common actions</CardDescription>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-cream-50 rounded-lg">
-                  <div className="text-3xl font-medium text-terracotta-500">
-                    {stats?.totalDishes || 0}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Unique Dishes</div>
-                </div>
-                <div className="text-center p-4 bg-cream-50 rounded-lg">
-                  <div className="text-3xl font-medium text-terracotta-500">
-                    {stats?.totalTimesCooked || 0}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Times Cooked</div>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <h4 className="font-medium mb-2">Top Cuisines</h4>
-                <div className="flex flex-wrap gap-2">
-                  {getTopCuisines().slice(0, 3).map((cuisine: any) => (
-                    <div key={cuisine.name} className="flex items-center">
-                      <CuisineTag cuisine={cuisine.name} size="sm" />
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        ({cuisine.value})
-                      </span>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link to="/add-meal" className="w-full">
+                  <Button variant="outline" className="w-full flex justify-between items-center text-left border-terracotta-200 hover:bg-terracotta-50 hover:border-terracotta-300">
+                    <div className="flex items-center">
+                      <Plus className="mr-2 h-4 w-4 text-terracotta-500" />
+                      <span>Add New Dish</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="mt-6 flex justify-center">
-                <Link to="/all-meals">
-                  <Button variant="outline" className="w-full">
-                    View All Dishes
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </Link>
+                
+                <Link to="/weekly-menu" className="w-full">
+                  <Button variant="outline" className="w-full flex justify-between items-center text-left border-terracotta-200 hover:bg-terracotta-50 hover:border-terracotta-300">
+                    <div className="flex items-center">
+                      <Shuffle className="mr-2 h-4 w-4 text-terracotta-500" />
+                      <span>Create Weekly Menu</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </Link>
+                
+                <Link to="/all-meals" className="w-full">
+                  <Button variant="outline" className="w-full flex justify-between items-center text-left border-terracotta-200 hover:bg-terracotta-50 hover:border-terracotta-300">
+                    <div className="flex items-center">
+                      <Edit className="mr-2 h-4 w-4 text-terracotta-500" />
+                      <span>Edit Your Dishes</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </Link>
+                
+                <div className="w-full">
+                  <AddCookedDishDialog />
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          {/* Weekly Dish Suggestions Card */}
-          <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 animate-fade-in delay-100">
-            <CardHeader className="bg-gradient-to-r from-sage-100 to-sage-50 pb-4">
-              <CardTitle className="text-sage-500 flex items-center">
-                <Calendar className="mr-2 h-5 w-5" />
-                Dish Suggestions
-              </CardTitle>
+          {/* Stats Card */}
+          <Card className="animate-slide-down delay-100">
+            <CardHeader>
+              <CardTitle className="text-xl">Your Stats</CardTitle>
+              <CardDescription>Summary of your cooking data</CardDescription>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="text-sm text-muted-foreground mb-4">
-                Here are some dish ideas for this week:
-              </div>
-              
-              <ul className="space-y-3">
-                {weeklyDishes.slice(0, 4).map((dish) => (
-                  <li key={dish.id} className="p-3 bg-cream-50 rounded-lg flex justify-between items-center group">
-                    <div>
-                      <div className="font-medium">{dish.name}</div>
-                      {dish.cuisines[0] && (
-                        <CuisineTag cuisine={dish.cuisines[0]} size="sm" />
-                      )}
+            <CardContent>
+              {isLoading ? (
+                <div className="space-y-4 animate-pulse">
+                  <div className="h-6 bg-slate-200 rounded w-2/3"></div>
+                  <div className="h-6 bg-slate-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-slate-200 rounded w-1/2"></div>
+                </div>
+              ) : stats ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Dishes:</span>
+                    <span className="font-medium">{stats.totalDishes}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Times Cooked:</span>
+                    <span className="font-medium">{stats.totalTimesCooked}</span>
+                  </div>
+                  
+                  {stats.mostCooked && (
+                    <div className="pt-2">
+                      <span className="text-sm text-muted-foreground">Most Cooked:</span>
+                      <div className="mt-1 font-medium text-sm flex justify-between items-center">
+                        <span>{stats.mostCooked.name}</span>
+                        <span>{stats.mostCooked.timesCooked}x</span>
+                      </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-terracotta-500"
-                      asChild
-                    >
-                      <Link to="/add-meal">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Cook
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="mt-6 flex justify-center">
-                <Link to="/weekly-menu">
-                  <Button variant="outline" className="w-full">
-                    See Weekly Plan
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Insights Card */}
-          <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 animate-fade-in delay-200">
-            <CardHeader className="bg-gradient-to-r from-cream-100 to-cream-50 pb-4">
-              <CardTitle className="text-terracotta-500 flex items-center">
-                <Calendar className="mr-2 h-5 w-5" />
-                Cuisine Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {stats && getTopCuisines().length > 0 ? (
-                <div className="h-48">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={getTopCuisines()}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        paddingAngle={2}
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                        labelLine={false}
-                      >
-                        {getTopCuisines().map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        formatter={(value: number, name: string) => [`${value} meals`, name]}
-                        contentStyle={{ background: "rgba(255, 255, 255, 0.9)", borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  )}
+                  
+                  {pieData.length > 0 && (
+                    <div className="mt-6">
+                      <span className="text-sm text-muted-foreground mb-2 block">Cuisine Distribution:</span>
+                      <div className="h-[150px] mt-2">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={60}
+                              fill="#8884d8"
+                              dataKey="value"
+                              nameKey="name"
+                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                              labelLine={false}
+                            >
+                              {pieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="h-48 flex items-center justify-center text-muted-foreground">
-                  Add more dishes to see cuisine insights
+                <div className="text-center py-4">
+                  <p className="text-muted-foreground">No stats available yet.</p>
+                  <p className="text-sm mt-1">Add some dishes to see your stats!</p>
                 </div>
               )}
-              
-              <div className="mt-4">
-                <h4 className="font-medium mb-2">Most Cooked Dish</h4>
-                {stats?.mostCooked ? (
-                  <div className="p-3 bg-cream-50 rounded-lg">
-                    <div className="font-medium">{stats.mostCooked.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Cooked {stats.mostCooked.timesCooked} times
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    No dishes cooked yet
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-6 flex justify-center">
-                <Link to="/add-meal">
-                  <Button variant="outline" className="w-full">
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add New Dish
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
         </div>
         
-        <div className="mb-8">
-          <Tabs defaultValue="recent" className="animate-fade-in delay-300">
-            <div className="flex justify-between items-center mb-6">
-              <TabsList>
-                <TabsTrigger value="recent">Recent Meals</TabsTrigger>
-                <TabsTrigger value="popular">Popular Dishes</TabsTrigger>
-              </TabsList>
-              
-              <Link to="/add-meal">
-                <Button className="bg-terracotta-500 hover:bg-terracotta-600">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Dish
-                </Button>
-              </Link>
+        {/* Suggested Dishes */}
+        <Card className="mb-6 animate-slide-down delay-150">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-xl">Suggested Dishes</CardTitle>
+              <CardDescription>Try cooking one of these today</CardDescription>
             </div>
-            
-            <TabsContent value="recent" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {stats?.recentlyCooked?.length > 0 ? (
-                  stats.recentlyCooked
-                    .filter((item: any) => item.dish)
-                    .map((item: any) => (
-                      <DishCard 
-                        key={`${item.dish.id}-${item.date}`} 
-                        dish={item.dish} 
-                        compact
-                      />
-                    ))
-                ) : (
-                  <div className="col-span-full py-12 text-center text-muted-foreground">
-                    <BookOpen className="mx-auto h-12 w-12 mb-4 text-muted-foreground opacity-20" />
-                    <h3 className="text-lg font-medium mb-1">No dishes recorded yet</h3>
-                    <p>Start tracking your family meals by adding your first dish.</p>
-                    <Link to="/add-meal" className="mt-4 inline-block">
-                      <Button className="bg-terracotta-500 hover:bg-terracotta-600 mt-4">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Your First Dish
-                      </Button>
-                    </Link>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleSuggestMoreDishes}
+              disabled={isLoading}
+              className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
+            >
+              <Shuffle className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="animate-pulse space-y-3 border rounded-lg p-4">
+                    <div className="h-6 bg-slate-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                    <div className="h-10 bg-slate-200 rounded w-full mt-4"></div>
                   </div>
-                )}
+                ))}
               </div>
-            </TabsContent>
-            
-            <TabsContent value="popular" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {dishes.length > 0 ? (
-                  [...dishes]
-                    .sort((a, b) => b.timesCooked - a.timesCooked)
-                    .slice(0, 8)
-                    .map((dish) => (
-                      <DishCard 
-                        key={dish.id} 
-                        dish={dish} 
-                        compact
-                      />
-                    ))
-                ) : (
-                  <div className="col-span-full py-12 text-center text-muted-foreground">
-                    <BookOpen className="mx-auto h-12 w-12 mb-4 text-muted-foreground opacity-20" />
-                    <h3 className="text-lg font-medium mb-1">No dishes added yet</h3>
-                    <p>Start your collection by adding your favorite family meals.</p>
-                    <Link to="/add-meal" className="mt-4 inline-block">
-                      <Button className="bg-terracotta-500 hover:bg-terracotta-600 mt-4">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Your First Dish
-                      </Button>
-                    </Link>
+            ) : suggestedDishes.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {suggestedDishes.map(dish => (
+                  <DishCard key={dish.id} dish={dish} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Utensils className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
+                <h3 className="mt-4 text-lg font-medium mb-1">No dishes available</h3>
+                <p className="text-muted-foreground mb-4">Add some dishes to get suggestions</p>
+                <Link to="/add-meal">
+                  <Button className="bg-terracotta-500 hover:bg-terracotta-600">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Your First Dish
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Recently Cooked */}
+        <Card className="animate-slide-down delay-200">
+          <CardHeader>
+            <CardTitle className="text-xl">Recently Cooked</CardTitle>
+            <CardDescription>Your meal history</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="space-y-4 animate-pulse">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center border rounded-lg p-3">
+                    <div className="w-8 h-8 bg-slate-200 rounded-full mr-3"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-slate-200 rounded w-1/3 mb-2"></div>
+                      <div className="h-3 bg-slate-200 rounded w-1/4"></div>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+            ) : stats && stats.recentlyCooked && stats.recentlyCooked.length > 0 ? (
+              <div className="space-y-3">
+                {stats.recentlyCooked.map((item: any, index: number) => (
+                  <div key={index} className="flex items-center border rounded-lg p-3 hover:bg-slate-50 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-terracotta-100 flex items-center justify-center mr-3 text-terracotta-500">
+                      <Check className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {item.dish ? item.dish.name : "Unknown Dish"}
+                      </div>
+                      <div className="text-sm text-muted-foreground flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {new Date(item.date).toLocaleDateString()}
+                      </div>
+                    </div>
+                    {item.dish && (
+                      <Link to={`/meal/${item.dish.id}`}>
+                        <Button variant="ghost" size="sm">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <Clock className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
+                <h3 className="mt-4 text-lg font-medium mb-1">No cooking history yet</h3>
+                <p className="text-muted-foreground mb-4">Record when you cook a dish to see your history</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
 };
 
-export default Index;
+export default Home;

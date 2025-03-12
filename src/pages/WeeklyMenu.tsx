@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useMeals";
@@ -15,6 +16,7 @@ const WeeklyMenu = () => {
   const { toast } = useToast();
   const [weeklyDishes, setWeeklyDishes] = useState<Dish[]>([]);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
@@ -24,7 +26,7 @@ const WeeklyMenu = () => {
     }
   }, [isLoading, dishes]);
   
-  const generateWeeklyMenu = () => {
+  const generateWeeklyMenu = async () => {
     if (dishes.length === 0) {
       toast({
         title: "No dishes available",
@@ -34,13 +36,25 @@ const WeeklyMenu = () => {
       return;
     }
     
-    const suggestions = getWeeklyDishSuggestions(7);
-    setWeeklyDishes(suggestions);
-    
-    toast({
-      title: "Weekly menu generated",
-      description: "Based on your meal history and preferences.",
-    });
+    try {
+      setIsGenerating(true);
+      const suggestions = await getWeeklyDishSuggestions(7);
+      setWeeklyDishes(suggestions);
+      
+      toast({
+        title: "Weekly menu generated",
+        description: "Based on your meal history and preferences.",
+      });
+    } catch (error) {
+      console.error("Error generating menu:", error);
+      toast({
+        title: "Error generating menu",
+        description: "There was a problem generating your weekly menu.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
   return (
@@ -59,15 +73,15 @@ const WeeklyMenu = () => {
               variant="outline" 
               onClick={generateWeeklyMenu}
               className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
-              disabled={isLoading || dishes.length === 0}
+              disabled={isLoading || dishes.length === 0 || isGenerating}
             >
               <Shuffle className="mr-2 h-4 w-4" />
-              Regenerate
+              {isGenerating ? 'Generating...' : 'Regenerate'}
             </Button>
           </div>
         </div>
         
-        {isLoading ? (
+        {isLoading || isGenerating ? (
           <div className="py-12 text-center">
             <div className="animate-pulse text-lg">Loading your dish data...</div>
           </div>
@@ -115,6 +129,7 @@ const WeeklyMenu = () => {
                               size="sm"
                               onClick={generateWeeklyMenu}
                               className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
+                              disabled={isGenerating}
                             >
                               <Shuffle className="mr-2 h-4 w-4" />
                               Generate Suggestion
@@ -139,10 +154,10 @@ const WeeklyMenu = () => {
           <Button 
             onClick={generateWeeklyMenu} 
             className="bg-terracotta-500 hover:bg-terracotta-600"
-            disabled={isLoading || dishes.length === 0}
+            disabled={isLoading || dishes.length === 0 || isGenerating}
           >
             <Shuffle className="mr-2 h-4 w-4" />
-            Generate New Suggestions
+            {isGenerating ? 'Generating...' : 'Generate New Suggestions'}
           </Button>
         </div>
       </div>
