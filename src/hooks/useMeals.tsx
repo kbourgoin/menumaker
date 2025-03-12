@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Dish } from "@/types";
+import { Dish, Cookbook } from "@/types";
 import { 
   getDishes,
   addDish,
@@ -12,7 +12,13 @@ import {
   getDishStats,
   importMealHistory,
   clearAllData,
-  getMealHistory
+  getMealHistory,
+  getCookbooks,
+  addCookbook,
+  updateCookbook,
+  deleteCookbook,
+  getCookbookById,
+  getDishesByBookId
 } from "@/utils/mealUtils";
 
 export function useDishes() {
@@ -94,6 +100,19 @@ export function useDishes() {
     setDishes([]);
   };
 
+  // Cookbook-related functions
+  const getCookbooksData = () => {
+    return getCookbooks();
+  };
+
+  const getCookbookData = (id: string) => {
+    return getCookbookById(id);
+  };
+
+  const getDishesByCookbook = (cookbookId: string) => {
+    return getDishesByBookId(cookbookId);
+  };
+
   return {
     dishes,
     isLoading,
@@ -106,6 +125,9 @@ export function useDishes() {
     getStats,
     getMealHistoryForDish,
     importMealHistory: importMealHistoryFromData,
-    clearData
+    clearData,
+    getCookbooks: getCookbooksData,
+    getCookbook: getCookbookData,
+    getDishesByCookbook
   };
 }

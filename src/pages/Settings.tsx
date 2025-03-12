@@ -3,10 +3,11 @@ import React from "react";
 import Layout from "@/components/Layout";
 import CSVImport from "@/components/CSVImport";
 import { ClearDataDialog } from "@/components/ClearDataDialog";
+import CookbookManager from "@/components/CookbookManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Settings as SettingsIcon } from "lucide-react";
+import { Settings as SettingsIcon, BookOpen } from "lucide-react";
 
 const Settings = () => {
   return (
@@ -29,10 +30,23 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle>Data Management</CardTitle>
                 <CardDescription>
-                  Import or clear your meal data
+                  Manage your meal data, cookbooks, and imports
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-terracotta-500" />
+                    Cookbooks
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Organize and manage your cookbook collection
+                  </p>
+                  <CookbookManager />
+                </div>
+                
+                <Separator />
+                
                 <div>
                   <h3 className="text-lg font-medium mb-2">Import Data</h3>
                   <p className="text-sm text-muted-foreground mb-4">
