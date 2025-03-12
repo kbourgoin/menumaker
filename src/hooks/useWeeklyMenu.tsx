@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useWeeklyMenu() {
   // Get dish data using React Query
-  const { data: allDishes = [] } = useQuery({
+  const { data: allDishes = [], isLoading } = useQuery({
     queryKey: ['dishes'],
     queryFn: async () => {
       // Fetch dishes
@@ -24,24 +24,26 @@ export function useWeeklyMenu() {
       
       // Group meal history by dish ID
       const historyByDishId: Record<string, any[]> = {};
-      historyData.forEach(entry => {
-        if (!historyByDishId[entry.dishid]) {
-          historyByDishId[entry.dishid] = [];
-        }
-        historyByDishId[entry.dishid].push(entry);
-      });
+      if (historyData) {
+        historyData.forEach(entry => {
+          if (!historyByDishId[entry.dishid]) {
+            historyByDishId[entry.dishid] = [];
+          }
+          historyByDishId[entry.dishid].push(entry);
+        });
+      }
       
       // Map dishes with their meal history data
-      return dishesData.map(dish => 
-        mapDishFromDB(dish, historyByDishId[dish.id] || [])
-      );
+      return dishesData 
+        ? dishesData.map(dish => mapDishFromDB(dish, historyByDishId[dish.id] || []))
+        : [];
     }
   });
 
   // Get weekly dish suggestions
   const getWeeklyDishSuggestions = async (count: number = 7): Promise<Dish[]> => {
     if (!allDishes || allDishes.length === 0) return [];
-    if (allDishes.length <= count) return allDishes;
+    if (allDishes.length <= count) return [...allDishes];
     
     // Calculate weights for dish suggestions
     const today = new Date();
@@ -93,6 +95,8 @@ export function useWeeklyMenu() {
   };
 
   return {
+    allDishes,
+    isLoading,
     getWeeklyDishSuggestions
   };
 }

@@ -28,6 +28,7 @@ export function useDishes() {
     
     // Weekly Menu
     getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,
+    allDishes: weeklyMenuHook.allDishes,
     
     // Cookbooks
     getCookbooks: cookbooksHook.getCookbooks,

@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { useDishes } from "@/hooks/useMeals";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Shuffle, Plus } from "lucide-react";
@@ -10,9 +9,10 @@ import DishCard from "@/components/MealCard";
 import { Dish } from "@/types";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useWeeklyMenu } from "@/hooks/useWeeklyMenu";
 
 const WeeklyMenu = () => {
-  const { dishes, isLoading, getWeeklyDishSuggestions } = useDishes();
+  const { allDishes, isLoading, getWeeklyDishSuggestions } = useWeeklyMenu();
   const { toast } = useToast();
   const [weeklyDishes, setWeeklyDishes] = useState<Dish[]>([]);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
@@ -21,13 +21,14 @@ const WeeklyMenu = () => {
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
   useEffect(() => {
-    if (!isLoading && dishes.length > 0) {
+    // Only generate menu when dishes are loaded and not already generating
+    if (!isLoading && allDishes && allDishes.length > 0 && !isGenerating && weeklyDishes.length === 0) {
       generateWeeklyMenu();
     }
-  }, [isLoading, dishes]);
+  }, [isLoading, allDishes]);
   
   const generateWeeklyMenu = async () => {
-    if (dishes.length === 0) {
+    if (!allDishes || allDishes.length === 0) {
       toast({
         title: "No dishes available",
         description: "Add some dishes first to generate a weekly menu.",
@@ -38,7 +39,6 @@ const WeeklyMenu = () => {
     
     try {
       setIsGenerating(true);
-      // Use await to properly resolve the promise
       const suggestions = await getWeeklyDishSuggestions(7);
       setWeeklyDishes(suggestions);
       
@@ -74,7 +74,7 @@ const WeeklyMenu = () => {
               variant="outline" 
               onClick={generateWeeklyMenu}
               className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
-              disabled={isLoading || dishes.length === 0 || isGenerating}
+              disabled={isLoading || !allDishes || allDishes.length === 0 || isGenerating}
             >
               <Shuffle className="mr-2 h-4 w-4" />
               {isGenerating ? 'Generating...' : 'Regenerate'}
@@ -86,7 +86,7 @@ const WeeklyMenu = () => {
           <div className="py-12 text-center">
             <div className="animate-pulse text-lg">Loading your dish data...</div>
           </div>
-        ) : dishes.length === 0 ? (
+        ) : !allDishes || allDishes.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground animate-fade-in">
             <Calendar className="mx-auto h-12 w-12 mb-4 text-muted-foreground opacity-20" />
             <h3 className="text-lg font-medium mb-1">No dishes in your collection yet</h3>
@@ -155,7 +155,7 @@ const WeeklyMenu = () => {
           <Button 
             onClick={generateWeeklyMenu} 
             className="bg-terracotta-500 hover:bg-terracotta-600"
-            disabled={isLoading || dishes.length === 0 || isGenerating}
+            disabled={isLoading || !allDishes || allDishes.length === 0 || isGenerating}
           >
             <Shuffle className="mr-2 h-4 w-4" />
             {isGenerating ? 'Generating...' : 'Generate New Suggestions'}
