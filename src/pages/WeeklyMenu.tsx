@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Calendar, Shuffle, Plus } from "lucide-react";
+import { Calendar, Shuffle, Plus, RefreshCw } from "lucide-react";
 import { format, addDays, startOfWeek } from "date-fns";
 import DishCard from "@/components/MealCard";
 import { Dish } from "@/types";
@@ -17,6 +17,7 @@ const WeeklyMenu = () => {
   const [weeklyDishes, setWeeklyDishes] = useState<Dish[]>([]);
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
   const [isGenerating, setIsGenerating] = useState(false);
+  const [refreshingDayIndex, setRefreshingDayIndex] = useState<number | null>(null);
   
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
@@ -55,6 +56,37 @@ const WeeklyMenu = () => {
       });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const refreshDayDish = async (dayIndex: number) => {
+    if (!allDishes || allDishes.length === 0) return;
+    
+    try {
+      setRefreshingDayIndex(dayIndex);
+      // Generate just 1 new dish suggestion
+      const newSuggestion = await getWeeklyDishSuggestions(1);
+      
+      if (newSuggestion.length > 0) {
+        // Replace the dish for the selected day
+        const updatedDishes = [...weeklyDishes];
+        updatedDishes[dayIndex] = newSuggestion[0];
+        setWeeklyDishes(updatedDishes);
+        
+        toast({
+          title: "New suggestion added",
+          description: `${newSuggestion[0].name} added to ${format(weekDates[dayIndex], "EEEE")}.`,
+        });
+      }
+    } catch (error) {
+      console.error("Error refreshing day suggestion:", error);
+      toast({
+        title: "Error refreshing suggestion",
+        description: "There was a problem generating a new suggestion.",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshingDayIndex(null);
     }
   };
   
@@ -117,10 +149,22 @@ const WeeklyMenu = () => {
                     
                     <div className="flex-1 p-4">
                       {dish ? (
-                        <DishCard 
-                          dish={dish} 
-                          compact 
-                        />
+                        <div className="relative">
+                          <DishCard 
+                            dish={dish} 
+                            showActions={false} 
+                            compact 
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="absolute top-2 right-2 border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
+                            onClick={() => refreshDayDish(index)}
+                            disabled={refreshingDayIndex === index}
+                          >
+                            <RefreshCw className={`h-4 w-4 ${refreshingDayIndex === index ? 'animate-spin' : ''}`} />
+                          </Button>
+                        </div>
                       ) : (
                         <div className="h-full flex items-center justify-center p-6 text-center text-muted-foreground">
                           <div>
@@ -128,12 +172,21 @@ const WeeklyMenu = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={generateWeeklyMenu}
+                              onClick={() => refreshDayDish(index)}
                               className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50"
-                              disabled={isGenerating}
+                              disabled={refreshingDayIndex === index}
                             >
-                              <Shuffle className="mr-2 h-4 w-4" />
-                              Generate Suggestion
+                              {refreshingDayIndex === index ? (
+                                <>
+                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                  Generating...
+                                </>
+                              ) : (
+                                <>
+                                  <Shuffle className="mr-2 h-4 w-4" />
+                                  Generate Suggestion
+                                </>
+                              )}
                             </Button>
                           </div>
                         </div>
