@@ -39,7 +39,7 @@ const CookbookManager = () => {
     description: "",
   });
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { session } = useAuth();
   const { getCookbooks, getDishesByCookbook } = useCookbooks();
   const queryClient = useQueryClient();
 
@@ -47,20 +47,24 @@ const CookbookManager = () => {
   const { data: cookbooks = [], isLoading } = useQuery({
     queryKey: ['cookbooks'],
     queryFn: getCookbooks,
-    enabled: !!user
+    enabled: !!session
   });
 
   // Mutation for adding a cookbook
   const addCookbookMutation = useMutation({
     mutationFn: async (cookbook: Omit<Cookbook, "id" | "createdAt" | "user_id">) => {
+      if (!session?.user?.id) {
+        throw new Error("User not authenticated");
+      }
+      
       const { data, error } = await supabase
         .from('cookbooks')
-        .insert([
+        .insert(
           mapCookbookToDB({
             ...cookbook,
-            user_id: user?.id
+            user_id: session.user.id
           })
-        ])
+        )
         .select()
         .single();
       
@@ -88,10 +92,17 @@ const CookbookManager = () => {
 
   // Mutation for updating a cookbook
   const updateCookbookMutation = useMutation({
-    mutationFn: async (cookbook: Partial<Cookbook> & { id: string }) => {
+    mutationFn: async (cookbook: Partial<Cookbook> & { id: string, user_id?: string }) => {
+      if (!session?.user?.id) {
+        throw new Error("User not authenticated");
+      }
+      
       const { data, error } = await supabase
         .from('cookbooks')
-        .update(mapCookbookToDB(cookbook))
+        .update(mapCookbookToDB({
+          ...cookbook,
+          user_id: session.user.id
+        }))
         .eq('id', cookbook.id)
         .select()
         .single();
