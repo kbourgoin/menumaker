@@ -86,6 +86,7 @@ export function useDishes() {
         type: 'url' | 'book' | 'none';
         value: string;
         page?: number;
+        bookId?: string; // Added bookId property
       };
     }[]
   ) => {

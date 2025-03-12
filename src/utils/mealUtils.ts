@@ -286,6 +286,7 @@ export const importMealHistory = (
       type: 'url' | 'book' | 'none';
       value: string;
       page?: number;
+      bookId?: string;
     };
   }[]
 ): { success: number; skipped: number } => {

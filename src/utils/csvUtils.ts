@@ -13,6 +13,7 @@ interface CSVDishEntry {
     type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
+    bookId?: string; // Added bookId property to match the type in types/index.ts
   };
 }
 
