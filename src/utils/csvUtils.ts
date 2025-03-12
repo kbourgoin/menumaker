@@ -1,11 +1,10 @@
-
 /**
  * Utility functions for CSV import
  */
 
 import { generateId } from "./mealUtils";
 
-interface CSVMealEntry {
+interface CSVDishEntry {
   date: string;
   dish: string;
   notes?: string;
@@ -18,7 +17,7 @@ interface CSVMealEntry {
 
 /**
  * Extract source information from dish name if it contains parentheses
- * Example: "Mapo Tofu (RICE80)" -> { dish: "Mapo Tofu", source: { type: "book", value: "RICE", page: 80 } }
+ * Example: "Mapo Tofu (RICE80)" -> { dishName: "Mapo Tofu", source: { type: "book", value: "RICE", page: 80 } }
  */
 export const extractSourceFromDish = (dish: string): { dishName: string; source?: { type: 'url' | 'book' | 'none'; value: string; page?: number } } => {
   // Check if dish contains parentheses at the end
@@ -70,7 +69,7 @@ export const extractSourceFromDish = (dish: string): { dishName: string; source?
  * Parse CSV data from a string
  * Expected format: date,dish,notes (optional)
  */
-export const parseCSVData = (csvData: string): CSVMealEntry[] => {
+export const parseCSVData = (csvData: string): CSVDishEntry[] => {
   const lines = csvData.split(/\r?\n/).filter(line => line.trim() !== '');
   
   // Skip header row if it exists
@@ -101,7 +100,7 @@ export const parseCSVData = (csvData: string): CSVMealEntry[] => {
 /**
  * Process CSV file and return parsed data
  */
-export const processCSVFile = (file: File): Promise<CSVMealEntry[]> => {
+export const processCSVFile = (file: File): Promise<CSVDishEntry[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     

@@ -1,5 +1,5 @@
 
-export interface Meal {
+export interface Dish {
   id: string;
   name: string;
   createdAt: string;
@@ -15,7 +15,7 @@ export interface Meal {
 
 export interface MealHistory {
   id: string;
-  mealId: string;
+  dishId: string;
   date: string;
   notes?: string;
 }

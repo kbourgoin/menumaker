@@ -1,61 +1,62 @@
+
 import { useState, useEffect } from "react";
-import { Meal } from "@/types";
+import { Dish } from "@/types";
 import { 
-  getMeals,
-  addMeal,
-  updateMeal,
-  deleteMeal,
-  logMealCooked,
-  getRandomMealSuggestions,
-  getMealById,
-  getMealStats,
+  getDishes,
+  addDish,
+  updateDish,
+  deleteDish,
+  logDishCooked,
+  getRandomDishSuggestions,
+  getDishById,
+  getDishStats,
   importMealHistory,
   clearAllData
 } from "@/utils/mealUtils";
 
-export function useMeals() {
-  const [meals, setMeals] = useState<Meal[]>([]);
+export function useDishes() {
+  const [dishes, setDishes] = useState<Dish[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load meals from localStorage
-    const loadedMeals = getMeals();
-    setMeals(loadedMeals);
+    // Load dishes from localStorage
+    const loadedDishes = getDishes();
+    setDishes(loadedDishes);
     setIsLoading(false);
   }, []);
 
-  const addNewMeal = (meal: Omit<Meal, "id" | "createdAt" | "timesCooked">) => {
-    const updatedMeals = addMeal(meal);
-    setMeals(updatedMeals);
-    return updatedMeals.find(m => m.name === meal.name);
+  const addNewDish = (dish: Omit<Dish, "id" | "createdAt" | "timesCooked">) => {
+    const updatedDishes = addDish(dish);
+    setDishes(updatedDishes);
+    return updatedDishes.find(d => d.name === dish.name);
   };
 
-  const updateExistingMeal = (id: string, updates: Partial<Meal>) => {
-    const updatedMeals = updateMeal(id, updates);
-    setMeals(updatedMeals);
+  const updateExistingDish = (id: string, updates: Partial<Dish>) => {
+    const updatedDishes = updateDish(id, updates);
+    setDishes(updatedDishes);
   };
 
-  const removeExistingMeal = (id: string) => {
-    const updatedMeals = deleteMeal(id);
-    setMeals(updatedMeals);
+  const removeExistingDish = (id: string) => {
+    const updatedDishes = deleteDish(id);
+    setDishes(updatedDishes);
   };
 
-  const recordMealCooked = (mealId: string, date?: string, notes?: string) => {
-    logMealCooked(mealId, date, notes);
-    // Refresh meals list to get updated timesCooked and lastMade
-    setMeals(getMeals());
+  const recordDishCooked = (dishId: string, date?: string, notes?: string) => {
+    logDishCooked(dishId, date, notes);
+    // Refresh dishes list to get updated timesCooked and lastMade
+    setDishes(getDishes());
   };
 
-  const getWeeklyMealSuggestions = (count: number = 7) => {
-    return getRandomMealSuggestions(count);
+  const getWeeklyDishSuggestions = (count: number = 7) => {
+    return getRandomDishSuggestions(count);
   };
 
-  const getMeal = (id: string) => {
-    return getMealById(id);
+  const getDish = (id: string) => {
+    return getDishById(id);
   };
 
   const getStats = () => {
-    return getMealStats();
+    return getDishStats();
   };
 
   const importMealHistoryFromData = (
@@ -71,25 +72,25 @@ export function useMeals() {
     }[]
   ) => {
     const result = importMealHistory(entries);
-    // Refresh meals list to get updated data
-    setMeals(getMeals());
+    // Refresh dishes list to get updated data
+    setDishes(getDishes());
     return result;
   };
 
   const clearData = () => {
     clearAllData();
-    setMeals([]);
+    setDishes([]);
   };
 
   return {
-    meals,
+    dishes,
     isLoading,
-    addMeal: addNewMeal,
-    updateMeal: updateExistingMeal,
-    deleteMeal: removeExistingMeal,
-    recordMealCooked,
-    getWeeklyMealSuggestions,
-    getMeal,
+    addDish: addNewDish,
+    updateDish: updateExistingDish,
+    deleteDish: removeExistingDish,
+    recordDishCooked,
+    getWeeklyDishSuggestions,
+    getDish,
     getStats,
     importMealHistory: importMealHistoryFromData,
     clearData

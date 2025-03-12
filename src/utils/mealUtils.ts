@@ -1,25 +1,25 @@
 
-import { Meal } from "@/types";
+import { Dish } from "@/types";
 
-// Get meals from localStorage or initialize with empty array
-export const getMeals = (): Meal[] => {
-  const meals = localStorage.getItem("meals");
-  return meals ? JSON.parse(meals) : [];
+// Get dishes from localStorage or initialize with empty array
+export const getDishes = (): Dish[] => {
+  const dishes = localStorage.getItem("dishes");
+  return dishes ? JSON.parse(dishes) : [];
 };
 
-// Save meals to localStorage
-export const saveMeals = (meals: Meal[]): void => {
-  localStorage.setItem("meals", JSON.stringify(meals));
+// Save dishes to localStorage
+export const saveDishes = (dishes: Dish[]): void => {
+  localStorage.setItem("dishes", JSON.stringify(dishes));
 };
 
 // Get meal history from localStorage or initialize with empty array
-export const getMealHistory = (): { date: string; mealId: string; notes?: string }[] => {
+export const getMealHistory = (): { date: string; dishId: string; notes?: string }[] => {
   const history = localStorage.getItem("mealHistory");
   return history ? JSON.parse(history) : [];
 };
 
 // Save meal history to localStorage
-export const saveMealHistory = (history: { date: string; mealId: string; notes?: string }[]): void => {
+export const saveMealHistory = (history: { date: string; dishId: string; notes?: string }[]): void => {
   localStorage.setItem("mealHistory", JSON.stringify(history));
 };
 
@@ -28,37 +28,37 @@ export const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
 };
 
-// Add a new meal and return the updated list
-export const addMeal = (meal: Omit<Meal, "id" | "createdAt" | "timesCooked">): Meal[] => {
-  const meals = getMeals();
-  const newMeal: Meal = {
+// Add a new dish and return the updated list
+export const addDish = (dish: Omit<Dish, "id" | "createdAt" | "timesCooked">): Dish[] => {
+  const dishes = getDishes();
+  const newDish: Dish = {
     id: generateId(),
     createdAt: new Date().toISOString(),
     timesCooked: 0,
-    ...meal,
+    ...dish,
   };
-  const updatedMeals = [...meals, newMeal];
-  saveMeals(updatedMeals);
-  return updatedMeals;
+  const updatedDishes = [...dishes, newDish];
+  saveDishes(updatedDishes);
+  return updatedDishes;
 };
 
-// Log that a meal was cooked (updates lastMade and timesCooked)
-export const logMealCooked = (
-  mealId: string, 
+// Log that a dish was cooked (updates lastMade and timesCooked)
+export const logDishCooked = (
+  dishId: string, 
   date: string = new Date().toISOString(),
   notes?: string
 ): void => {
-  // Update meal stats
-  const meals = getMeals();
-  const updatedMeals = meals.map((meal) => {
-    if (meal.id === mealId) {
+  // Update dish stats
+  const dishes = getDishes();
+  const updatedDishes = dishes.map((dish) => {
+    if (dish.id === dishId) {
       return {
-        ...meal,
+        ...dish,
         lastMade: date,
-        timesCooked: meal.timesCooked + 1,
+        timesCooked: dish.timesCooked + 1,
       };
     }
-    return meal;
+    return dish;
   });
 
   // Update history
@@ -67,125 +67,125 @@ export const logMealCooked = (
     ...history, 
     { 
       date, 
-      mealId, 
+      dishId, 
       notes 
     }
   ];
 
-  saveMeals(updatedMeals);
+  saveDishes(updatedDishes);
   saveMealHistory(updatedHistory);
 };
 
-// Generate random meal suggestions weighted by frequency and recency
-export const getRandomMealSuggestions = (count: number = 7): Meal[] => {
-  const meals = getMeals();
-  if (meals.length === 0) return [];
-  if (meals.length <= count) return [...meals];
+// Generate random dish suggestions weighted by frequency and recency
+export const getRandomDishSuggestions = (count: number = 7): Dish[] => {
+  const dishes = getDishes();
+  if (dishes.length === 0) return [];
+  if (dishes.length <= count) return [...dishes];
 
-  // Calculate the 'weight' for each meal based on:
+  // Calculate the 'weight' for each dish based on:
   // 1. How often it's been cooked (less is better)
   // 2. How recently it's been cooked (longer ago is better)
   const today = new Date();
   
   // Calculate weights
-  const mealsWithWeights = meals.map(meal => {
+  const dishesWithWeights = dishes.map(dish => {
     // Frequency weight (inverse of timesCooked)
-    const frequencyWeight = meal.timesCooked === 0 ? 5 : (10 / (meal.timesCooked + 1));
+    const frequencyWeight = dish.timesCooked === 0 ? 5 : (10 / (dish.timesCooked + 1));
     
     // Recency weight (more days since last made = higher weight)
     let recencyWeight = 5; // Default for never made
-    if (meal.lastMade) {
+    if (dish.lastMade) {
       const daysSinceLastMade = Math.max(
         1, 
-        Math.floor((today.getTime() - new Date(meal.lastMade).getTime()) / (1000 * 60 * 60 * 24))
+        Math.floor((today.getTime() - new Date(dish.lastMade).getTime()) / (1000 * 60 * 60 * 24))
       );
       recencyWeight = Math.min(10, daysSinceLastMade / 7); // Cap at 10 (about 10 weeks)
     }
     
     // Surface old favorites (high times cooked but not recent)
     const oldFavoriteBonus = 
-      meal.timesCooked > 3 && 
-      meal.lastMade && 
-      (today.getTime() - new Date(meal.lastMade).getTime()) > (90 * 24 * 60 * 60 * 1000) // > 90 days
+      dish.timesCooked > 3 && 
+      dish.lastMade && 
+      (today.getTime() - new Date(dish.lastMade).getTime()) > (90 * 24 * 60 * 60 * 1000) // > 90 days
         ? 5 
         : 0;
     
     const totalWeight = frequencyWeight + recencyWeight + oldFavoriteBonus;
     
     return {
-      meal,
+      dish,
       weight: totalWeight
     };
   });
   
   // Sort by weight (higher weights first)
-  mealsWithWeights.sort((a, b) => b.weight - a.weight);
+  dishesWithWeights.sort((a, b) => b.weight - a.weight);
   
-  // Get the top meals by weight, but add some randomness by selecting from the top 60%
-  const topMeals = mealsWithWeights.slice(0, Math.max(count * 2, Math.floor(meals.length * 0.6)));
+  // Get the top dishes by weight, but add some randomness by selecting from the top 60%
+  const topDishes = dishesWithWeights.slice(0, Math.max(count * 2, Math.floor(dishes.length * 0.6)));
   
-  // Randomly select from top-weighted meals
-  const suggestions: Meal[] = [];
+  // Randomly select from top-weighted dishes
+  const suggestions: Dish[] = [];
   const selectedIndexes = new Set<number>();
   
-  while (suggestions.length < count && suggestions.length < topMeals.length) {
-    const randomIndex = Math.floor(Math.random() * topMeals.length);
+  while (suggestions.length < count && suggestions.length < topDishes.length) {
+    const randomIndex = Math.floor(Math.random() * topDishes.length);
     if (!selectedIndexes.has(randomIndex)) {
       selectedIndexes.add(randomIndex);
-      suggestions.push(topMeals[randomIndex].meal);
+      suggestions.push(topDishes[randomIndex].dish);
     }
   }
   
   return suggestions;
 };
 
-// Get meal by ID
-export const getMealById = (id: string): Meal | undefined => {
-  const meals = getMeals();
-  return meals.find((meal) => meal.id === id);
+// Get dish by ID
+export const getDishById = (id: string): Dish | undefined => {
+  const dishes = getDishes();
+  return dishes.find((dish) => dish.id === id);
 };
 
-// Update meal by ID
-export const updateMeal = (id: string, updates: Partial<Meal>): Meal[] => {
-  const meals = getMeals();
-  const updatedMeals = meals.map((meal) => {
-    if (meal.id === id) {
+// Update dish by ID
+export const updateDish = (id: string, updates: Partial<Dish>): Dish[] => {
+  const dishes = getDishes();
+  const updatedDishes = dishes.map((dish) => {
+    if (dish.id === id) {
       return {
-        ...meal,
+        ...dish,
         ...updates,
       };
     }
-    return meal;
+    return dish;
   });
-  saveMeals(updatedMeals);
-  return updatedMeals;
+  saveDishes(updatedDishes);
+  return updatedDishes;
 };
 
-// Delete meal by ID
-export const deleteMeal = (id: string): Meal[] => {
-  const meals = getMeals();
-  const updatedMeals = meals.filter((meal) => meal.id !== id);
-  saveMeals(updatedMeals);
+// Delete dish by ID
+export const deleteDish = (id: string): Dish[] => {
+  const dishes = getDishes();
+  const updatedDishes = dishes.filter((dish) => dish.id !== id);
+  saveDishes(updatedDishes);
   
   // Also clean up meal history
   const history = getMealHistory();
-  const updatedHistory = history.filter((entry) => entry.mealId !== id);
+  const updatedHistory = history.filter((entry) => entry.dishId !== id);
   saveMealHistory(updatedHistory);
   
-  return updatedMeals;
+  return updatedDishes;
 };
 
-// Get stats about meals
-export const getMealStats = () => {
-  const meals = getMeals();
+// Get stats about dishes
+export const getDishStats = () => {
+  const dishes = getDishes();
   const history = getMealHistory();
   
   return {
-    totalMeals: meals.length,
-    totalTimesCooked: meals.reduce((sum, meal) => sum + meal.timesCooked, 0),
-    mostCooked: [...meals].sort((a, b) => b.timesCooked - a.timesCooked)[0],
-    cuisineBreakdown: meals.reduce((acc, meal) => {
-      meal.cuisines.forEach(cuisine => {
+    totalDishes: dishes.length,
+    totalTimesCooked: dishes.reduce((sum, dish) => sum + dish.timesCooked, 0),
+    mostCooked: [...dishes].sort((a, b) => b.timesCooked - a.timesCooked)[0],
+    cuisineBreakdown: dishes.reduce((acc, dish) => {
+      dish.cuisines.forEach(cuisine => {
         acc[cuisine] = (acc[cuisine] || 0) + 1;
       });
       return acc;
@@ -195,7 +195,7 @@ export const getMealStats = () => {
       .slice(0, 5)
       .map(h => ({
         date: h.date,
-        meal: getMealById(h.mealId)
+        dish: getDishById(h.dishId)
       }))
   };
 };
@@ -213,7 +213,7 @@ export const importMealHistory = (
     };
   }[]
 ): { success: number; skipped: number } => {
-  const meals = getMeals();
+  const dishes = getDishes();
   const history = getMealHistory();
   let successCount = 0;
   let skippedCount = 0;
@@ -229,18 +229,18 @@ export const importMealHistory = (
     entriesByDish[dishLower].push(entry);
   });
   
-  const updatedMeals = [...meals];
+  const updatedDishes = [...dishes];
   const updatedHistory = [...history];
   
   // Process each unique dish
   Object.entries(entriesByDish).forEach(([dishLower, dishEntries]) => {
     // Find if this dish already exists in the database
-    let meal = meals.find(m => m.name.toLowerCase() === dishLower);
+    let dish = dishes.find(d => d.name.toLowerCase() === dishLower);
     
     // If dish doesn't exist, create it once using the first entry's data
-    if (!meal) {
+    if (!dish) {
       const firstEntry = dishEntries[0];
-      meal = {
+      dish = {
         id: generateId(),
         name: firstEntry.dish,
         createdAt: firstEntry.date, // Use the earliest historical date as creation date
@@ -251,7 +251,7 @@ export const importMealHistory = (
           value: ''
         }
       };
-      updatedMeals.push(meal);
+      updatedDishes.push(dish);
     }
     
     // Process all entries for this dish (different cooking dates)
@@ -261,13 +261,13 @@ export const importMealHistory = (
       // Create history entry for each cooking date
       const historyEntry = {
         date: entry.date,
-        mealId: meal!.id,
+        dishId: dish!.id,
         notes: entry.notes
       };
       
       // Check if this exact entry already exists (avoid duplicates)
       const duplicateEntry = updatedHistory.some(h => 
-        h.mealId === historyEntry.mealId && 
+        h.dishId === historyEntry.dishId && 
         h.date === historyEntry.date
       );
       
@@ -280,34 +280,34 @@ export const importMealHistory = (
       }
     });
     
-    // Only update the meal record if we added new cooking instances
+    // Only update the dish record if we added new cooking instances
     if (newCookCount > 0) {
-      // Find the meal in updatedMeals to update its stats
-      const mealIndex = updatedMeals.findIndex(m => m.id === meal!.id);
-      if (mealIndex >= 0) {
+      // Find the dish in updatedDishes to update its stats
+      const dishIndex = updatedDishes.findIndex(d => d.id === dish!.id);
+      if (dishIndex >= 0) {
         // Sort all entries for this dish by date
         const sortedEntries = [...dishEntries].sort((a, b) => 
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
         
         // Update lastMade to the most recent date
-        updatedMeals[mealIndex].lastMade = sortedEntries[0].date;
+        updatedDishes[dishIndex].lastMade = sortedEntries[0].date;
         
         // Increment timesCooked by the number of new entries
-        updatedMeals[mealIndex].timesCooked += newCookCount;
+        updatedDishes[dishIndex].timesCooked += newCookCount;
       }
     }
   });
   
   // Save updated data
-  saveMeals(updatedMeals);
+  saveDishes(updatedDishes);
   saveMealHistory(updatedHistory);
   
   return { success: successCount, skipped: skippedCount };
 };
 
-// Clear all meal data from localStorage
+// Clear all dish data from localStorage
 export const clearAllData = (): void => {
-  localStorage.removeItem("meals");
+  localStorage.removeItem("dishes");
   localStorage.removeItem("mealHistory");
 };

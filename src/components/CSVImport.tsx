@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useMeals } from "@/hooks/useMeals";
+import { useDishes } from "@/hooks/useMeals";
 import { processCSVFile } from "@/utils/csvUtils";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -14,7 +13,7 @@ interface CSVImportProps {
 }
 
 const CSVImport = ({ onImportComplete }: CSVImportProps) => {
-  const { importMealHistory } = useMeals();
+  const { importMealHistory } = useDishes();
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -36,7 +35,6 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
     
     setFile(selectedFile);
     
-    // Preview first few rows
     try {
       const reader = new FileReader();
       reader.onload = (event) => {

@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMeals } from "@/hooks/useMeals";
+import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
-import { Meal, CuisineType } from "@/types";
+import { Dish, CuisineType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -25,35 +24,35 @@ const CUISINES: CuisineType[] = [
 ];
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Meal name must be at least 2 characters." }),
+  name: z.string().min(2, { message: "Dish name must be at least 2 characters." }),
   cuisines: z.array(z.string()).min(1, { message: "Select at least one cuisine." }),
   sourceType: z.enum(["none", "url", "book"]),
   sourceValue: z.string().optional(),
   sourcePage: z.string().optional(),
 });
 
-interface MealFormProps {
-  existingMeal?: Meal;
-  onSuccess?: (meal: Meal) => void;
+interface DishFormProps {
+  existingDish?: Dish;
+  onSuccess?: (dish: Dish) => void;
 }
 
-const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
-  const { meals, addMeal, updateMeal } = useMeals();
+const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
+  const { dishes, addDish, updateDish } = useDishes();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showSourceFields, setShowSourceFields] = useState(
-    existingMeal?.source ? (existingMeal.source.type === "url" || existingMeal.source.type === "book") : false
+    existingDish?.source ? (existingDish.source.type === "url" || existingDish.source.type === "book") : false
   );
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: existingMeal?.name || "",
-      cuisines: existingMeal?.cuisines || [],
-      sourceType: existingMeal?.source?.type || "none",
-      sourceValue: existingMeal?.source?.value || "",
-      sourcePage: existingMeal?.source?.page?.toString() || "",
+      name: existingDish?.name || "",
+      cuisines: existingDish?.cuisines || [],
+      sourceType: existingDish?.source?.type || "none",
+      sourceValue: existingDish?.source?.value || "",
+      sourcePage: existingDish?.source?.page?.toString() || "",
     },
   });
 
@@ -66,20 +65,20 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
   }, [watchSourceType]);
 
   useEffect(() => {
-    // Generate suggestions based on existing meals
+    // Generate suggestions based on existing dishes
     if (watchName.length >= 2) {
-      const filteredSuggestions = meals
-        .filter(meal => 
-          meal.name.toLowerCase().includes(watchName.toLowerCase()) &&
-          meal.name.toLowerCase() !== watchName.toLowerCase()
+      const filteredSuggestions = dishes
+        .filter(dish => 
+          dish.name.toLowerCase().includes(watchName.toLowerCase()) &&
+          dish.name.toLowerCase() !== watchName.toLowerCase()
         )
-        .map(meal => meal.name);
+        .map(dish => dish.name);
       
       setSuggestions([...new Set(filteredSuggestions)].slice(0, 5));
     } else {
       setSuggestions([]);
     }
-  }, [watchName, meals]);
+  }, [watchName, dishes]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     try {
@@ -93,33 +92,33 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
         };
       }
       
-      if (existingMeal) {
-        // Update existing meal
-        updateMeal(existingMeal.id, {
+      if (existingDish) {
+        // Update existing dish
+        updateDish(existingDish.id, {
           name: data.name,
           cuisines: data.cuisines,
           source
         });
         
         toast({
-          title: "Meal updated",
+          title: "Dish updated",
           description: `${data.name} has been updated successfully.`,
         });
       } else {
-        // Add new meal
-        const newMeal = addMeal({
+        // Add new dish
+        const newDish = addDish({
           name: data.name,
           cuisines: data.cuisines,
           source
         });
         
         toast({
-          title: "Meal added",
-          description: `${data.name} has been added to your meals.`,
+          title: "Dish added",
+          description: `${data.name} has been added to your dishes.`,
         });
         
-        if (onSuccess && newMeal) {
-          onSuccess(newMeal);
+        if (onSuccess && newDish) {
+          onSuccess(newDish);
         }
       }
       
@@ -127,10 +126,10 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
         navigate("/all-meals");
       }
     } catch (error) {
-      console.error("Error saving meal:", error);
+      console.error("Error saving dish:", error);
       toast({
         title: "Error",
-        description: "There was a problem saving your meal.",
+        description: "There was a problem saving your dish.",
         variant: "destructive",
       });
     }
@@ -144,12 +143,12 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Meal Name</FormLabel>
+              <FormLabel>Dish Name</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input 
                     {...field} 
-                    placeholder="Enter meal name" 
+                    placeholder="Enter dish name" 
                     className="w-full"
                   />
                   {suggestions.length > 0 && (
@@ -317,7 +316,7 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
             type="submit"
             className="bg-terracotta-500 hover:bg-terracotta-600"
           >
-            {existingMeal ? "Update Meal" : "Add Meal"}
+            {existingDish ? "Update Dish" : "Add Dish"}
           </Button>
         </div>
       </form>
@@ -325,4 +324,4 @@ const MealForm = ({ existingMeal, onSuccess }: MealFormProps) => {
   );
 };
 
-export default MealForm;
+export default DishForm;

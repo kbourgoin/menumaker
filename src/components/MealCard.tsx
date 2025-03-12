@@ -1,49 +1,49 @@
 
 import { useState } from "react";
-import { Meal } from "@/types";
+import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Plus, Link, Trash } from "lucide-react";
 import CuisineTag from "./CuisineTag";
 import SourceLink from "./SourceLink";
-import { useMeals } from "@/hooks/useMeals";
+import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-interface MealCardProps {
-  meal: Meal;
+interface DishCardProps {
+  dish: Dish;
   showActions?: boolean;
   compact?: boolean;
   onDeleted?: () => void;
 }
 
-const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: MealCardProps) => {
-  const { recordMealCooked, deleteMeal } = useMeals();
+const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: DishCardProps) => {
+  const { recordDishCooked, deleteDish } = useDishes();
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
   const [isAddingMeal, setIsAddingMeal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   const handleLogMeal = () => {
-    recordMealCooked(meal.id, new Date().toISOString(), notes || undefined);
+    recordDishCooked(dish.id, new Date().toISOString(), notes || undefined);
     setNotes("");
     setIsAddingMeal(false);
     
     toast({
       title: "Meal logged",
-      description: `${meal.name} has been added to your meal history.`,
+      description: `${dish.name} has been added to your meal history.`,
     });
   };
   
-  const handleDeleteMeal = () => {
-    deleteMeal(meal.id);
+  const handleDeleteDish = () => {
+    deleteDish(dish.id);
     setIsDeleteDialogOpen(false);
     
     toast({
-      title: "Meal deleted",
-      description: `${meal.name} has been deleted from your meals.`,
+      title: "Dish deleted",
+      description: `${dish.name} has been deleted from your dishes.`,
     });
     
     if (onDeleted) {
@@ -75,7 +75,7 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
     <Card className="transition-all duration-300 hover:shadow-md overflow-hidden group">
       <CardHeader className={compact ? "pb-2 pt-4 px-4" : "pb-4"}>
         <CardTitle className={`line-clamp-1 text-lg ${compact ? "text-base" : "text-xl"}`}>
-          {meal.name}
+          {dish.name}
         </CardTitle>
       </CardHeader>
       
@@ -83,27 +83,27 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
         <div className="space-y-3">
           {!compact && (
             <div className="flex flex-wrap gap-1.5">
-              {meal.cuisines.map((cuisine) => (
+              {dish.cuisines.map((cuisine) => (
                 <CuisineTag key={cuisine} cuisine={cuisine} size={compact ? "sm" : "md"} />
               ))}
             </div>
           )}
           
-          {compact && meal.cuisines.length > 0 && (
-            <CuisineTag cuisine={meal.cuisines[0]} size="sm" />
+          {compact && dish.cuisines.length > 0 && (
+            <CuisineTag cuisine={dish.cuisines[0]} size="sm" />
           )}
           
           <div className={`text-sm text-muted-foreground ${compact ? "text-xs" : ""}`}>
             <div className="flex items-center space-x-1">
               <Calendar className="w-3.5 h-3.5 mr-1" />
-              <span>Last made: {formatDate(meal.lastMade)} {meal.lastMade && `(${formatTimeAgo(meal.lastMade)})`}</span>
+              <span>Last made: {formatDate(dish.lastMade)} {dish.lastMade && `(${formatTimeAgo(dish.lastMade)})`}</span>
             </div>
-            <div className="mt-1">Made {meal.timesCooked} {meal.timesCooked === 1 ? "time" : "times"}</div>
+            <div className="mt-1">Made {dish.timesCooked} {dish.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
-          {meal.source && meal.source.type !== 'none' && !compact && (
+          {dish.source && dish.source.type !== 'none' && !compact && (
             <div className="mt-2">
-              <SourceLink source={meal.source} />
+              <SourceLink source={dish.source} />
             </div>
           )}
         </div>
@@ -121,7 +121,7 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Log {meal.name}</DialogTitle>
+                  <DialogTitle>Log {dish.name}</DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
                   <div className="space-y-2">
@@ -159,10 +159,10 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Delete {meal.name}</DialogTitle>
+                  <DialogTitle>Delete {dish.name}</DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
-                  <p>Are you sure you want to delete this meal? This action cannot be undone.</p>
+                  <p>Are you sure you want to delete this dish? This action cannot be undone.</p>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
@@ -170,7 +170,7 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
                   </Button>
                   <Button 
                     variant="destructive" 
-                    onClick={handleDeleteMeal}
+                    onClick={handleDeleteDish}
                   >
                     Delete
                   </Button>
@@ -184,4 +184,4 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
   );
 };
 
-export default MealCard;
+export default DishCard;
