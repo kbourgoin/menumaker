@@ -47,7 +47,7 @@ export default function AddCookedDishDialog() {
     setSearchQuery(dish.name);
   };
 
-  const handleCook = () => {
+  const handleCook = async () => {
     if (!selectedDish) {
       toast({
         title: "No dish selected",
@@ -57,7 +57,7 @@ export default function AddCookedDishDialog() {
       return;
     }
 
-    recordDishCooked(selectedDish.id, date.toISOString(), notes || undefined);
+    await recordDishCooked(selectedDish.id, date.toISOString(), notes || undefined);
     toast({
       title: "Dish cooked!",
       description: `${selectedDish.name} has been recorded in your meal history.`,

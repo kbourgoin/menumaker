@@ -41,6 +41,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const { dishes, addDish, updateDish } = useDishes();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSourceFields, setShowSourceFields] = useState(
     existingDish?.source ? (existingDish.source.type === "url" || existingDish.source.type === "book") : false
   );
@@ -64,8 +65,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
     setShowSourceFields(watchSourceType !== "none");
   }, [watchSourceType]);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsSubmitting(true);
       let source = undefined;
       
       if (data.sourceType !== "none") {
@@ -78,7 +80,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
       
       if (existingDish) {
         // Update existing dish
-        updateDish(existingDish.id, {
+        await updateDish(existingDish.id, {
           name: data.name,
           cuisines: data.cuisines,
           source
@@ -88,9 +90,13 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           title: "Dish updated",
           description: `${data.name} has been updated successfully.`,
         });
+        
+        if (onSuccess) {
+          onSuccess(existingDish);
+        }
       } else {
         // Add new dish
-        const newDish = addDish({
+        const newDish = await addDish({
           name: data.name,
           cuisines: data.cuisines,
           source
@@ -116,6 +122,8 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         description: "There was a problem saving your dish.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -278,9 +286,10 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           </Button>
           <Button
             type="submit"
+            disabled={isSubmitting}
             className="bg-terracotta-500 hover:bg-terracotta-600"
           >
-            {existingDish ? "Update Dish" : "Add Dish"}
+            {isSubmitting ? "Saving..." : existingDish ? "Update Dish" : "Add Dish"}
           </Button>
         </div>
       </form>

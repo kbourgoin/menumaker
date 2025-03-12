@@ -1,7 +1,15 @@
 
 import { useState } from "react";
 import { Dish, Cookbook } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
+import { 
+  supabase, 
+  mapDishFromDB, 
+  mapDishToDB, 
+  mapMealHistoryFromDB, 
+  mapMealHistoryToDB,
+  mapCookbookFromDB,
+  mapCookbookToDB
+} from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useDishes() {
@@ -19,18 +27,19 @@ export function useDishes() {
       
       if (error) throw error;
       setIsLoading(false);
-      return data || [];
+      return data ? data.map(mapDishFromDB) : [];
     }
   });
 
   // Mutation to add a new dish
   const addDishMutation = useMutation({
     mutationFn: async (dish: Omit<Dish, "id" | "createdAt" | "timesCooked" | "user_id">) => {
-      const newDish = {
+      const newDish = mapDishToDB({
         ...dish,
         timesCooked: 0,
-        createdAt: new Date().toISOString()
-      };
+        createdAt: new Date().toISOString(),
+        user_id: (await supabase.auth.getUser()).data.user?.id
+      });
       
       const { data, error } = await supabase
         .from('dishes')
@@ -39,7 +48,7 @@ export function useDishes() {
         .single();
         
       if (error) throw error;
-      return data;
+      return mapDishFromDB(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
@@ -51,7 +60,7 @@ export function useDishes() {
     mutationFn: async ({ id, updates }: { id: string, updates: Partial<Dish> }) => {
       const { error } = await supabase
         .from('dishes')
-        .update(updates)
+        .update(mapDishToDB(updates))
         .eq('id', id);
         
       if (error) throw error;
@@ -68,7 +77,7 @@ export function useDishes() {
       await supabase
         .from('meal_history')
         .delete()
-        .eq('dishId', id);
+        .eq('dishid', id);
         
       // Then delete the dish
       const { error } = await supabase
@@ -87,10 +96,19 @@ export function useDishes() {
   // Mutation to record a dish was cooked
   const recordDishCookedMutation = useMutation({
     mutationFn: async ({ dishId, date = new Date().toISOString(), notes }: { dishId: string, date?: string, notes?: string }) => {
+      const user_id = (await supabase.auth.getUser()).data.user?.id;
+      
       // Add to meal history
+      const historyEntry = mapMealHistoryToDB({
+        dishId,
+        date,
+        notes,
+        user_id
+      });
+      
       const { error: historyError } = await supabase
         .from('meal_history')
-        .insert({ dishId, date, notes });
+        .insert(historyEntry);
       
       if (historyError) throw historyError;
       
@@ -98,8 +116,8 @@ export function useDishes() {
       const { error: dishError } = await supabase
         .from('dishes')
         .update({ 
-          timesCooked: supabase.rpc('increment_times_cooked', { dish_id: dishId }),
-          lastMade: date 
+          timescooked: supabase.rpc('increment_times_cooked', { dish_id: dishId }),
+          lastmade: date 
         })
         .eq('id', dishId);
       
@@ -120,7 +138,7 @@ export function useDishes() {
       .single();
       
     if (error) throw error;
-    return data;
+    return mapDishFromDB(data);
   };
 
   // Get weekly dish suggestions
@@ -134,7 +152,7 @@ export function useDishes() {
     if (error) throw error;
     
     if (!allDishes || allDishes.length === 0) return [];
-    if (allDishes.length <= count) return allDishes;
+    if (allDishes.length <= count) return allDishes.map(mapDishFromDB);
     
     // The weighted random logic would be similar to the localStorage version
     // but can be moved to a database function later
@@ -142,26 +160,27 @@ export function useDishes() {
     
     // Calculate weights (simplified version of the original logic)
     const dishesWithWeights = allDishes.map(dish => {
-      const frequencyWeight = dish.timesCooked === 0 ? 5 : (10 / (dish.timesCooked + 1));
+      const mappedDish = mapDishFromDB(dish);
+      const frequencyWeight = mappedDish.timesCooked === 0 ? 5 : (10 / (mappedDish.timesCooked + 1));
       
       let recencyWeight = 5; // Default for never made
-      if (dish.lastMade) {
+      if (mappedDish.lastMade) {
         const daysSinceLastMade = Math.max(
           1, 
-          Math.floor((today.getTime() - new Date(dish.lastMade).getTime()) / (1000 * 60 * 60 * 24))
+          Math.floor((today.getTime() - new Date(mappedDish.lastMade).getTime()) / (1000 * 60 * 60 * 24))
         );
         recencyWeight = Math.min(10, daysSinceLastMade / 7);
       }
       
       const oldFavoriteBonus = 
-        dish.timesCooked > 3 && 
-        dish.lastMade && 
-        (today.getTime() - new Date(dish.lastMade).getTime()) > (90 * 24 * 60 * 60 * 1000)
+        mappedDish.timesCooked > 3 && 
+        mappedDish.lastMade && 
+        (today.getTime() - new Date(mappedDish.lastMade).getTime()) > (90 * 24 * 60 * 60 * 1000)
           ? 5 
           : 0;
       
       return {
-        dish,
+        dish: mappedDish,
         weight: frequencyWeight + recencyWeight + oldFavoriteBonus
       };
     });
@@ -191,7 +210,7 @@ export function useDishes() {
     const { data, error } = await supabase
       .from('meal_history')
       .select('*')
-      .eq('dishId', dishId)
+      .eq('dishid', dishId)
       .order('date', { ascending: false });
       
     if (error) throw error;
@@ -203,19 +222,21 @@ export function useDishes() {
 
   // Get dish stats
   const getStats = async () => {
-    const { data: dishes, error: dishesError } = await supabase
+    const { data: dishesData, error: dishesError } = await supabase
       .from('dishes')
       .select('*');
       
     if (dishesError) throw dishesError;
+    const dishes = dishesData.map(mapDishFromDB);
     
-    const { data: history, error: historyError } = await supabase
+    const { data: historyData, error: historyError } = await supabase
       .from('meal_history')
       .select('*')
       .order('date', { ascending: false })
       .limit(5);
       
     if (historyError) throw historyError;
+    const history = historyData.map(mapMealHistoryFromDB);
     
     // Get most cooked dish
     const mostCooked = [...dishes].sort((a, b) => b.timesCooked - a.timesCooked)[0];
@@ -262,6 +283,7 @@ export function useDishes() {
       };
     }[]
   ) => {
+    const user_id = (await supabase.auth.getUser()).data.user?.id;
     let successCount = 0;
     let skippedCount = 0;
     
@@ -307,7 +329,10 @@ export function useDishes() {
             // Create new cookbook
             const { data: newCookbook } = await supabase
               .from('cookbooks')
-              .insert({ name: source.value })
+              .insert({ 
+                name: source.value,
+                user_id 
+              })
               .select('id')
               .single();
               
@@ -331,10 +356,11 @@ export function useDishes() {
           .from('dishes')
           .insert({
             name: firstEntry.dish,
-            createdAt: firstEntry.date,
-            timesCooked: 0,
+            createdat: firstEntry.date,
+            timescooked: 0,
             cuisines: ['Other'],
-            source
+            source,
+            user_id
           })
           .select('id')
           .single();
@@ -355,7 +381,7 @@ export function useDishes() {
           const { data: existingEntries } = await supabase
             .from('meal_history')
             .select('*')
-            .eq('dishId', dishId)
+            .eq('dishid', dishId)
             .eq('date', entry.date);
             
           if (!existingEntries || existingEntries.length === 0) {
@@ -363,9 +389,10 @@ export function useDishes() {
             await supabase
               .from('meal_history')
               .insert({
-                dishId,
+                dishid: dishId,
                 date: entry.date,
-                notes: entry.notes
+                notes: entry.notes,
+                user_id
               });
               
             newCookCount++;
@@ -385,8 +412,8 @@ export function useDishes() {
           await supabase
             .from('dishes')
             .update({
-              lastMade: sortedEntries[0].date,
-              timesCooked: supabase.rpc('increment_by', { dish_id: dishId, increment_amount: newCookCount })
+              lastmade: sortedEntries[0].date,
+              timescooked: supabase.rpc('increment_by', { dish_id: dishId, increment_amount: newCookCount })
             })
             .eq('id', dishId);
         }
@@ -419,7 +446,7 @@ export function useDishes() {
       .order('name');
       
     if (error) throw error;
-    return data || [];
+    return data ? data.map(mapCookbookFromDB) : [];
   };
 
   const getCookbookData = async (id: string): Promise<Cookbook> => {
@@ -430,7 +457,7 @@ export function useDishes() {
       .single();
       
     if (error) throw error;
-    return data;
+    return mapCookbookFromDB(data);
   };
 
   const getDishesByCookbook = async (cookbookId: string): Promise<Dish[]> => {
@@ -441,7 +468,7 @@ export function useDishes() {
       .order('name');
       
     if (error) throw error;
-    return data || [];
+    return data ? data.map(mapDishFromDB) : [];
   };
 
   return {

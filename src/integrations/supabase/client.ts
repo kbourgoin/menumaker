@@ -44,3 +44,60 @@ export type Cookbook = {
   createdAt: string;
   user_id: string;
 };
+
+// Mapping functions to convert between database and client formats
+export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row']): Dish => ({
+  id: dish.id,
+  name: dish.name,
+  createdAt: dish.createdat,
+  cuisines: dish.cuisines,
+  source: dish.source as any,
+  lastMade: dish.lastmade || undefined,
+  timesCooked: dish.timescooked,
+  user_id: dish.user_id
+});
+
+export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Tables']['dishes']['Insert']> => ({
+  id: dish.id,
+  name: dish.name,
+  createdat: dish.createdAt,
+  cuisines: dish.cuisines,
+  source: dish.source as any,
+  lastmade: dish.lastMade,
+  timescooked: dish.timesCooked,
+  user_id: dish.user_id
+});
+
+export const mapMealHistoryFromDB = (history: Database['public']['Tables']['meal_history']['Row']): MealHistory => ({
+  id: history.id,
+  dishId: history.dishid,
+  date: history.date,
+  notes: history.notes || undefined,
+  user_id: history.user_id
+});
+
+export const mapMealHistoryToDB = (history: Partial<MealHistory>): Partial<Database['public']['Tables']['meal_history']['Insert']> => ({
+  id: history.id,
+  dishid: history.dishId,
+  date: history.date,
+  notes: history.notes,
+  user_id: history.user_id
+});
+
+export const mapCookbookFromDB = (cookbook: Database['public']['Tables']['cookbooks']['Row']): Cookbook => ({
+  id: cookbook.id,
+  name: cookbook.name,
+  author: cookbook.author || undefined,
+  description: cookbook.description || undefined,
+  createdAt: cookbook.createdat,
+  user_id: cookbook.user_id
+});
+
+export const mapCookbookToDB = (cookbook: Partial<Cookbook>): Partial<Database['public']['Tables']['cookbooks']['Insert']> => ({
+  id: cookbook.id,
+  name: cookbook.name,
+  author: cookbook.author,
+  description: cookbook.description,
+  createdat: cookbook.createdAt,
+  user_id: cookbook.user_id
+});
