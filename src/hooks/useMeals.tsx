@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dish, Cookbook } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ export function useDishes() {
   // Query to fetch dishes from Supabase
   const { data: dishes = [] } = useQuery({
     queryKey: ['dishes'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Dish[]> => {
       const { data, error } = await supabase
         .from('dishes')
         .select('*')
@@ -25,7 +25,7 @@ export function useDishes() {
 
   // Mutation to add a new dish
   const addDishMutation = useMutation({
-    mutationFn: async (dish: Omit<Dish, "id" | "createdAt" | "timesCooked">) => {
+    mutationFn: async (dish: Omit<Dish, "id" | "createdAt" | "timesCooked" | "user_id">) => {
       const newDish = {
         ...dish,
         timesCooked: 0,
@@ -112,7 +112,7 @@ export function useDishes() {
   });
 
   // Get dish by ID
-  const getDish = async (id: string) => {
+  const getDish = async (id: string): Promise<Dish> => {
     const { data, error } = await supabase
       .from('dishes')
       .select('*')
@@ -124,7 +124,7 @@ export function useDishes() {
   };
 
   // Get weekly dish suggestions
-  const getWeeklyDishSuggestions = async (count: number = 7) => {
+  const getWeeklyDishSuggestions = async (count: number = 7): Promise<Dish[]> => {
     // This is complex logic that would be better as a Postgres function
     // For now, we'll fetch all dishes and calculate client-side
     const { data: allDishes, error } = await supabase
@@ -403,16 +403,16 @@ export function useDishes() {
   // Clear all data
   const clearData = async () => {
     // Delete all data in reverse order of dependencies
-    await supabase.from('meal_history').delete().neq('id', 0);
-    await supabase.from('dishes').delete().neq('id', 0);
-    await supabase.from('cookbooks').delete().neq('id', 0);
+    await supabase.from('meal_history').delete().neq('id', '0');
+    await supabase.from('dishes').delete().neq('id', '0');
+    await supabase.from('cookbooks').delete().neq('id', '0');
     
     // Refresh queries
     queryClient.invalidateQueries();
   };
 
   // Cookbook functions
-  const getCookbooksData = async () => {
+  const getCookbooksData = async (): Promise<Cookbook[]> => {
     const { data, error } = await supabase
       .from('cookbooks')
       .select('*')
@@ -422,7 +422,7 @@ export function useDishes() {
     return data || [];
   };
 
-  const getCookbookData = async (id: string) => {
+  const getCookbookData = async (id: string): Promise<Cookbook> => {
     const { data, error } = await supabase
       .from('cookbooks')
       .select('*')
@@ -433,7 +433,7 @@ export function useDishes() {
     return data;
   };
 
-  const getDishesByCookbook = async (cookbookId: string) => {
+  const getDishesByCookbook = async (cookbookId: string): Promise<Dish[]> => {
     const { data, error } = await supabase
       .from('dishes')
       .select('*')
@@ -447,7 +447,7 @@ export function useDishes() {
   return {
     dishes,
     isLoading,
-    addDish: (dish: Omit<Dish, "id" | "createdAt" | "timesCooked">) => addDishMutation.mutateAsync(dish),
+    addDish: (dish: Omit<Dish, "id" | "createdAt" | "timesCooked" | "user_id">) => addDishMutation.mutateAsync(dish),
     updateDish: (id: string, updates: Partial<Dish>) => updateDishMutation.mutateAsync({ id, updates }),
     deleteDish: (id: string) => deleteDishMutation.mutateAsync(id),
     recordDishCooked: (dishId: string, date?: string, notes?: string) => 

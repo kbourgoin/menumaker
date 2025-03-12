@@ -57,7 +57,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
     
     try {
       const entries = await processCSVFile(file);
-      const result = importMealHistory(entries);
+      const result = await importMealHistory(entries);
       
       setIsDialogOpen(false);
       setFile(null);

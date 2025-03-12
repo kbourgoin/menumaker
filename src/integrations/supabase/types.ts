@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cookbooks: {
+        Row: {
+          author: string | null
+          createdat: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          author?: string | null
+          createdat?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          author?: string | null
+          createdat?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dishes: {
+        Row: {
+          createdat: string
+          cuisines: string[]
+          id: string
+          lastmade: string | null
+          name: string
+          source: Json | null
+          timescooked: number
+          user_id: string
+        }
+        Insert: {
+          createdat?: string
+          cuisines?: string[]
+          id?: string
+          lastmade?: string | null
+          name: string
+          source?: Json | null
+          timescooked?: number
+          user_id: string
+        }
+        Update: {
+          createdat?: string
+          cuisines?: string[]
+          id?: string
+          lastmade?: string | null
+          name?: string
+          source?: Json | null
+          timescooked?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meal_history: {
+        Row: {
+          date: string
+          dishid: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          date?: string
+          dishid: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          date?: string
+          dishid?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_history_dishid_fkey"
+            columns: ["dishid"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -35,7 +127,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_by: {
+        Args: {
+          dish_id: string
+          increment_amount: number
+        }
+        Returns: number
+      }
+      increment_times_cooked: {
+        Args: {
+          dish_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
