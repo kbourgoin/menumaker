@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface SourceLinkProps {
   source: {
-    type: 'url' | 'book';
+    type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
   };
@@ -12,6 +12,11 @@ interface SourceLinkProps {
 }
 
 const SourceLink = ({ source, className = "" }: SourceLinkProps) => {
+  // Handle 'none' type or empty source
+  if (source.type === 'none' || !source.value) {
+    return null;
+  }
+  
   if (source.type === 'url') {
     return (
       <TooltipProvider>

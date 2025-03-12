@@ -101,7 +101,7 @@ const MealCard = ({ meal, showActions = true, compact = false, onDeleted }: Meal
             <div className="mt-1">Made {meal.timesCooked} {meal.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
-          {meal.source && !compact && (
+          {meal.source && meal.source.type !== 'none' && !compact && (
             <div className="mt-2">
               <SourceLink source={meal.source} />
             </div>
