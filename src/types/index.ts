@@ -24,6 +24,7 @@ export interface Source {
   name: string;
   type: 'book' | 'website' | 'document';
   description?: string;
+  url?: string;
   createdAt: string;
   user_id: string;
 }

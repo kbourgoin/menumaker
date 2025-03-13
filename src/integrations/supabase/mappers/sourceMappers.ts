@@ -2,7 +2,9 @@
 import { Database } from '../types';
 import { Source } from '@/types';
 
-export type DBSource = Database['public']['Tables']['sources']['Row'];
+export type DBSource = Database['public']['Tables']['sources']['Row'] & {
+  url?: string;
+};
 
 export const mapSourceFromDB = (source: DBSource): Source => ({
   id: source.id,
@@ -14,7 +16,7 @@ export const mapSourceFromDB = (source: DBSource): Source => ({
   user_id: source.user_id
 });
 
-export const mapSourceToDB = (source: Partial<Source>): Partial<Database['public']['Tables']['sources']['Insert']> => {
+export const mapSourceToDB = (source: Partial<Source>): Partial<Database['public']['Tables']['sources']['Insert']> & { url?: string } => {
   // Ensure required fields are present when inserting a new source
   if (source.name === undefined && !source.id) {
     throw new Error('Name is required when creating a new source');

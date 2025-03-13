@@ -40,10 +40,14 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
   }
   
   // For website sources, make the name a clickable external link
-  if (source.type === 'website' && source.url) {
+  if (source.type === 'website' && source.name) {
+    // For websites, use the name as URL if no explicit URL is provided
+    const url = source.url || source.name;
+    const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+    
     return (
       <a 
-        href={source.url.startsWith('http') ? source.url : `https://${source.url}`}
+        href={fullUrl}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-flex items-center text-sm text-terracotta-500 hover:text-terracotta-600 hover:underline ${className}`}
