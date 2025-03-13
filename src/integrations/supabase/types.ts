@@ -142,7 +142,7 @@ export type Database = {
     Functions: {
       clear_user_data: {
         Args: {
-          user_id: string
+          p_user_id: string
         }
         Returns: undefined
       }
