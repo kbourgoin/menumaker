@@ -58,11 +58,10 @@ export const findOrCreateSource = async (sourceName: string, sourceType: 'book' 
 };
 
 // Find or create a dish by name - COMPLETELY avoid the dish_summary view
-// Updated to handle the location field
+// Updated to handle the source_id and location fields
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
-  source: any, 
   sourceId: string | null | undefined,
   userId: string,
   location?: string
@@ -97,24 +96,11 @@ export const findOrCreateDish = async (
     // Create a new dish - bypass the materialized view completely
     console.log(`Creating new dish '${dishName}'`);
     
-    // Prepare the dish data - ensure source is properly formatted
-    let formattedSource = source;
-    if (typeof source === 'string') {
-      try {
-        formattedSource = JSON.parse(source);
-      } catch {
-        formattedSource = { type: 'none', value: source };
-      }
-    } else if (!source || !source.type) {
-      formattedSource = { type: 'none', value: '' };
-    }
-    
     // Create dish data with the direct source_id relationship
     const dishData = {
       name: dishName,
       createdat: date,
       cuisines: ['Other'], // Default cuisine
-      source: formattedSource,
       user_id: userId,
       source_id: sourceId || null,
       location: location // Include the location field

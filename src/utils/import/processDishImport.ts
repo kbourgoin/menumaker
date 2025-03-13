@@ -21,22 +21,31 @@ export const processDishImport = async (
   try {
     const firstEntry = dishEntries[0];
     let sourceId = undefined;
+    let location = undefined;
     
     // If it's a book source, try to find or create a source entry
     if (firstEntry.source?.type === 'book' && firstEntry.source.value) {
       sourceId = await findOrCreateSource(firstEntry.source.value, 'book', null, userId);
+      // For book sources, set location to page number if it exists
+      if (firstEntry.source.page) {
+        location = firstEntry.source.page.toString();
+      }
     } else if (firstEntry.source?.type === 'url' && firstEntry.source.value) {
-      // Optionally also track website sources
+      // For URL sources, set location to the URL
       sourceId = await findOrCreateSource(firstEntry.source.value, 'website', firstEntry.source.value, userId);
+      location = firstEntry.source.value;
+    } else if (firstEntry.location) {
+      // Use explicit location if provided
+      location = firstEntry.location;
     }
     
-    // Find or create the dish - pass the location field
+    // Find or create the dish - pass the sourceId and location separately
     const dishId = await findOrCreateDish(
       firstEntry.dish, 
       firstEntry.date, 
-      sourceId, 
+      sourceId,
       userId,
-      firstEntry.location
+      location
     );
     
     if (!dishId) {

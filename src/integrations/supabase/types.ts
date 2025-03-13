@@ -16,7 +16,6 @@ export type Database = {
           id: string
           location: string | null
           name: string
-          source: Json | null
           source_id: string | null
           user_id: string
         }
@@ -26,7 +25,6 @@ export type Database = {
           id?: string
           location?: string | null
           name: string
-          source?: Json | null
           source_id?: string | null
           user_id: string
         }
@@ -36,7 +34,6 @@ export type Database = {
           id?: string
           location?: string | null
           name?: string
-          source?: Json | null
           source_id?: string | null
           user_id?: string
         }
@@ -148,12 +145,21 @@ export type Database = {
           cuisines: string[] | null
           id: string | null
           last_made: string | null
+          location: string | null
           name: string | null
-          source: Json | null
+          source_id: string | null
           times_cooked: number | null
           user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dishes_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

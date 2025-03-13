@@ -13,7 +13,6 @@ export type DishSummary = {
   name: string;
   createdat: string;
   cuisines: string[];
-  source?: any;
   source_id?: string;
   location?: string;
   user_id: string;
