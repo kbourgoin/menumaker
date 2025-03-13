@@ -31,7 +31,7 @@ export function useImportMealHistory() {
     
     let successCount = 0;
     let skippedCount = 0;
-    const BATCH_SIZE = 10; // Process entries in batches of 10
+    const BATCH_SIZE = 5; // Process fewer entries in batches to reduce load
     
     try {
       // Group entries by dish name
@@ -59,7 +59,7 @@ export function useImportMealHistory() {
         console.log(`Processing batch ${i/BATCH_SIZE + 1} of ${Math.ceil(dishEntries.length/BATCH_SIZE)}`);
         
         // Process each batch in parallel
-        await Promise.all(batch.map(async ([dishLower, dishEntries]) => {
+        const results = await Promise.allSettled(batch.map(async ([dishLower, dishEntries]) => {
           try {
             // Search for existing dishes by name
             const { data: existingDishes, error: dishError } = await supabase
@@ -71,7 +71,7 @@ export function useImportMealHistory() {
             
             if (dishError) {
               console.error(`Error finding dish '${dishEntries[0].dish}':`, dishError);
-              return;
+              return { success: 0, skipped: dishEntries.length };
             }
             
             console.log(`Search for '${dishEntries[0].dish}' found ${existingDishes?.length || 0} potential matches`);
@@ -153,30 +153,25 @@ export function useImportMealHistory() {
                 }
               }
               
-              // Create the new dish - Now explicitly insert only into the dishes table
-              try {
-                const { data: newDish, error: newDishError } = await supabase
-                  .from('dishes')
-                  .insert({
-                    name: firstEntry.dish,
-                    createdat: firstEntry.date,
-                    cuisines: ['Other'],
-                    source,
-                    user_id
-                  })
-                  .select('id')
-                  .single();
-                  
-                if (newDishError) {
-                  console.error(`Error creating dish '${firstEntry.dish}':`, newDishError);
-                  return;
-                } else if (newDish) {
-                  dishId = newDish.id;
-                  console.log(`Created new dish '${firstEntry.dish}' with ID ${dishId}`);
-                }
-              } catch (err) {
-                console.error(`Failed to create dish '${firstEntry.dish}':`, err);
-                return;
+              // Create the new dish - Insert only into the dishes table with explicit fields
+              const { data: newDish, error: newDishError } = await supabase
+                .from('dishes')
+                .insert({
+                  name: firstEntry.dish,
+                  createdat: firstEntry.date,
+                  cuisines: ['Other'],
+                  source,
+                  user_id
+                })
+                .select('id')
+                .single();
+                
+              if (newDishError) {
+                console.error(`Error creating dish '${firstEntry.dish}':`, newDishError);
+                return { success: 0, skipped: dishEntries.length };
+              } else if (newDish) {
+                dishId = newDish.id;
+                console.log(`Created new dish '${firstEntry.dish}' with ID ${dishId}`);
               }
             }
             
@@ -206,6 +201,7 @@ export function useImportMealHistory() {
               
               // Prepare new entries that don't exist yet
               const historyEntries = [];
+              let skipped = 0;
               
               for (const entry of dishEntries) {
                 // Compare just the date part
@@ -219,40 +215,49 @@ export function useImportMealHistory() {
                     user_id
                   });
                 } else {
-                  skippedCount++;
+                  skipped++;
                 }
               }
               
-              console.log(`Adding ${historyEntries.length} new history entries for dish ${dishId} (skipped ${dishEntries.length - historyEntries.length})`);
+              console.log(`Adding ${historyEntries.length} new history entries for dish ${dishId} (skipped ${skipped})`);
               
               // Insert all new entries in a single batch
               if (historyEntries.length > 0) {
-                try {
-                  const { error: insertError } = await supabase
-                    .from('meal_history')
-                    .insert(historyEntries);
-                    
-                  if (insertError) {
-                    console.error(`Error inserting history entries for dish ${dishId}:`, insertError);
-                  } else {
-                    successCount += historyEntries.length;
-                    console.log(`Successfully added ${historyEntries.length} history entries for dish ${dishId}`);
-                  }
-                } catch (err) {
-                  console.error(`Failed to insert history entries for dish ${dishId}:`, err);
+                const { error: insertError } = await supabase
+                  .from('meal_history')
+                  .insert(historyEntries);
+                  
+                if (insertError) {
+                  console.error(`Error inserting history entries for dish ${dishId}:`, insertError);
+                  return { success: 0, skipped: dishEntries.length };
+                } else {
+                  return { success: historyEntries.length, skipped };
                 }
+              } else {
+                return { success: 0, skipped: dishEntries.length };
               }
             }
+            
+            return { success: 0, skipped: dishEntries.length };
           } catch (err) {
             console.error(`Error processing dish '${dishEntries[0].dish}':`, err);
-          } finally {
-            // Always update progress even if there was an error
-            processedDishes++;
-            if (onProgress) {
-              onProgress(processedDishes, totalDishes);
-            }
+            return { success: 0, skipped: dishEntries.length };
           }
         }));
+        
+        // Count successes and failures
+        results.forEach(result => {
+          if (result.status === 'fulfilled') {
+            successCount += result.value.success;
+            skippedCount += result.value.skipped;
+          }
+        });
+        
+        // Update progress after each batch
+        processedDishes += batch.length;
+        if (onProgress) {
+          onProgress(processedDishes, totalDishes);
+        }
       }
       
       console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}`);

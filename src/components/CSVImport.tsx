@@ -72,17 +72,22 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
     setError(null);
     
     try {
+      // Process the CSV file to get entries
       const entries = await processCSVFile(file);
       
       if (entries.length === 0) {
         throw new Error("No valid entries found in the CSV file. Please check the format.");
       }
       
-      // Use the progress callback to update UI
+      // Import the entries with progress updates
       const result = await importMealHistory(entries, (processed, total) => {
         const progressPercentage = Math.floor((processed / total) * 100);
+        console.log(`Import progress: ${processed}/${total} (${progressPercentage}%)`);
         setProgress(progressPercentage);
       });
+      
+      // Ensure we always show 100% at the end for better UX
+      setProgress(100);
       
       // Wait a moment to show 100% progress before closing dialog
       setTimeout(() => {
@@ -91,18 +96,31 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         setPreviewData([]);
         setProgress(0);
         
+        // Show success message
         toast({
           title: "Import complete",
-          description: `Imported ${result.success} meals. Skipped ${result.skipped} duplicates.`,
+          description: `Successfully imported ${result.success} meals. Skipped ${result.skipped} duplicates or invalid entries.`,
         });
         
         if (onImportComplete) {
           onImportComplete();
         }
-      }, 800); // Slightly longer delay to ensure users see the 100% progress
+      }, 1000);
     } catch (error) {
       console.error("Import failed:", error);
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      let errorMessage = "An unknown error occurred during import";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // Check for specific errors from Supabase
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        const supabaseError = error as any;
+        if (supabaseError.message.includes('dish_summary')) {
+          errorMessage = "Database permission error. Unable to import meals.";
+        }
+      }
       
       setError(errorMessage);
       toast({
