@@ -22,7 +22,6 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
   const [previewData, setPreviewData] = useState<string[][]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
   const [error, setError] = useState<string | null>(null);
   
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +70,6 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
     setIsUploading(true);
     setProgress(0);
     setError(null);
-    setTotalItems(1); // Initialize with 1 to show some progress immediately
     
     try {
       const entries = await processCSVFile(file);
@@ -80,12 +78,10 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         throw new Error("No valid entries found in the CSV file. Please check the format.");
       }
       
-      // Show how many entries we're going to process
-      setTotalItems(Math.max(1, entries.length)); 
-      
-      // Use the progress callback
+      // Use the progress callback to update UI
       const result = await importMealHistory(entries, (processed, total) => {
-        setProgress(Math.floor((processed / total) * 100));
+        const progressPercentage = Math.floor((processed / total) * 100);
+        setProgress(progressPercentage);
       });
       
       // Wait a moment to show 100% progress before closing dialog
@@ -103,15 +99,19 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         if (onImportComplete) {
           onImportComplete();
         }
-      }, 500);
+      }, 800); // Slightly longer delay to ensure users see the 100% progress
     } catch (error) {
       console.error("Import failed:", error);
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      
+      setError(errorMessage);
       toast({
         title: "Import failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // Reset progress on error
       setProgress(0);
     } finally {
       setIsUploading(false);

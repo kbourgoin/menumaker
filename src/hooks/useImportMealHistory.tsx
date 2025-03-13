@@ -61,11 +61,12 @@ export function useImportMealHistory() {
         // Process each batch in parallel
         await Promise.all(batch.map(async ([dishLower, dishEntries]) => {
           try {
-            // Use a more forgiving search to find dishes with similar names
+            // Search for existing dishes by name
             const { data: existingDishes, error: dishError } = await supabase
               .from('dishes')
-              .select('*')
+              .select('id, name')
               .ilike('name', `%${dishEntries[0].dish.substring(0, Math.min(dishEntries[0].dish.length, 10))}%`)
+              .eq('user_id', user_id)
               .limit(5);
             
             if (dishError) {
@@ -105,8 +106,9 @@ export function useImportMealHistory() {
                 console.log(`Looking for cookbook '${source.value}'`);
                 const { data: existingCookbooks, error: cookbookError } = await supabase
                   .from('cookbooks')
-                  .select('*')
-                  .ilike('name', `%${source.value}%`);
+                  .select('id, name')
+                  .ilike('name', `%${source.value}%`)
+                  .eq('user_id', user_id);
                 
                 if (cookbookError) {
                   console.error(`Error finding cookbook '${source.value}':`, cookbookError);
@@ -121,7 +123,8 @@ export function useImportMealHistory() {
                     .from('cookbooks')
                     .insert({ 
                       name: source.value,
-                      user_id 
+                      user_id,
+                      createdat: new Date().toISOString()
                     })
                     .select('id')
                     .single();
@@ -150,7 +153,7 @@ export function useImportMealHistory() {
                 }
               }
               
-              // Create new dish - This is the part that was failing due to the materialized view
+              // Create the new dish - Now explicitly insert only into the dishes table
               try {
                 const { data: newDish, error: newDishError } = await supabase
                   .from('dishes')
@@ -178,21 +181,21 @@ export function useImportMealHistory() {
             }
             
             if (dishId) {
-              // Create meal history entries for this dish
-              const historyEntries = [];
-              
-              // Use a Set for existing entries to avoid duplicates
-              const existingEntries = new Set();
-              
               // Get all existing meal history entries for this dish to check for duplicates
               const { data: existingMealHistory, error: historyError } = await supabase
                 .from('meal_history')
                 .select('date')
-                .eq('dishid', dishId);
+                .eq('dishid', dishId)
+                .eq('user_id', user_id);
                 
               if (historyError) {
                 console.error(`Error fetching meal history for dish ${dishId}:`, historyError);
-              } else if (existingMealHistory) {
+              }
+              
+              // Use a Set for existing entries to avoid duplicates
+              const existingEntries = new Set();
+              
+              if (existingMealHistory) {
                 existingMealHistory.forEach(entry => {
                   // Store just the date part to simplify comparison
                   const dateOnly = new Date(entry.date).toISOString().split('T')[0];
@@ -202,6 +205,8 @@ export function useImportMealHistory() {
               }
               
               // Prepare new entries that don't exist yet
+              const historyEntries = [];
+              
               for (const entry of dishEntries) {
                 // Compare just the date part
                 const entryDateOnly = new Date(entry.date).toISOString().split('T')[0];
@@ -223,7 +228,7 @@ export function useImportMealHistory() {
               // Insert all new entries in a single batch
               if (historyEntries.length > 0) {
                 try {
-                  const { data: newHistory, error: insertError } = await supabase
+                  const { error: insertError } = await supabase
                     .from('meal_history')
                     .insert(historyEntries);
                     
