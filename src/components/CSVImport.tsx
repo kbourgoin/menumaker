@@ -27,6 +27,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
   
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
+    setProgress(0);
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
     
@@ -87,7 +88,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         setProgress(Math.floor((processed / total) * 100));
       });
       
-      // Wait a moment to show 100% progress
+      // Wait a moment to show 100% progress before closing dialog
       setTimeout(() => {
         setIsDialogOpen(false);
         setFile(null);
