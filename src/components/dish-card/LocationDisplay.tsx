@@ -15,8 +15,8 @@ const LocationDisplay = ({ location, inline = false }: LocationDisplayProps) => 
   const isLocationUrl = isUrl(location);
   
   return (
-    <div className={`${inline ? "" : "text-sm"} text-muted-foreground inline-flex items-center`}>
-      <span>{isLocationUrl ? location : `Page: ${location}`}</span>
+    <div className={`${inline ? "" : "text-sm"} inline-flex items-center text-terracotta-500`}>
+      <span>{isLocationUrl ? location : `p. ${location}`}</span>
     </div>
   );
 };
