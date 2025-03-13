@@ -44,7 +44,7 @@ const AllDishes = () => {
         </div>
         
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {!isLoading && filteredDishes.map((dish) => (
+          {!isLoading && filteredDishes.length > 0 && filteredDishes.map((dish) => (
             <DishCard key={dish.id} dish={dish} />
           ))}
           
