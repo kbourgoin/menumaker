@@ -1,13 +1,15 @@
 
 import { useDishQueries } from "./dish/useDishQueries";
 import { useDishMutations } from "./dish/useDishMutations";
+import { useMealHistory } from "./useMealHistory";
 
 /**
  * Main hook that combines dish queries and mutations
  */
 export function useDishes() {
   const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
-  const { addDish, updateDish, deleteDish, recordDishCooked } = useDishMutations();
+  const { addDish, updateDish, deleteDish } = useDishMutations();
+  const { recordDishCooked } = useMealHistory();
 
   return {
     dishes,
