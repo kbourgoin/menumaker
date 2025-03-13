@@ -39,7 +39,6 @@ const SourceTable = ({ sources, onEdit, onDelete }: SourceTableProps) => {
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Type</TableHead>
-            <TableHead className="hidden md:table-cell">Location</TableHead>
             <TableHead className="hidden md:table-cell">Description</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -49,9 +48,6 @@ const SourceTable = ({ sources, onEdit, onDelete }: SourceTableProps) => {
             <TableRow key={source.id}>
               <TableCell className="font-medium">{source.name}</TableCell>
               <TableCell>{getSourceTypeLabel(source.type)}</TableCell>
-              <TableCell className="hidden md:table-cell">
-                {source.location || "-"}
-              </TableCell>
               <TableCell className="hidden md:table-cell">
                 {source.description ? (
                   <span className="line-clamp-1">{source.description}</span>

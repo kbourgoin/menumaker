@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,6 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
   const [formData, setFormData] = useState({
     name: "",
     type: "book" as 'book' | 'website' | 'document',
-    location: "",
     description: "",
   });
   
@@ -47,7 +47,6 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       setFormData({
         name: source.name,
         type: source.type,
-        location: source.location || "",
         description: source.description || "",
       });
     }
@@ -111,7 +110,6 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       id: source.id,
       name: formData.name,
       type: formData.type,
-      location: formData.location || undefined,
       description: formData.description || undefined,
     });
   };
@@ -155,19 +153,6 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
                 <SelectItem value="document">Document</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="edit-location" className="text-sm font-medium">
-              Location
-            </label>
-            <Input
-              id="edit-location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder={formData.type === 'website' ? "https://example.com/recipes" : "Location or reference"}
-            />
           </div>
           
           <div className="space-y-2">

@@ -22,8 +22,7 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
           if (sourceData) {
             setSource({
               name: sourceData.name,
-              type: sourceData.type,
-              url: sourceData.type === 'website' ? sourceData.location : undefined
+              type: sourceData.type
             });
           }
         } catch (error) {
@@ -39,45 +38,24 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
     return null;
   }
   
-  if (source.type === 'website' && source.url) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <a 
-              href={source.url.startsWith('http') ? source.url : `https://${source.url}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex items-center text-sm transition-colors text-terracotta-500 hover:text-terracotta-600 hover:underline ${className}`}
-            >
-              <Globe className="w-4 h-4 mr-1.5" />
-              <span className="truncate max-w-[200px]">
-                {source.name}
-              </span>
-            </a>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>View recipe online</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-  
   // Book source
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <span className={`inline-flex items-center text-sm text-terracotta-500 ${className}`}>
-            <Book className="w-4 h-4 mr-1.5" />
+            {source.type === 'book' && <Book className="w-4 h-4 mr-1.5" />}
+            {source.type === 'website' && <Globe className="w-4 h-4 mr-1.5" />}
+            {source.type === 'document' && <FileText className="w-4 h-4 mr-1.5" />}
             <span className="truncate max-w-[200px]">
               {source.name}
             </span>
           </span>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Book reference</p>
+          <p>{source.type === 'book' ? "Book reference" : 
+             source.type === 'website' ? "Website reference" : 
+             "Document reference"}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,7 +1,8 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Find or create a source for a dish
-export const findOrCreateSource = async (sourceName: string, sourceType: 'book' | 'website' | 'document', location: string | null, userId: string) => {
+export const findOrCreateSource = async (sourceName: string, sourceType: 'book' | 'website' | 'document', userId: string) => {
   console.log(`Looking for source '${sourceName}' of type ${sourceType}`);
   
   const { data: existingSources, error: sourceError } = await supabase
@@ -34,14 +35,13 @@ export const findOrCreateSource = async (sourceName: string, sourceType: 'book' 
     }
   }
   
-  // Create new source - note: keep location field for backward compatibility
+  // Create new source
   console.log(`Creating new source '${sourceName}' of type ${sourceType}`);
   const { data: newSource, error: newSourceError } = await supabase
     .from('sources')
     .insert({ 
       name: sourceName,
       type: sourceType,
-      location: location,
       user_id: userId,
       created_at: new Date().toISOString()
     })

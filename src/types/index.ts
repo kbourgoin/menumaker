@@ -26,9 +26,6 @@ export interface Source {
   description?: string;
   createdAt: string;
   user_id: string;
-  // Note: location is still in the Source interface for backwards compatibility
-  // but we'll eventually want to remove it after all data is migrated
-  location?: string;
 }
 
 export type CuisineType = 

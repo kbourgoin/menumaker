@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,6 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
   const [formData, setFormData] = useState({
     name: "",
     type: "book", // Default type
-    location: "",
     description: "",
   });
   
@@ -55,7 +55,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sources'] });
       setIsOpen(false);
-      setFormData({ name: "", type: "book", location: "", description: "" });
+      setFormData({ name: "", type: "book", description: "" });
       
       toast({
         title: "Source added",
@@ -99,7 +99,6 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
     addSourceMutation.mutate({
       name: formData.name,
       type: formData.type as 'book' | 'website' | 'document',
-      location: formData.location || undefined,
       description: formData.description || undefined,
     });
   };
@@ -149,23 +148,10 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
                 <SelectItem value="document">Document</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="location" className="text-sm font-medium">
-              Location
-            </label>
-            <Input
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder={formData.type === 'website' ? "https://example.com/recipes" : "Location or reference"}
-            />
             <p className="text-xs text-muted-foreground">
-              {formData.type === 'book' ? "Page numbers can be added per recipe" : 
-               formData.type === 'website' ? "URL of the recipe source" : 
-               "Any additional reference information"}
+              {formData.type === 'book' ? "Book or cookbook" : 
+               formData.type === 'website' ? "Online recipe source" : 
+               "Any other document type source"}
             </p>
           </div>
           

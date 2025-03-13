@@ -7,7 +7,6 @@ export type DBSource = Database['public']['Tables']['sources']['Row'];
 export const mapSourceFromDB = (source: DBSource): Source => ({
   id: source.id,
   name: source.name,
-  location: source.location || undefined,
   type: source.type as 'book' | 'website' | 'document',
   description: source.description || undefined,
   createdAt: source.created_at,
@@ -27,7 +26,6 @@ export const mapSourceToDB = (source: Partial<Source>): Partial<Database['public
   return {
     id: source.id,
     name: source.name,
-    location: source.location,
     type: source.type,
     description: source.description,
     created_at: source.createdAt,
