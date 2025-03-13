@@ -16,10 +16,10 @@ export function useClearData() {
       
       console.log("Clearing data for user:", userId);
       
-      // Change the parameter name to p_user_id to avoid ambiguity with column names
+      // Use the stored procedure without referencing cookbooks
       const { error } = await supabase.rpc('clear_user_data', { 
-        p_user_id: userId  // Changed parameter name to avoid ambiguity
-      }) as any;
+        p_user_id: userId
+      });
       
       if (error) {
         console.error("Error clearing data:", error);
