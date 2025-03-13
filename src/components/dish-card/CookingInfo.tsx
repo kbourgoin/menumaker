@@ -1,6 +1,12 @@
 
 import { Calendar } from "lucide-react";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 interface CookingInfoProps {
   lastMade?: string;
@@ -33,9 +39,21 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
     <div className={`text-sm text-muted-foreground ${compact ? "text-xs" : ""}`}>
       <div className="flex items-center space-x-1">
         <Calendar className="w-3.5 h-3.5 mr-1" />
-        <span>
-          Last made: {formatDate(lastMade)} {lastMade && `(${formatTimeAgo(lastMade)})`}
-        </span>
+        <span>Last made: </span>
+        {lastMade ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">{formatTimeAgo(lastMade)}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{formatDate(lastMade)}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <span>Never</span>
+        )}
       </div>
       <div className="mt-1">
         Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}
