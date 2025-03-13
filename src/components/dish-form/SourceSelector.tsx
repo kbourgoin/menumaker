@@ -1,12 +1,11 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { FormValues } from "./FormSchema";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Book, Globe, FileText } from "lucide-react";
 import { Source } from "@/types";
 
 interface SourceSelectorProps {
@@ -15,6 +14,19 @@ interface SourceSelectorProps {
 }
 
 const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
+  const getSourceIcon = (type: string) => {
+    switch (type) {
+      case 'book':
+        return <Book className="h-4 w-4 mr-2" />;
+      case 'website':
+        return <Globe className="h-4 w-4 mr-2" />;
+      case 'document':
+        return <FileText className="h-4 w-4 mr-2" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <FormField
@@ -31,11 +43,14 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                     role="combobox"
                     className="justify-between"
                   >
-                    {field.value
-                      ? sources.find(source => source.id === field.value)?.name + 
-                        (sources.find(source => source.id === field.value)?.type ? 
-                        ` (${sources.find(source => source.id === field.value)?.type})` : "")
-                      : "No source selected"}
+                    {field.value ? (
+                      <div className="flex items-center">
+                        {getSourceIcon(sources.find(source => source.id === field.value)?.type || '')}
+                        <span>{sources.find(source => source.id === field.value)?.name}</span>
+                      </div>
+                    ) : (
+                      "No source selected"
+                    )}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
@@ -74,7 +89,10 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                                 : "opacity-0"
                             }`}
                           />
-                          {source.name} ({source.type})
+                          <div className="flex items-center">
+                            {getSourceIcon(source.type)}
+                            <span>{source.name}</span>
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
