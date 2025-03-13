@@ -62,7 +62,12 @@ export function useImportMealHistory() {
         
         // Process each batch in parallel
         const results = await Promise.allSettled(batch.map(async ([dishLower, dishEntries]) => {
-          return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
+          try {
+            return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
+          } catch (error) {
+            console.error(`Error processing dish ${dishEntries[0].dish}:`, error);
+            return { success: 0, skipped: dishEntries.length };
+          }
         }));
         
         // Count successes and failures

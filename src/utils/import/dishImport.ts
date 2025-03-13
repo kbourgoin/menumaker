@@ -86,17 +86,21 @@ export const findOrCreateDish = async (
     }
   }
   
-  // Create a new dish
+  // Create a new dish - directly insert into dishes table, not the materialized view
   console.log(`Creating new dish '${dishName}'`);
+  
+  // Prepare the dish data
+  const dishData = {
+    name: dishName,
+    createdat: date,
+    cuisines: ['Other'], // Default cuisine
+    source,
+    user_id: userId
+  };
+  
   const { data: newDish, error: newDishError } = await supabase
     .from('dishes')
-    .insert({
-      name: dishName,
-      createdat: date,
-      cuisines: ['Other'],
-      source,
-      user_id: userId
-    })
+    .insert(dishData)
     .select('id')
     .single();
     

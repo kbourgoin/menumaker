@@ -84,11 +84,15 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         errorMessage = error.message;
       }
       
-      // Check for specific errors from Supabase
-      if (typeof error === 'object' && error !== null && 'message' in error) {
+      // Check for specific Supabase database errors
+      if (typeof error === 'object' && error !== null) {
         const supabaseError = error as any;
-        if (supabaseError.message.includes('dish_summary')) {
-          errorMessage = "Database permission error. Unable to import meals.";
+        if (supabaseError.code === '42501') {
+          errorMessage = "Database permission error. You don't have the required permissions.";
+        } else if (supabaseError.message && typeof supabaseError.message === 'string') {
+          if (supabaseError.message.includes('dish_summary')) {
+            errorMessage = "Cannot write to the dish summary view. Please contact support.";
+          }
         }
       }
       
