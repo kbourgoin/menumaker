@@ -2,10 +2,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useBatchProcessing } from "./import/useBatchProcessing";
+import { processDishImport } from "@/utils/import/processDishImport";
 
 export function useImportMealHistory() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const BATCH_SIZE = 5;
 
   // Import meal history with progress reporting
   const importMealHistory = async (
@@ -31,7 +34,6 @@ export function useImportMealHistory() {
     
     let successCount = 0;
     let skippedCount = 0;
-    const BATCH_SIZE = 5; // Process fewer entries in batches to reduce load
     
     try {
       // Group entries by dish name
@@ -60,189 +62,7 @@ export function useImportMealHistory() {
         
         // Process each batch in parallel
         const results = await Promise.allSettled(batch.map(async ([dishLower, dishEntries]) => {
-          try {
-            // FIXED: Use direct table access instead of the materialized view
-            // Search for existing dishes by name directly from dishes table
-            const { data: existingDishes, error: dishError } = await supabase
-              .from('dishes')
-              .select('id, name')
-              .ilike('name', `%${dishEntries[0].dish.substring(0, Math.min(dishEntries[0].dish.length, 10))}%`)
-              .eq('user_id', user_id);
-            
-            if (dishError) {
-              console.error(`Error finding dish '${dishEntries[0].dish}':`, dishError);
-              return { success: 0, skipped: dishEntries.length };
-            }
-            
-            console.log(`Search for '${dishEntries[0].dish}' found ${existingDishes?.length || 0} potential matches`);
-            
-            let dishId;
-            let exactMatch = false;
-            
-            // Check for an exact match (case insensitive)
-            if (existingDishes && existingDishes.length > 0) {
-              const exactDish = existingDishes.find(d => 
-                d.name.toLowerCase() === dishEntries[0].dish.toLowerCase()
-              );
-              
-              if (exactDish) {
-                dishId = exactDish.id;
-                exactMatch = true;
-                console.log(`Found exact match for dish '${dishEntries[0].dish}' with ID ${dishId}`);
-              }
-            }
-            
-            // If no exact match, create a new dish
-            if (!exactMatch) {
-              console.log(`Creating new dish '${dishEntries[0].dish}'`);
-              const firstEntry = dishEntries[0];
-              let source = firstEntry.source || {
-                type: 'none',
-                value: ''
-              };
-              
-              // If it's a book source, try to find or create cookbook
-              if (source.type === 'book' && source.value) {
-                console.log(`Looking for cookbook '${source.value}'`);
-                const { data: existingCookbooks, error: cookbookError } = await supabase
-                  .from('cookbooks')
-                  .select('id, name')
-                  .ilike('name', `%${source.value}%`)
-                  .eq('user_id', user_id);
-                
-                if (cookbookError) {
-                  console.error(`Error finding cookbook '${source.value}':`, cookbookError);
-                }
-                
-                let cookbookId;
-                
-                if (!existingCookbooks || existingCookbooks.length === 0) {
-                  // Create new cookbook
-                  console.log(`Creating new cookbook '${source.value}'`);
-                  const { data: newCookbook, error: newCookbookError } = await supabase
-                    .from('cookbooks')
-                    .insert({ 
-                      name: source.value,
-                      user_id,
-                      createdat: new Date().toISOString()
-                    })
-                    .select('id')
-                    .single();
-                    
-                  if (newCookbookError) {
-                    console.error(`Error creating cookbook '${source.value}':`, newCookbookError);
-                  } else if (newCookbook) {
-                    cookbookId = newCookbook.id;
-                    console.log(`Created cookbook '${source.value}' with ID ${cookbookId}`);
-                  }
-                } else {
-                  // Find the best match (exact match preferred)
-                  const exactCookbook = existingCookbooks.find(c => 
-                    c.name.toLowerCase() === source.value.toLowerCase()
-                  );
-                  
-                  cookbookId = exactCookbook ? exactCookbook.id : existingCookbooks[0].id;
-                  console.log(`Using existing cookbook '${exactCookbook?.name || existingCookbooks[0].name}' with ID ${cookbookId}`);
-                }
-                
-                if (cookbookId) {
-                  source = {
-                    ...source,
-                    bookId: cookbookId
-                  };
-                }
-              }
-              
-              // FIXED: Create the new dish with ONLY required fields, no references to materialized view
-              const { data: newDish, error: newDishError } = await supabase
-                .from('dishes')
-                .insert({
-                  name: firstEntry.dish,
-                  createdat: firstEntry.date,
-                  cuisines: ['Other'],
-                  source,
-                  user_id
-                })
-                .select('id')
-                .single();
-                
-              if (newDishError) {
-                console.error(`Error creating dish '${firstEntry.dish}':`, newDishError);
-                return { success: 0, skipped: dishEntries.length };
-              } else if (newDish) {
-                dishId = newDish.id;
-                console.log(`Created new dish '${firstEntry.dish}' with ID ${dishId}`);
-              }
-            }
-            
-            if (dishId) {
-              // FIXED: Get existing meal history entries directly from meal_history table
-              const { data: existingMealHistory, error: historyError } = await supabase
-                .from('meal_history')
-                .select('date')
-                .eq('dishid', dishId)
-                .eq('user_id', user_id);
-                
-              if (historyError) {
-                console.error(`Error fetching meal history for dish ${dishId}:`, historyError);
-              }
-              
-              // Use a Set for existing entries to avoid duplicates
-              const existingEntries = new Set();
-              
-              if (existingMealHistory) {
-                existingMealHistory.forEach(entry => {
-                  // Store just the date part to simplify comparison
-                  const dateOnly = new Date(entry.date).toISOString().split('T')[0];
-                  existingEntries.add(dateOnly);
-                });
-                console.log(`Found ${existingMealHistory.length} existing history entries for dish ${dishId}`);
-              }
-              
-              // Prepare new entries that don't exist yet
-              const historyEntries = [];
-              let skipped = 0;
-              
-              for (const entry of dishEntries) {
-                // Compare just the date part
-                const entryDateOnly = new Date(entry.date).toISOString().split('T')[0];
-                
-                if (!existingEntries.has(entryDateOnly)) {
-                  historyEntries.push({
-                    dishid: dishId,
-                    date: entry.date,
-                    notes: entry.notes,
-                    user_id
-                  });
-                } else {
-                  skipped++;
-                }
-              }
-              
-              console.log(`Adding ${historyEntries.length} new history entries for dish ${dishId} (skipped ${skipped})`);
-              
-              // Insert all new entries in a single batch
-              if (historyEntries.length > 0) {
-                const { error: insertError } = await supabase
-                  .from('meal_history')
-                  .insert(historyEntries);
-                  
-                if (insertError) {
-                  console.error(`Error inserting history entries for dish ${dishId}:`, insertError);
-                  return { success: 0, skipped: dishEntries.length };
-                } else {
-                  return { success: historyEntries.length, skipped };
-                }
-              } else {
-                return { success: 0, skipped: dishEntries.length };
-              }
-            }
-            
-            return { success: 0, skipped: dishEntries.length };
-          } catch (err) {
-            console.error(`Error processing dish '${dishEntries[0].dish}':`, err);
-            return { success: 0, skipped: dishEntries.length };
-          }
+          return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
         }));
         
         // Count successes and failures
