@@ -3,7 +3,7 @@ import React from "react";
 import { Dish } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { Book, MapPin } from "lucide-react";
+import { MapPin, BookOpen, ExternalLink } from "lucide-react";
 
 interface LinkedDishesSectionProps {
   dishes: Dish[];
@@ -19,6 +19,54 @@ const LinkedDishesSection: React.FC<LinkedDishesSectionProps> = ({ dishes }) => 
     );
   }
 
+  const formatLocation = (location: string | undefined) => {
+    if (!location) return null;
+    
+    // Check if location is a URL
+    const isUrl = location.startsWith('http') || 
+                  location.startsWith('www.') || 
+                  location.includes('.com') || 
+                  location.includes('.org') || 
+                  location.includes('.net');
+    
+    if (isUrl) {
+      const href = location.startsWith('http') ? location : `https://${location}`;
+      return (
+        <span className="flex items-center gap-1">
+          <ExternalLink className="h-3 w-3" />
+          <a 
+            href={href} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-terracotta-500 hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Recipe Link
+          </a>
+        </span>
+      );
+    }
+    
+    // Check if location is a number or contains numbers (page number)
+    const hasNumbers = /\d/.test(location);
+    if (hasNumbers) {
+      return (
+        <span className="flex items-center gap-1">
+          <BookOpen className="h-3 w-3" />
+          p. {location}
+        </span>
+      );
+    }
+    
+    // Default case - just show the location with a map pin
+    return (
+      <span className="flex items-center gap-1">
+        <MapPin className="h-3 w-3" />
+        {location}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium">Linked Recipes ({dishes.length})</h3>
@@ -33,12 +81,7 @@ const LinkedDishesSection: React.FC<LinkedDishesSectionProps> = ({ dishes }) => 
               >
                 <div className="font-medium">{dish.name}</div>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
-                  {dish.location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {dish.location}
-                    </span>
-                  )}
+                  {dish.location && formatLocation(dish.location)}
                   {dish.timesCooked > 0 && (
                     <span>
                       Cooked {dish.timesCooked} {dish.timesCooked === 1 ? 'time' : 'times'}
