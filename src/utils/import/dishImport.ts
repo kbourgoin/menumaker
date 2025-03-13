@@ -53,67 +53,72 @@ export const findOrCreateCookbook = async (cookbookName: string, userId: string)
   return newCookbook.id;
 };
 
-// Find or create a dish by name
+// Find or create a dish by name - completely avoid interacting with dish_summary view
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
   source: any, 
   userId: string
 ) => {
-  // Search for existing dishes by name directly from dishes table
-  const { data: existingDishes, error: dishError } = await supabase
-    .from('dishes')
-    .select('id, name')
-    .ilike('name', `%${dishName.substring(0, Math.min(dishName.length, 10))}%`)
-    .eq('user_id', userId);
-  
-  if (dishError) {
-    console.error(`Error finding dish '${dishName}':`, dishError);
-    return null;
-  }
-  
-  console.log(`Search for '${dishName}' found ${existingDishes?.length || 0} potential matches`);
-  
-  // Check for an exact match (case insensitive)
-  if (existingDishes && existingDishes.length > 0) {
-    const exactDish = existingDishes.find(d => 
-      d.name.toLowerCase() === dishName.toLowerCase()
-    );
+  try {
+    // Search for existing dishes by name directly from dishes table only
+    const { data: existingDishes, error: dishError } = await supabase
+      .from('dishes')
+      .select('id, name')
+      .ilike('name', `%${dishName.substring(0, Math.min(dishName.length, 10))}%`)
+      .eq('user_id', userId);
     
-    if (exactDish) {
-      console.log(`Found exact match for dish '${dishName}' with ID ${exactDish.id}`);
-      return exactDish.id;
+    if (dishError) {
+      console.error(`Error finding dish '${dishName}':`, dishError);
+      return null;
     }
-  }
-  
-  // Create a new dish - directly insert into dishes table
-  console.log(`Creating new dish '${dishName}'`);
-  
-  // Prepare the dish data
-  const dishData = {
-    name: dishName,
-    createdat: date,
-    cuisines: ['Other'], // Default cuisine
-    source,
-    user_id: userId
-  };
-  
-  // IMPORTANT: Use .maybeSingle() instead of .single() to avoid errors when no rows are returned
-  const { data: newDish, error: newDishError } = await supabase
-    .from('dishes')
-    .insert(dishData)
-    .select('id');
     
-  if (newDishError) {
-    console.error(`Error creating dish '${dishName}':`, newDishError);
+    console.log(`Search for '${dishName}' found ${existingDishes?.length || 0} potential matches`);
+    
+    // Check for an exact match (case insensitive)
+    if (existingDishes && existingDishes.length > 0) {
+      const exactDish = existingDishes.find(d => 
+        d.name.toLowerCase() === dishName.toLowerCase()
+      );
+      
+      if (exactDish) {
+        console.log(`Found exact match for dish '${dishName}' with ID ${exactDish.id}`);
+        return exactDish.id;
+      }
+    }
+    
+    // Create a new dish - bypass the materialized view completely
+    console.log(`Creating new dish '${dishName}'`);
+    
+    // Prepare the dish data
+    const dishData = {
+      name: dishName,
+      createdat: date,
+      cuisines: ['Other'], // Default cuisine
+      source,
+      user_id: userId
+    };
+    
+    // Insert directly into dishes table and avoid single() which can cause errors
+    const { data: newDish, error: newDishError } = await supabase
+      .from('dishes')
+      .insert(dishData)
+      .select('id');
+    
+    if (newDishError) {
+      console.error(`Error creating dish '${dishName}':`, newDishError);
+      return null;
+    }
+    
+    if (!newDish || newDish.length === 0) {
+      console.error(`Failed to create dish '${dishName}': No ID returned`);
+      return null;
+    }
+    
+    console.log(`Created new dish '${dishName}' with ID ${newDish[0].id}`);
+    return newDish[0].id;
+  } catch (error) {
+    console.error(`Unexpected error in findOrCreateDish for '${dishName}':`, error);
     return null;
   }
-  
-  if (!newDish || newDish.length === 0) {
-    console.error(`Failed to create dish '${dishName}': No ID returned`);
-    return null;
-  }
-  
-  console.log(`Created new dish '${dishName}' with ID ${newDish[0].id}`);
-  return newDish[0].id;
 };

@@ -89,7 +89,7 @@ export function useImportMealHistory() {
       
       console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
       
-      // Refresh data regardless of success count
+      // Refresh data once after all processing is complete
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
