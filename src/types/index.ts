@@ -4,11 +4,6 @@ export interface Dish {
   name: string;
   createdAt: string;
   cuisines: string[];
-  source?: {
-    type: 'url' | 'book' | 'none';
-    value: string;
-    page?: number;
-  };
   sourceId?: string;
   lastMade?: string;
   timesCooked: number;

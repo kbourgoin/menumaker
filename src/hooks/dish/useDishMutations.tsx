@@ -25,7 +25,6 @@ export function useDishMutations() {
         name: dish.name, // Ensure required field is present
         cuisines: dish.cuisines || ['Other'],
         createdat: new Date().toISOString(),
-        source: dish.source,
         source_id: dish.sourceId, // Using the source_id field 
         location: dish.location, // Include the location field
         user_id

@@ -39,9 +39,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
     defaultValues: {
       name: existingDish?.name || "",
       cuisines: existingDish?.cuisines || [],
-      sourceType: existingDish?.source?.type || "none",
-      sourceValue: existingDish?.source?.value || "",
-      sourcePage: existingDish?.source?.page?.toString() || "",
+      sourceType: existingDish?.sourceId ? "book" : "none",
+      sourceValue: "",
+      sourcePage: "",
       sourceId: existingDish?.sourceId || "",
       location: existingDish?.location || "",
     },
@@ -50,21 +50,11 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      let source = undefined;
-      
-      if (data.sourceType !== "none") {
-        source = {
-          type: data.sourceType,
-          value: data.sourceValue || "",
-          ...(data.sourceType === "book" && data.sourcePage ? { page: parseInt(data.sourcePage) } : {})
-        };
-      }
       
       if (existingDish) {
         await updateDish(existingDish.id, {
           name: data.name,
           cuisines: data.cuisines,
-          source,
           sourceId: data.sourceType === "book" ? data.sourceId : undefined,
           location: data.location,
         });
@@ -81,7 +71,6 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         const newDish = await addDish({
           name: data.name,
           cuisines: data.cuisines,
-          source,
           sourceId: data.sourceType === "book" ? data.sourceId : undefined,
           location: data.location,
         });
