@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,9 +39,6 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
     defaultValues: {
       name: existingDish?.name || "",
       cuisines: existingDish?.cuisines || [],
-      sourceType: existingDish?.sourceId ? "book" : "none",
-      sourceValue: "",
-      sourcePage: "",
       sourceId: existingDish?.sourceId || "",
       location: existingDish?.location || "",
     },
@@ -55,7 +52,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         await updateDish(existingDish.id, {
           name: data.name,
           cuisines: data.cuisines,
-          sourceId: data.sourceType === "book" ? data.sourceId : undefined,
+          sourceId: data.sourceId || undefined,
           location: data.location,
         });
         
@@ -71,7 +68,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         const newDish = await addDish({
           name: data.name,
           cuisines: data.cuisines,
-          sourceId: data.sourceType === "book" ? data.sourceId : undefined,
+          sourceId: data.sourceId || undefined,
           location: data.location,
         });
         
@@ -123,9 +120,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
 
         <CuisineSelector form={form} />
         
-        <LocationField form={form} />
-        
         <SourceSelector form={form} sources={sources} />
+        
+        <LocationField form={form} />
 
         <div className="flex justify-end space-x-3 pt-3">
           <Button
