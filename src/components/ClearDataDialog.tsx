@@ -10,11 +10,11 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useClearData } from "@/hooks/useClearData";
+import { useDataImport } from "@/hooks/useDataImport";
 import { toast } from "sonner";
 
 export function ClearDataDialog() {
-  const { clearData } = useClearData();
+  const { clearData } = useDataImport();
   const [open, setOpen] = React.useState(false);
   const [isClearing, setIsClearing] = React.useState(false);
 
