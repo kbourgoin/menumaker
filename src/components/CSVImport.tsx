@@ -71,10 +71,11 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
             variant: "destructive",
           });
         } else {
+          // Fix: Change "warning" to "default" as that's what the Toast component allows
           toast({
             title: "Nothing to import",
             description: `No new meals were imported. ${result.skipped} entries were skipped (already exist or invalid format).`,
-            variant: "warning", 
+            variant: "default", 
           });
         }
         
