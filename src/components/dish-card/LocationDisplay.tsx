@@ -3,9 +3,10 @@ import { ExternalLink } from "lucide-react";
 
 interface LocationDisplayProps {
   location: string;
+  inline?: boolean;
 }
 
-const LocationDisplay = ({ location }: LocationDisplayProps) => {
+const LocationDisplay = ({ location, inline = false }: LocationDisplayProps) => {
   console.log("LocationDisplay received location:", location);
   
   const isUrl = location.startsWith('http') || 
@@ -20,7 +21,7 @@ const LocationDisplay = ({ location }: LocationDisplayProps) => {
       : `https://${location}`;
       
     return (
-      <div className="text-sm">
+      <div className={inline ? "" : "text-sm"}>
         <a 
           href={href}
           target="_blank"
@@ -36,7 +37,7 @@ const LocationDisplay = ({ location }: LocationDisplayProps) => {
   }
   
   return (
-    <div className="text-sm text-muted-foreground">
+    <div className={`${inline ? "" : "text-sm"} text-muted-foreground inline-flex items-center`}>
       <span>Page: {location}</span>
     </div>
   );
