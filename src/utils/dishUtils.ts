@@ -1,4 +1,3 @@
-
 import { Dish } from "@/types";
 import { getStorageItem, saveStorageItem, generateId } from "./storageUtils";
 
@@ -45,6 +44,22 @@ export const updateDish = (id: string, updates: Partial<Dish>): Dish[] => {
     return dish;
   });
   saveDishes(updatedDishes);
+  
+  // Update any cached lastMade/timesCooked values
+  const recentDishes = getStorageItem<Dish[]>("recentDishes", []);
+  if (recentDishes.length > 0) {
+    const updatedRecentDishes = recentDishes.map((dish) => {
+      if (dish.id === id) {
+        return {
+          ...dish,
+          ...updates,
+        };
+      }
+      return dish;
+    });
+    saveStorageItem("recentDishes", updatedRecentDishes);
+  }
+
   return updatedDishes;
 };
 

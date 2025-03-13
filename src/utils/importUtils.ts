@@ -1,142 +1,73 @@
-
-import { getDishes, saveDishes } from "./dishUtils";
-import { getMealHistory, saveMealHistory } from "./mealHistoryUtils";
-import { getCookbooks, saveCookbooks } from "./cookbookUtils";
+import { Dish, MealHistory } from "@/types";
 import { generateId } from "./storageUtils";
 
-// Import meal history from CSV data
+// Function to import meal history data
 export const importMealHistory = (
-  entries: { 
-    date: string; 
-    dish: string; 
-    notes?: string;
-    source?: {
-      type: 'url' | 'book' | 'none';
-      value: string;
-      page?: number;
-    };
-  }[],
-  userId: string // Add userId parameter to function
-): { success: number; skipped: number } => {
-  const dishes = getDishes();
-  const history = getMealHistory();
-  const cookbooks = getCookbooks();
-  let successCount = 0;
-  let skippedCount = 0;
-  
-  // Group entries by dish name to handle duplicates
-  const entriesByDish: Record<string, typeof entries> = {};
-  
-  entries.forEach(entry => {
-    const dishLower = entry.dish.toLowerCase();
-    if (!entriesByDish[dishLower]) {
-      entriesByDish[dishLower] = [];
-    }
-    entriesByDish[dishLower].push(entry);
-  });
-  
-  const updatedDishes = [...dishes];
-  const updatedHistory = [...history];
-  
-  // Process each unique dish
-  Object.entries(entriesByDish).forEach(([dishLower, dishEntries]) => {
-    // Find if this dish already exists in the database
-    let dish = dishes.find(d => d.name.toLowerCase() === dishLower);
-    
-    // If dish doesn't exist, create it once using the first entry's data
-    if (!dish) {
-      const firstEntry = dishEntries[0];
-      let source = firstEntry.source || {
-        type: 'none',
-        value: ''
-      };
-      
-      let cookbookId = undefined;
-      
-      // If it's a book source, try to find or create cookbook
-      if (source.type === 'book' && source.value) {
-        // Check if cookbook already exists
-        let cookbook = cookbooks.find(c => c.name.toLowerCase() === source.value.toLowerCase());
-        
-        // If cookbook doesn't exist, create it
-        if (!cookbook) {
-          cookbook = {
-            id: generateId(),
-            name: source.value,
-            createdAt: new Date().toISOString(),
-            user_id: userId // Add user_id to new cookbook
-          };
-          cookbooks.push(cookbook);
-          saveCookbooks(cookbooks);
-        }
-        
-        // Set cookbookId for the dish
-        cookbookId = cookbook.id;
-      }
-      
-      dish = {
-        id: generateId(),
-        name: firstEntry.dish,
-        createdAt: firstEntry.date, // Use the earliest historical date as creation date
-        timesCooked: 0,
-        cuisines: ['Other'], // Default cuisine
-        source,
-        cookbookId, // Using the direct foreign key relationship
-        user_id: userId // Add user_id to new dish
-      };
-      updatedDishes.push(dish);
-    }
-    
-    // Process all entries for this dish (different cooking dates)
-    let newCookCount = 0;
-    
-    dishEntries.forEach(entry => {
-      // Create history entry for each cooking date
-      const historyEntry = {
-        id: generateId(),
-        date: entry.date,
-        dishId: dish!.id,
-        notes: entry.notes,
-        user_id: userId // Add user_id to history entry
-      };
-      
-      // Check if this exact entry already exists (avoid duplicates)
-      const duplicateEntry = updatedHistory.some(h => 
-        h.dishId === historyEntry.dishId && 
-        h.date === historyEntry.date
-      );
-      
-      if (!duplicateEntry) {
-        updatedHistory.push(historyEntry);
-        newCookCount++;
-        successCount++;
-      } else {
-        skippedCount++;
-      }
-    });
-    
-    // Only update the dish record if we added new cooking instances
-    if (newCookCount > 0) {
-      // Find the dish in updatedDishes to update its stats
-      const dishIndex = updatedDishes.findIndex(d => d.id === dish!.id);
-      if (dishIndex >= 0) {
-        // Sort all entries for this dish by date
-        const sortedEntries = [...dishEntries].sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-        
-        // Update lastMade to the most recent date
-        updatedDishes[dishIndex].lastMade = sortedEntries[0].date;
-        
-        // Increment timesCooked by the number of new entries
-        updatedDishes[dishIndex].timesCooked += newCookCount;
-      }
-    }
-  });
-  
-  // Save updated data
-  saveDishes(updatedDishes);
-  saveMealHistory(updatedHistory);
-  
-  return { success: successCount, skipped: skippedCount };
+  mealHistoryData: Record<string, any>[],
+  userId: string
+): MealHistory[] => {
+  return mealHistoryData.map((historyData) => importMealHistoryEntry(historyData, userId));
+};
+
+// Function to import a single meal history entry
+export const importMealHistoryEntry = (
+  historyData: Record<string, any>,
+  userId: string
+): MealHistory => {
+  // Set default values for required fields if they aren't present
+  if (!historyData.dishId) {
+    throw new Error("Dish ID is required");
+  }
+  if (!historyData.date) {
+    throw new Error("Date is required");
+  }
+
+  // Create a new meal history entry with the imported data
+  const newMealHistoryEntry: MealHistory = {
+    id: generateId(),
+    dishId: historyData.dishId,
+    date: historyData.date,
+    notes: historyData.notes || undefined,
+    user_id: userId
+  };
+
+  return newMealHistoryEntry;
+};
+
+// Function to import dish data
+export const importDishes = (
+  dishesData: Record<string, any>[],
+  userId: string
+): Dish[] => {
+  return dishesData.map((dishData) => importDish(dishData, userId));
+};
+
+// Function to import a single dish
+export const importDish = (
+  dishData: Record<string, any>,
+  userId: string
+): Dish => {
+  // Set default values for required fields if they aren't present
+  if (!dishData.name) {
+    throw new Error("Dish name is required");
+  }
+
+  // Create a new dish with the imported data
+  const newDish: Dish = {
+    id: generateId(),
+    name: dishData.name,
+    cuisines: Array.isArray(dishData.cuisines)
+      ? dishData.cuisines
+      : dishData.cuisines
+      ? [dishData.cuisines]
+      : ["Other"],
+    createdAt: dishData.createdAt || new Date().toISOString(),
+    timesCooked: dishData.timesCooked || 0,
+    lastMade: dishData.lastMade || undefined,
+    source: dishData.source || undefined,
+    sourceId: dishData.sourceId || undefined,
+    user_id: userId
+  };
+
+  return newDish;
 };

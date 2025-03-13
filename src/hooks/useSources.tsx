@@ -1,49 +1,77 @@
 
-import { Source, Dish } from "@/types";
+import { Dish, Source } from "@/types";
 import { 
   supabase, 
   mapSourceFromDB, 
   mapSourceToDB,
   mapDishFromDB 
 } from "@/integrations/supabase/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useSources() {
-  // Source functions
+  const queryClient = useQueryClient();
+
+  // Get all sources
   const getSources = async (): Promise<Source[]> => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id) return [];
+    
     const { data, error } = await supabase
       .from('sources')
       .select('*')
+      .eq('user_id', user_id)
       .order('name');
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching sources:', error);
+      return [];
+    }
+    
     return data ? data.map(mapSourceFromDB) : [];
   };
 
-  const getSource = async (id: string): Promise<Source> => {
+  // Get a single source by ID
+  const getSource = async (id: string): Promise<Source | null> => {
+    if (!id) return null;
+    
     const { data, error } = await supabase
       .from('sources')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
       
-    if (error) throw error;
-    return mapSourceFromDB(data);
+    if (error) {
+      console.error('Error fetching source:', error);
+      return null;
+    }
+    
+    return data ? mapSourceFromDB(data) : null;
   };
 
-  // Get dishes by source ID
+  // Get all dishes associated with a source
   const getDishesBySource = async (sourceId: string): Promise<Dish[]> => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id || !sourceId) return [];
+    
     const { data: dishesData, error } = await supabase
       .from('dishes')
       .select('*')
       .eq('source_id', sourceId)
+      .eq('user_id', user_id)
       .order('name');
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching dishes by source:', error);
+      return [];
+    }
     
-    // Fetch meal history for all dishes
-    const dishIds = dishesData ? dishesData.map(dish => dish.id) : [];
-    
-    let historyByDishId: Record<string, any[]> = {};
+    // Get meal history for these dishes
+    const dishIds = dishesData.map(dish => dish.id);
+    let mealHistoryByDish: Record<string, any[]> = {};
     
     if (dishIds.length > 0) {
       const { data: historyData, error: historyError } = await supabase
@@ -51,88 +79,107 @@ export function useSources() {
         .select('*')
         .in('dishid', dishIds);
         
-      if (!historyError && historyData) {
-        // Group meal history by dish ID
-        historyByDishId = historyData.reduce((acc: Record<string, any[]>, entry) => {
-          if (!acc[entry.dishid]) {
-            acc[entry.dishid] = [];
+      if (historyError) {
+        console.error('Error fetching meal history:', historyError);
+      } else if (historyData) {
+        // Group history by dish ID
+        mealHistoryByDish = historyData.reduce((acc, history) => {
+          if (!acc[history.dishid]) {
+            acc[history.dishid] = [];
           }
-          acc[entry.dishid].push(entry);
+          acc[history.dishid].push(history);
           return acc;
-        }, {});
+        }, {} as Record<string, any[]>);
       }
     }
     
-    // Now map each dish with its corresponding meal history
-    return dishesData 
-      ? dishesData.map(dish => mapDishFromDB(dish, historyByDishId[dish.id] || []))
-      : [];
+    return dishesData.map(dish => mapDishFromDB(dish, mealHistoryByDish[dish.id] || []));
   };
 
-  // Create a new source
-  const createSource = async (
-    source: Omit<Source, "id" | "createdAt" | "user_id">, 
-    userId: string
-  ): Promise<Source> => {
-    // Ensure name is provided (required field)
-    if (!source.name) {
-      throw new Error("Source name is required");
+  // Add a new source
+  const addSource = useMutation({
+    mutationFn: async (source: Omit<Source, 'id' | 'createdAt' | 'user_id'>) => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user_id = userData.user?.id;
+      
+      if (!user_id) throw new Error('User not authenticated');
+      
+      const sourceToInsert = {
+        ...source,
+        user_id
+      };
+      
+      const { data, error } = await supabase
+        .from('sources')
+        .insert(sourceToInsert)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      return mapSourceFromDB(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
     }
-
-    // Ensure type is provided (required field)
-    if (!source.type) {
-      throw new Error("Source type is required");
-    }
-
-    const sourceToInsert = {
-      name: source.name,
-      location: source.location || null,
-      type: source.type,
-      description: source.description || null,
-      user_id: userId
-    };
-
-    const { data, error } = await supabase
-      .from('sources')
-      .insert(sourceToInsert)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return mapSourceFromDB(data);
-  };
+  });
 
   // Update an existing source
-  const updateSource = async (source: Partial<Source> & { id: string }, userId: string): Promise<Source> => {
-    // Ensure we have at least an ID to update
-    if (!source.id) {
-      throw new Error("Source ID is required for updates");
+  const updateSource = useMutation({
+    mutationFn: async (source: Partial<Source> & { id: string }) => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user_id = userData.user?.id;
+      
+      if (!user_id) throw new Error('User not authenticated');
+      
+      // Only include properties that are present
+      const sourceToUpdate = mapSourceToDB(source);
+      
+      const { data, error } = await supabase
+        .from('sources')
+        .update(sourceToUpdate)
+        .eq('id', source.id)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      return mapSourceFromDB(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
     }
+  });
 
-    const sourceToUpdate = {
-      ...(source.name && { name: source.name }),
-      ...(source.location !== undefined && { location: source.location }),
-      ...(source.type && { type: source.type }),
-      ...(source.description !== undefined && { description: source.description }),
-      user_id: userId
-    };
-
-    const { data, error } = await supabase
-      .from('sources')
-      .update(sourceToUpdate)
-      .eq('id', source.id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return mapSourceFromDB(data);
-  };
+  // Delete a source
+  const deleteSource = useMutation({
+    mutationFn: async (id: string) => {
+      // First update any dishes that reference this source
+      await supabase
+        .from('dishes')
+        .update({ source_id: null })
+        .eq('source_id', id);
+        
+      // Then delete the source
+      const { error } = await supabase
+        .from('sources')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
+      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+    }
+  });
 
   return {
     getSources,
     getSource,
     getDishesBySource,
-    createSource,
-    updateSource
+    addSource: addSource.mutateAsync,
+    updateSource: updateSource.mutateAsync,
+    deleteSource: deleteSource.mutateAsync
   };
 }
