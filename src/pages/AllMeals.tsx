@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useDishes";
 import DishCard from "@/components/dish-card";
@@ -12,6 +12,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 const AllDishes = () => {
   const { dishes, isLoading } = useDishes();
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Log dishes when they load
+  useEffect(() => {
+    if (dishes && dishes.length > 0) {
+      console.log("Dishes loaded in AllMeals:", dishes);
+      // Check for source and location in the first few dishes
+      dishes.slice(0, 3).forEach((dish, index) => {
+        console.log(`Dish ${index} details:`, {
+          name: dish.name,
+          sourceId: dish.sourceId,
+          location: dish.location
+        });
+      });
+    }
+  }, [dishes]);
   
   // Filter dishes based on search query
   const filteredDishes = dishes?.filter(dish => 
@@ -74,7 +89,10 @@ const AllDishes = () => {
               {dishes && dishes.length > 0 ? (
                 filteredDishes.length > 0 ? (
                   filteredDishes.map((dish) => (
-                    <DishCard key={dish.id} dish={dish} />
+                    <DishCard 
+                      key={dish.id} 
+                      dish={dish} 
+                    />
                   ))
                 ) : (
                   <div className="col-span-full text-center p-8 border rounded-lg">

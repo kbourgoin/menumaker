@@ -6,6 +6,8 @@ interface LocationDisplayProps {
 }
 
 const LocationDisplay = ({ location }: LocationDisplayProps) => {
+  console.log("LocationDisplay received location:", location);
+  
   const isUrl = location.startsWith('http') || 
                 location.startsWith('www.') || 
                 location.includes('.com') || 

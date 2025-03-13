@@ -8,7 +8,12 @@ interface SourceInfoProps {
 }
 
 const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
-  if (!sourceId && !location) return null;
+  console.log("SourceInfo received:", { sourceId, location });
+  
+  if (!sourceId && !location) {
+    console.log("SourceInfo returning null - no data");
+    return null;
+  }
   
   return (
     <div className="mt-2 space-y-1">
