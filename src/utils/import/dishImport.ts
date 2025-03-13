@@ -53,7 +53,7 @@ export const findOrCreateCookbook = async (cookbookName: string, userId: string)
   return newCookbook.id;
 };
 
-// Find or create a dish by name - completely avoid interacting with dish_summary view
+// Find or create a dish by name - COMPLETELY avoid the dish_summary view
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
@@ -90,16 +90,27 @@ export const findOrCreateDish = async (
     // Create a new dish - bypass the materialized view completely
     console.log(`Creating new dish '${dishName}'`);
     
-    // Prepare the dish data
+    // Prepare the dish data - ensure source is properly formatted
+    let formattedSource = source;
+    if (typeof source === 'string') {
+      try {
+        formattedSource = JSON.parse(source);
+      } catch {
+        formattedSource = { type: 'none', value: source };
+      }
+    } else if (!source || !source.type) {
+      formattedSource = { type: 'none', value: '' };
+    }
+    
     const dishData = {
       name: dishName,
       createdat: date,
       cuisines: ['Other'], // Default cuisine
-      source,
+      source: formattedSource,
       user_id: userId
     };
     
-    // Insert directly into dishes table and avoid single() which can cause errors
+    // Insert directly into dishes table and avoid using single() which can cause errors
     const { data: newDish, error: newDishError } = await supabase
       .from('dishes')
       .insert(dishData)

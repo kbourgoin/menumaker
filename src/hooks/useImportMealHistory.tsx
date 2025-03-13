@@ -2,7 +2,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useBatchProcessing } from "./import/useBatchProcessing";
 import { processDishImport } from "@/utils/import/processDishImport";
 
 export function useImportMealHistory() {
@@ -68,10 +67,6 @@ export function useImportMealHistory() {
             return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
           } catch (error) {
             console.error(`Error processing dish ${dishEntries[0].dish}:`, error);
-            // Return detailed error info for debugging
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error(`Import error details: ${errorMessage}`);
-            
             errorCount += 1;
             return { success: 0, skipped: dishEntries.length };
           }
@@ -94,29 +89,15 @@ export function useImportMealHistory() {
       
       console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
       
-      // Refresh data once after all processing is complete - ONLY invalidate queries, do not try to refresh view
+      // Refresh data once after all processing is complete
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       
-      // Always return a result even if nothing was imported
+      // Return the result
       return { success: successCount, skipped: skippedCount, errors: errorCount };
     } catch (error) {
       console.error("Import error:", error);
-      
-      // Enhanced error logging
-      const errorObj = error as any;
-      if (errorObj?.message) {
-        console.error("Error message:", errorObj.message);
-        
-        // Check if the error is related to the dish_summary view
-        if (errorObj.message.includes("dish_summary") || 
-            errorObj.message.includes("permission denied") || 
-            errorObj.message.includes("must be owner")) {
-          throw new Error("Database permission error. Please contact support.");
-        }
-      }
-      
       throw error;
     }
   };

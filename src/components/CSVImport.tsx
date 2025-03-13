@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -73,7 +74,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
           toast({
             title: "Nothing to import",
             description: `No new meals were imported. ${result.skipped} entries were skipped (already exist or invalid format).`,
-            variant: "destructive", 
+            variant: "warning", 
           });
         }
         
@@ -89,14 +90,15 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         errorMessage = error.message;
       }
       
-      // Check for common database errors with improved detection
+      // Check for database permission errors with improved detection
       if (typeof error === 'object' && error !== null) {
         const supabaseError = error as any;
         if (supabaseError.code === '42501' || 
             (supabaseError.message && typeof supabaseError.message === 'string' && 
              (supabaseError.message.includes('permission denied') || 
-              supabaseError.message.includes('must be owner')))) {
-          errorMessage = "Database permission error. You don't have the required permissions.";
+              supabaseError.message.includes('must be owner') ||
+              supabaseError.message.includes('dish_summary')))) {
+          errorMessage = "Database permission error. This is likely due to restrictions on the materialized view.";
         }
       }
       

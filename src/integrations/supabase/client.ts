@@ -89,7 +89,7 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
   };
 };
 
-// Updated function to map from our materialized view
+// Updated function to map from our materialized view with more robust source handling
 export const mapDishFromSummary = (summary: DishSummary): Dish => {
   // Ensure source property is properly formatted with more robust error handling
   let formattedSource = undefined;
@@ -109,15 +109,18 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
           ...(sourceData.page !== undefined ? { page: sourceData.page } : {}),
           ...(sourceData.bookId !== undefined ? { bookId: sourceData.bookId } : {})
         };
+      } else {
+        // Fallback for non-object source
+        formattedSource = { type: 'none', value: String(sourceData) };
       }
+    } else {
+      // Default source when null/undefined
+      formattedSource = { type: 'none', value: '' };
     }
   } catch (error) {
     console.error("Error formatting source data:", error);
     // Default to a safe empty source object if parsing fails
-    formattedSource = {
-      type: 'none',
-      value: ''
-    };
+    formattedSource = { type: 'none', value: '' };
   }
   
   return {
