@@ -15,7 +15,8 @@ export const importMealHistory = (
       value: string;
       page?: number;
     };
-  }[]
+  }[],
+  userId: string // Add userId parameter to function
 ): { success: number; skipped: number } => {
   const dishes = getDishes();
   const history = getMealHistory();
@@ -63,6 +64,7 @@ export const importMealHistory = (
             id: generateId(),
             name: source.value,
             createdAt: new Date().toISOString(),
+            user_id: userId // Add user_id to new cookbook
           };
           cookbooks.push(cookbook);
           saveCookbooks(cookbooks);
@@ -79,7 +81,8 @@ export const importMealHistory = (
         timesCooked: 0,
         cuisines: ['Other'], // Default cuisine
         source,
-        cookbookId // Using the direct foreign key relationship
+        cookbookId, // Using the direct foreign key relationship
+        user_id: userId // Add user_id to new dish
       };
       updatedDishes.push(dish);
     }
@@ -93,7 +96,8 @@ export const importMealHistory = (
         id: generateId(),
         date: entry.date,
         dishId: dish!.id,
-        notes: entry.notes
+        notes: entry.notes,
+        user_id: userId // Add user_id to history entry
       };
       
       // Check if this exact entry already exists (avoid duplicates)
