@@ -28,7 +28,8 @@ export function ClearDataDialog() {
         setOpen(false);
         toast.success("All dish data has been cleared from the database");
       } else {
-        toast.error("Failed to clear data. Please try again.");
+        const errorMessage = result.error?.message || "Failed to clear data";
+        toast.error(`Error: ${errorMessage}. Please try again.`);
       }
     } catch (error) {
       console.error("Error clearing data:", error);
