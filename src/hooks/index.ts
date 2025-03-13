@@ -3,12 +3,14 @@
 export * from './use-mobile';
 export * from './use-toast';
 export * from './useCookbooks';
-export * from './useDishes';
+// Export useDishes separately to avoid name conflict
+export { useDishes } from './useDishes';
 export * from './useMealHistory';
 export * from './useMeals';
 export * from './useStats';
 export * from './useWeeklyMenu';
 export * from './useClearData';
 export * from './import';
-export * from './dish/useDishMutations';
-export * from './dish/useDishQueries';
+// Export from dish subdirectory, but avoid re-exporting useDishes
+export { useDishMutations } from './dish/useDishMutations';
+export { useDishQueries } from './dish/useDishQueries';

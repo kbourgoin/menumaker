@@ -4,7 +4,7 @@ import { useMealHistory } from "./useMealHistory";
 import { useWeeklyMenu } from "./useWeeklyMenu";
 import { useCookbooks } from "./useCookbooks";
 import { useStats } from "./useStats";
-import { useDataImport } from "./useDataImport";
+import { useDataImport } from "./import";
 
 /**
  * This is a composite hook that combines all meal-related functionality.
