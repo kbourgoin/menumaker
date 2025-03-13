@@ -16,10 +16,9 @@ export function useClearData() {
       
       console.log("Clearing data for user:", userId);
       
-      // Use a stored procedure for deleting all user data
-      // The parameter name here should match the function parameter in SQL (but with camelCase)
+      // Change the parameter name to p_user_id to avoid ambiguity with column names
       const { error } = await supabase.rpc('clear_user_data', { 
-        user_id: userId  // Make sure we pass with the exact parameter name expected by the function
+        p_user_id: userId  // Changed parameter name to avoid ambiguity
       }) as any;
       
       if (error) {
