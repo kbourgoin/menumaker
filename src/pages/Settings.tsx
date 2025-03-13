@@ -3,7 +3,7 @@ import React from "react";
 import Layout from "@/components/Layout";
 import CSVImport from "@/components/CSVImport";
 import { ClearDataDialog } from "@/components/ClearDataDialog";
-import CookbookManager from "@/components/CookbookManager";
+import SourceManager from "@/components/SourceManager";
 import AccountSettings from "@/components/AccountSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,19 +31,19 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle>Data Management</CardTitle>
                 <CardDescription>
-                  Manage your meal data, cookbooks, and imports
+                  Manage your meal data, recipe sources, and imports
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-terracotta-500" />
-                    Cookbooks
+                    Recipe Sources
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Organize and manage your cookbook collection
+                    Organize and manage your recipe sources (books, websites, documents)
                   </p>
-                  <CookbookManager />
+                  <SourceManager />
                 </div>
                 
                 <Separator />

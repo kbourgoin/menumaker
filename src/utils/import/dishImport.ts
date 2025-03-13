@@ -1,65 +1,70 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-// Find or create a cookbook for a dish source
-export const findOrCreateCookbook = async (cookbookName: string, userId: string) => {
-  console.log(`Looking for cookbook '${cookbookName}'`);
+// Find or create a source for a dish
+export const findOrCreateSource = async (sourceName: string, sourceType: 'book' | 'website' | 'document', location: string | null, userId: string) => {
+  console.log(`Looking for source '${sourceName}' of type ${sourceType}`);
   
-  const { data: existingCookbooks, error: cookbookError } = await supabase
-    .from('cookbooks')
-    .select('id, name')
-    .ilike('name', `%${cookbookName}%`)
+  const { data: existingSources, error: sourceError } = await supabase
+    .from('sources')
+    .select('id, name, type')
+    .ilike('name', `%${sourceName}%`)
     .eq('user_id', userId);
   
-  if (cookbookError) {
-    console.error(`Error finding cookbook '${cookbookName}':`, cookbookError);
+  if (sourceError) {
+    console.error(`Error finding source '${sourceName}':`, sourceError);
     return null;
   }
   
-  // Check for exact match
-  if (existingCookbooks && existingCookbooks.length > 0) {
-    const exactCookbook = existingCookbooks.find(c => 
-      c.name.toLowerCase() === cookbookName.toLowerCase()
+  // Check for exact match with the same type
+  if (existingSources && existingSources.length > 0) {
+    const exactSource = existingSources.find(s => 
+      s.name.toLowerCase() === sourceName.toLowerCase() && s.type === sourceType
     );
     
-    if (exactCookbook) {
-      console.log(`Using existing cookbook '${exactCookbook.name}' with ID ${exactCookbook.id}`);
-      return exactCookbook.id;
+    if (exactSource) {
+      console.log(`Using existing source '${exactSource.name}' with ID ${exactSource.id}`);
+      return exactSource.id;
     }
     
-    // Use the first match if no exact match
-    console.log(`Using existing cookbook '${existingCookbooks[0].name}' with ID ${existingCookbooks[0].id}`);
-    return existingCookbooks[0].id;
+    // Use the first match of the same type if no exact match
+    const sameTypeSource = existingSources.find(s => s.type === sourceType);
+    if (sameTypeSource) {
+      console.log(`Using existing source '${sameTypeSource.name}' with ID ${sameTypeSource.id}`);
+      return sameTypeSource.id;
+    }
   }
   
-  // Create new cookbook
-  console.log(`Creating new cookbook '${cookbookName}'`);
-  const { data: newCookbook, error: newCookbookError } = await supabase
-    .from('cookbooks')
+  // Create new source
+  console.log(`Creating new source '${sourceName}' of type ${sourceType}`);
+  const { data: newSource, error: newSourceError } = await supabase
+    .from('sources')
     .insert({ 
-      name: cookbookName,
+      name: sourceName,
+      type: sourceType,
+      location: location,
       user_id: userId,
-      createdat: new Date().toISOString()
+      created_at: new Date().toISOString()
     })
     .select('id')
     .single();
     
-  if (newCookbookError) {
-    console.error(`Error creating cookbook '${cookbookName}':`, newCookbookError);
+  if (newSourceError) {
+    console.error(`Error creating source '${sourceName}':`, newSourceError);
     return null;
   }
   
-  console.log(`Created cookbook '${cookbookName}' with ID ${newCookbook.id}`);
-  return newCookbook.id;
+  console.log(`Created source '${sourceName}' with ID ${newSource.id}`);
+  return newSource.id;
 };
 
 // Find or create a dish by name - COMPLETELY avoid the dish_summary view
-// Updated to handle the cookbook_id as a direct column
+// Updated to handle the source_id as a direct column
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
   source: any, 
-  cookbookId: string | null | undefined,
+  sourceId: string | null | undefined,
   userId: string
 ) => {
   try {
@@ -104,14 +109,14 @@ export const findOrCreateDish = async (
       formattedSource = { type: 'none', value: '' };
     }
     
-    // Create dish data with the direct cookbook_id relationship
+    // Create dish data with the direct source_id relationship
     const dishData = {
       name: dishName,
       createdat: date,
       cuisines: ['Other'], // Default cuisine
       source: formattedSource,
       user_id: userId,
-      cookbook_id: cookbookId || null
+      source_id: sourceId || null
     };
     
     // Insert directly into dishes table and avoid using single() which can cause errors

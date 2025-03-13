@@ -1,5 +1,5 @@
 
-import { findOrCreateCookbook, findOrCreateDish } from "./dishImport";
+import { findOrCreateSource, findOrCreateDish } from "./dishImport";
 import { getExistingMealEntries, createMealHistoryEntries } from "./mealHistoryImport";
 
 // Process a single dish and its entries
@@ -24,15 +24,18 @@ export const processDishImport = async (
       value: ''
     };
     
-    let cookbookId = undefined;
+    let sourceId = undefined;
     
-    // If it's a book source, try to find or create cookbook
+    // If it's a book source, try to find or create a source entry
     if (source.type === 'book' && source.value) {
-      cookbookId = await findOrCreateCookbook(source.value, userId);
+      sourceId = await findOrCreateSource(source.value, 'book', null, userId);
+    } else if (source.type === 'url' && source.value) {
+      // Optionally also track website sources
+      sourceId = await findOrCreateSource(source.value, 'website', source.value, userId);
     }
     
-    // Find or create the dish - using updated implementation to handle the new cookbookId field
-    const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, cookbookId, userId);
+    // Find or create the dish - using updated implementation to handle the new sourceId field
+    const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, sourceId, userId);
     
     if (!dishId) {
       console.error(`Failed to find or create dish '${firstEntry.dish}'`);

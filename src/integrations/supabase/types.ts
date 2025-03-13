@@ -9,67 +9,40 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      cookbooks: {
-        Row: {
-          author: string | null
-          createdat: string
-          description: string | null
-          id: string
-          name: string
-          user_id: string
-        }
-        Insert: {
-          author?: string | null
-          createdat?: string
-          description?: string | null
-          id?: string
-          name: string
-          user_id: string
-        }
-        Update: {
-          author?: string | null
-          createdat?: string
-          description?: string | null
-          id?: string
-          name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       dishes: {
         Row: {
-          cookbook_id: string | null
           createdat: string
           cuisines: string[]
           id: string
           name: string
           source: Json | null
+          source_id: string | null
           user_id: string
         }
         Insert: {
-          cookbook_id?: string | null
           createdat?: string
           cuisines?: string[]
           id?: string
           name: string
           source?: Json | null
+          source_id?: string | null
           user_id: string
         }
         Update: {
-          cookbook_id?: string | null
           createdat?: string
           cuisines?: string[]
           id?: string
           name?: string
           source?: Json | null
+          source_id?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "dishes_cookbook_id_fkey"
-            columns: ["cookbook_id"]
+            foreignKeyName: "dishes_source_id_fkey"
+            columns: ["source_id"]
             isOneToOne: false
-            referencedRelation: "cookbooks"
+            referencedRelation: "sources"
             referencedColumns: ["id"]
           },
         ]
@@ -131,6 +104,36 @@ export type Database = {
           id?: string
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      sources: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          name: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -8,12 +8,11 @@ export interface Dish {
     type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
-    // bookId removed from here as it's now a top-level property
   };
-  cookbookId?: string; // Direct foreign key to cookbooks
+  sourceId?: string; // Updated: reference to the sources table
   lastMade?: string;
   timesCooked: number;
-  user_id: string; // Added user_id property
+  user_id: string;
 }
 
 export interface MealHistory {
@@ -21,16 +20,17 @@ export interface MealHistory {
   dishId: string;
   date: string;
   notes?: string;
-  user_id: string; // Added user_id property
+  user_id: string;
 }
 
-export interface Cookbook {
+export interface Source {
   id: string;
   name: string;
-  author?: string;
+  location?: string;
+  type: 'book' | 'website' | 'document';
   description?: string;
   createdAt: string;
-  user_id: string; // Added user_id property
+  user_id: string;
 }
 
 export type CuisineType = 

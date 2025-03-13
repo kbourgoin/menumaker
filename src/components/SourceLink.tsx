@@ -1,36 +1,45 @@
 
-import { Link, Globe, Book } from "lucide-react";
+import { Link, Globe, Book, FileText } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getCookbookById } from "@/utils/mealUtils";
 import { useEffect, useState } from "react";
+import { useSources } from "@/hooks/useSources";
 
 interface SourceLinkProps {
   source: {
     type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
-    bookId?: string;
   };
+  sourceId?: string;
   className?: string;
 }
 
-const SourceLink = ({ source, className = "" }: SourceLinkProps) => {
-  const [cookbookName, setCookbookName] = useState<string | null>(null);
+const SourceLink = ({ source, sourceId, className = "" }: SourceLinkProps) => {
+  const [sourceName, setSourceName] = useState<string | null>(null);
+  const { getSource } = useSources();
   
   // Handle 'none' type or empty source
   if (source.type === 'none' || !source.value) {
     return null;
   }
   
-  // Fetch cookbook name if bookId is provided
+  // Fetch source name if sourceId is provided
   useEffect(() => {
-    if (source.type === 'book' && source.bookId) {
-      const cookbook = getCookbookById(source.bookId);
-      if (cookbook) {
-        setCookbookName(cookbook.name);
-      }
+    if (sourceId) {
+      const fetchSource = async () => {
+        try {
+          const sourceData = await getSource(sourceId);
+          if (sourceData) {
+            setSourceName(sourceData.name);
+          }
+        } catch (error) {
+          console.error("Error fetching source:", error);
+        }
+      };
+      
+      fetchSource();
     }
-  }, [source.bookId, source.type]);
+  }, [sourceId, getSource]);
   
   if (source.type === 'url') {
     return (
@@ -65,7 +74,7 @@ const SourceLink = ({ source, className = "" }: SourceLinkProps) => {
           <span className={`inline-flex items-center text-sm text-terracotta-500 ${className}`}>
             <Book className="w-4 h-4 mr-1.5" />
             <span className="truncate max-w-[200px]">
-              {cookbookName || source.value} {source.page && `(p. ${source.page})`}
+              {sourceName || source.value} {source.page && `(p. ${source.page})`}
             </span>
           </span>
         </TooltipTrigger>

@@ -13,4 +13,4 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Re-export all mappers from their respective files
 export * from './mappers/dishMappers';
 export * from './mappers/mealHistoryMappers';
-export * from './mappers/cookbookMappers';
+export * from './mappers/sourceMappers';

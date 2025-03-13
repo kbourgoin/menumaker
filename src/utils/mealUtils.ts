@@ -11,8 +11,7 @@ export {
   addDish, 
   getDishById, 
   updateDish, 
-  deleteDish,
-  getDishesByBookId
+  deleteDish
 } from './dishUtils';
 
 // Meal history utilities
@@ -22,15 +21,15 @@ export {
   logDishCooked
 } from './mealHistoryUtils';
 
-// Cookbook utilities
+// Source utilities
 export {
-  getCookbooks,
-  saveCookbooks,
-  addCookbook,
-  updateCookbook,
-  deleteCookbook,
-  getCookbookById
-} from './cookbookUtils';
+  getSources,
+  saveSources,
+  addSource,
+  updateSource,
+  deleteSource,
+  getSourceById
+} from './sourceUtils';
 
 // Suggestion utilities
 export { getRandomDishSuggestions } from './suggestionUtils';

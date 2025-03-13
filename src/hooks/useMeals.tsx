@@ -2,7 +2,7 @@
 import { useDishes as useDishesHook } from "./useDishes";
 import { useMealHistory } from "./useMealHistory";
 import { useWeeklyMenu } from "./useWeeklyMenu";
-import { useCookbooks } from "./useCookbooks";
+import { useSources } from "./useSources";
 import { useStats } from "./useStats";
 import { useDataImport } from "./import";
 
@@ -14,7 +14,7 @@ export function useDishes() {
   const dishesHook = useDishesHook();
   const mealHistoryHook = useMealHistory();
   const weeklyMenuHook = useWeeklyMenu();
-  const cookbooksHook = useCookbooks();
+  const sourcesHook = useSources();
   const statsHook = useStats();
   const dataImportHook = useDataImport();
 
@@ -30,10 +30,10 @@ export function useDishes() {
     getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,
     allDishes: weeklyMenuHook.allDishes,
     
-    // Cookbooks
-    getCookbooks: cookbooksHook.getCookbooks,
-    getCookbook: cookbooksHook.getCookbook,
-    getDishesByCookbook: cookbooksHook.getDishesByCookbook,
+    // Sources
+    getSources: sourcesHook.getSources,
+    getSource: sourcesHook.getSource,
+    getDishesBySource: sourcesHook.getDishesBySource,
     
     // Stats
     getStats: statsHook.getStats,
