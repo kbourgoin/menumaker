@@ -1,3 +1,4 @@
+
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +28,9 @@ export function useWeeklyMenu() {
       
       // Map the summary data to our Dish type
       return summaryData ? summaryData.map(summary => mapDishFromSummary(summary)) : [];
-    }
+    },
+    // Enable stale time for caching
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Get weekly dish suggestions

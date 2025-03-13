@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useDishes();
@@ -18,6 +19,28 @@ const AllDishes = () => {
     dish.cuisines.some(cuisine => 
       cuisine.toLowerCase().includes(searchQuery.toLowerCase())
     )
+  );
+  
+  // Create loading skeletons for dishes
+  const LoadingSkeletons = () => (
+    <>
+      {Array(8).fill(0).map((_, index) => (
+        <div key={`skeleton-${index}`} className="rounded-lg border overflow-hidden">
+          <div className="p-6">
+            <Skeleton className="h-6 w-3/4 mb-4" />
+            <Skeleton className="h-4 w-1/4 mb-2" />
+            <Skeleton className="h-4 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+          <div className="border-t p-4">
+            <div className="flex justify-between">
+              <Skeleton className="h-9 w-20" />
+              <Skeleton className="h-9 w-9 rounded-md" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
   );
   
   return (
@@ -44,18 +67,24 @@ const AllDishes = () => {
         </div>
         
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {!isLoading && filteredDishes.length > 0 && filteredDishes.map((dish) => (
-            <DishCard key={dish.id} dish={dish} />
-          ))}
-          
-          {!isLoading && filteredDishes.length === 0 && (
-            <div className="col-span-full text-center p-8 border rounded-lg">
-              <p className="text-muted-foreground">
-                {dishes.length === 0 
-                  ? "No dishes found. Add your first dish or import from CSV." 
-                  : "No dishes match your search."}
-              </p>
-            </div>
+          {isLoading ? (
+            <LoadingSkeletons />
+          ) : (
+            <>
+              {filteredDishes.length > 0 ? (
+                filteredDishes.map((dish) => (
+                  <DishCard key={dish.id} dish={dish} />
+                ))
+              ) : (
+                <div className="col-span-full text-center p-8 border rounded-lg">
+                  <p className="text-muted-foreground">
+                    {dishes.length === 0 
+                      ? "No dishes found. Add your first dish or import from CSV." 
+                      : "No dishes match your search."}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

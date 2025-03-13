@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dish } from "@/types";
 import { 
@@ -54,7 +55,11 @@ export function useDishes() {
         setIsLoading(false);
         return [];
       }
-    }
+    },
+    // Enable caching to improve performance
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Improved error handling
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Fallback method if the materialized view fails
