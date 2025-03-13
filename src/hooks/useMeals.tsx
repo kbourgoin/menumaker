@@ -1,5 +1,5 @@
 
-import { useDishes as useDishesHook } from "./useDishes";
+import { useDishQueries, useDishMutations } from "./dish";
 import { useMealHistory } from "./useMealHistory";
 import { useWeeklyMenu } from "./useWeeklyMenu";
 import { useSources } from "./useSources";
@@ -11,8 +11,9 @@ import { useDataImport } from "./import";
  * It imports from individual hook files and provides a unified API.
  */
 export function useDishes() {
-  const dishesHook = useDishesHook();
-  const mealHistoryHook = useMealHistory();
+  const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
+  const { addDish, updateDish, deleteDish } = useDishMutations();
+  const { recordDishCooked } = useMealHistory();
   const weeklyMenuHook = useWeeklyMenu();
   const sourcesHook = useSources();
   const statsHook = useStats();
@@ -20,11 +21,16 @@ export function useDishes() {
 
   return {
     // Dishes
-    ...dishesHook,
+    dishes,
+    isLoading,
+    addDish,
+    updateDish,
+    deleteDish,
+    getDish,
     
     // Meal History
-    recordDishCooked: mealHistoryHook.recordDishCooked,
-    getMealHistoryForDish: mealHistoryHook.getMealHistoryForDish,
+    recordDishCooked,
+    getMealHistoryForDish,
     
     // Weekly Menu
     getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,

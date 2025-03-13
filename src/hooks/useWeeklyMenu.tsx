@@ -1,6 +1,8 @@
+
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { fetchDishesOriginalMethod } from "./dish";
 
 export function useWeeklyMenu() {
   // Get dish data using React Query and the materialized view (READ ONLY)
@@ -24,31 +26,8 @@ export function useWeeklyMenu() {
         if (summaryError) {
           console.error("Error fetching from dish_summary:", summaryError);
           
-          // Fallback to direct table query if view access fails
-          const { data: dishesData, error: dishesError } = await supabase
-            .from('dishes')
-            .select('*')
-            .eq('user_id', user_id);
-            
-          if (dishesError) {
-            console.error("Error fetching from dishes table:", dishesError);
-            return [];
-          }
-          
-          // Map the dish data without using the view - properly format with source_id and location
-          return dishesData ? dishesData.map(dish => {
-            return {
-              id: dish.id,
-              name: dish.name,
-              createdAt: dish.createdat,
-              cuisines: dish.cuisines,
-              sourceId: dish.source_id,
-              location: dish.location,
-              lastMade: null, // Not available without joining meal_history
-              timesCooked: 0,  // Not available without counting meal_history
-              user_id: dish.user_id
-            } as Dish;
-          }) : [];
+          // Use the fallback method imported from useDishQueries
+          return await fetchDishesOriginalMethod(user_id);
         }
         
         // Map the summary data to our Dish type
