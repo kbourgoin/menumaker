@@ -2,7 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 // Get existing meal history entries for a dish to avoid duplicates
-export const getExistingMealEntries = async (dishId: string, userId: string) => {
+export const getExistingMealEntries = async (dishId: string, userId: string): Promise<Set<string>> => {
   const { data: existingMealHistory, error: historyError } = await supabase
     .from('meal_history')
     .select('date')
@@ -11,11 +11,11 @@ export const getExistingMealEntries = async (dishId: string, userId: string) => 
     
   if (historyError) {
     console.error(`Error fetching meal history for dish ${dishId}:`, historyError);
-    return new Set();
+    return new Set<string>();
   }
   
   // Use a Set for existing entries to avoid duplicates
-  const existingEntries = new Set();
+  const existingEntries = new Set<string>();
   
   if (existingMealHistory) {
     existingMealHistory.forEach(entry => {
