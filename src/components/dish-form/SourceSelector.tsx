@@ -32,7 +32,9 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                     className="justify-between"
                   >
                     {field.value
-                      ? sources.find(source => source.id === field.value)?.name || "Select source"
+                      ? sources.find(source => source.id === field.value)?.name + 
+                        (sources.find(source => source.id === field.value)?.type ? 
+                        ` (${sources.find(source => source.id === field.value)?.type})` : "")
                       : "No source selected"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
