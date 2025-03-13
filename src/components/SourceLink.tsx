@@ -1,5 +1,5 @@
 
-import { Link, Globe, Book, FileText } from "lucide-react";
+import { Link, Globe, Book, FileText, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { useSources } from "@/hooks/useSources";
@@ -22,7 +22,8 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
           if (sourceData) {
             setSource({
               name: sourceData.name,
-              type: sourceData.type
+              type: sourceData.type,
+              url: sourceData.url
             });
           }
         } catch (error) {
@@ -38,7 +39,26 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
     return null;
   }
   
-  // Book source
+  // For website sources, make the name a clickable external link
+  if (source.type === 'website' && source.url) {
+    return (
+      <a 
+        href={source.url.startsWith('http') ? source.url : `https://${source.url}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`inline-flex items-center text-sm text-terracotta-500 hover:text-terracotta-600 hover:underline ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Globe className="w-4 h-4 mr-1.5" />
+        <span className="truncate max-w-[200px]">
+          {source.name}
+        </span>
+        <ExternalLink className="w-3.5 h-3.5 ml-1" />
+      </a>
+    );
+  }
+  
+  // For non-website sources (book, document, etc.)
   return (
     <TooltipProvider>
       <Tooltip>
