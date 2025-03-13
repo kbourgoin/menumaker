@@ -39,9 +39,22 @@ export function useJSONImport() {
       for (const source of jsonData.sources) {
         try {
           const sourceToDB = mapSourceToDB(updateUserIds(source));
+          
+          // Ensure required fields are present
+          if (!sourceToDB.name || !sourceToDB.type || !sourceToDB.user_id) {
+            throw new Error("Missing required fields for source");
+          }
+          
           const { error } = await supabase
             .from('sources')
-            .upsert(sourceToDB, { onConflict: 'id' });
+            .upsert({
+              id: sourceToDB.id,
+              name: sourceToDB.name,
+              type: sourceToDB.type,
+              description: sourceToDB.description,
+              created_at: sourceToDB.created_at,
+              user_id: sourceToDB.user_id
+            }, { onConflict: 'id' });
             
           if (error) throw error;
           successCount++;
@@ -60,9 +73,23 @@ export function useJSONImport() {
       for (const dish of jsonData.dishes) {
         try {
           const dishToDB = mapDishToDB(updateUserIds(dish));
+          
+          // Ensure required fields are present
+          if (!dishToDB.name || !dishToDB.user_id) {
+            throw new Error("Missing required fields for dish");
+          }
+          
           const { error } = await supabase
             .from('dishes')
-            .upsert(dishToDB, { onConflict: 'id' });
+            .upsert({
+              id: dishToDB.id,
+              name: dishToDB.name,
+              createdat: dishToDB.createdat || new Date().toISOString(),
+              cuisines: dishToDB.cuisines || ['Other'],
+              source_id: dishToDB.source_id,
+              location: dishToDB.location,
+              user_id: dishToDB.user_id
+            }, { onConflict: 'id' });
             
           if (error) throw error;
           successCount++;
@@ -81,9 +108,21 @@ export function useJSONImport() {
       for (const history of jsonData.mealHistory) {
         try {
           const historyToDB = mapMealHistoryToDB(updateUserIds(history));
+          
+          // Ensure required fields are present
+          if (!historyToDB.dishid || !historyToDB.user_id) {
+            throw new Error("Missing required fields for meal history entry");
+          }
+          
           const { error } = await supabase
             .from('meal_history')
-            .upsert(historyToDB, { onConflict: 'id' });
+            .upsert({
+              id: historyToDB.id,
+              dishid: historyToDB.dishid,
+              date: historyToDB.date || new Date().toISOString(),
+              notes: historyToDB.notes,
+              user_id: historyToDB.user_id
+            }, { onConflict: 'id' });
             
           if (error) throw error;
           successCount++;
