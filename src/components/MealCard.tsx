@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
@@ -50,7 +49,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only navigate if the click wasn't on a button, dialog, or interactive element
     if (
       (e.target as HTMLElement).closest('button') || 
       (e.target as HTMLElement).closest('a') || 
@@ -59,7 +57,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       return;
     }
     
-    // Navigate to the dish detail page
     e.preventDefault();
     navigate(`/meal/${dish.id}`);
   };
@@ -84,11 +81,9 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
     }
   };
 
-  // Helper function to render location as a link if it looks like a URL
   const renderLocation = () => {
     if (!dish.location) return null;
     
-    // Simple check if it's a URL
     const isUrl = dish.location.startsWith('http') || 
                   dish.location.startsWith('www.') || 
                   dish.location.includes('.com') || 
@@ -116,7 +111,6 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       );
     }
     
-    // If it's not a URL, just show as plain text
     return (
       <div className="mt-1 text-sm text-muted-foreground">
         <span>Page: {dish.location}</span>
