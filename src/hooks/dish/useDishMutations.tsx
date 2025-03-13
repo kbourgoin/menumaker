@@ -26,6 +26,7 @@ export function useDishMutations() {
         cuisines: dish.cuisines || ['Other'],
         createdat: new Date().toISOString(),
         source: dish.source,
+        cookbook_id: dish.cookbookId, // Using the new direct relationship
         user_id
       };
       

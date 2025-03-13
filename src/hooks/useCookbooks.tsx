@@ -30,11 +30,12 @@ export function useCookbooks() {
     return mapCookbookFromDB(data);
   };
 
+  // Updated to use the direct foreign key relationship
   const getDishesByCookbook = async (cookbookId: string): Promise<Dish[]> => {
     const { data: dishesData, error } = await supabase
       .from('dishes')
       .select('*')
-      .eq('source->>bookId', cookbookId)
+      .eq('cookbook_id', cookbookId)
       .order('name');
       
     if (error) throw error;

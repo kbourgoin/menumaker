@@ -13,7 +13,6 @@ export const processDishImport = async (
       type: 'url' | 'book' | 'none';
       value: string;
       page?: number;
-      bookId?: string;
     }; 
   }[],
   userId: string
@@ -25,20 +24,15 @@ export const processDishImport = async (
       value: ''
     };
     
+    let cookbookId = undefined;
+    
     // If it's a book source, try to find or create cookbook
     if (source.type === 'book' && source.value) {
-      const cookbookId = await findOrCreateCookbook(source.value, userId);
-      
-      if (cookbookId) {
-        source = {
-          ...source,
-          bookId: cookbookId
-        };
-      }
+      cookbookId = await findOrCreateCookbook(source.value, userId);
     }
     
-    // Find or create the dish - using updated implementation to bypass the view
-    const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, userId);
+    // Find or create the dish - using updated implementation to handle the new cookbookId field
+    const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, cookbookId, userId);
     
     if (!dishId) {
       console.error(`Failed to find or create dish '${firstEntry.dish}'`);

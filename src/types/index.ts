@@ -8,8 +8,9 @@ export interface Dish {
     type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
-    bookId?: string; // New field to link to a cookbook
+    // bookId removed from here as it's now a top-level property
   };
+  cookbookId?: string; // New direct foreign key to cookbooks
   lastMade?: string;
   timesCooked: number;
 }

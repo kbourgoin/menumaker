@@ -21,8 +21,8 @@ export type Dish = {
     type: 'url' | 'book' | 'none';
     value: string;
     page?: number;
-    bookId?: string;
   };
+  cookbookId?: string; // New direct foreign key
   lastMade?: string;
   timesCooked: number;
   user_id: string;
@@ -52,6 +52,7 @@ export type DishSummary = {
   createdat: string;
   cuisines: string[];
   source?: any;
+  cookbook_id?: string; // Updated for the new schema
   user_id: string;
   times_cooked: number;
   last_made?: string;
@@ -83,6 +84,7 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
     createdAt: dish.createdat,
     cuisines: dish.cuisines,
     source: dish.source as any,
+    cookbookId: dish.cookbook_id, // Map from the direct foreign key
     lastMade,  // Derived value
     timesCooked, // Derived value
     user_id: dish.user_id
@@ -106,8 +108,7 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
         formattedSource = {
           type: sourceData.type === 'url' || sourceData.type === 'book' ? sourceData.type : 'none',
           value: sourceData.value || '',
-          ...(sourceData.page !== undefined ? { page: sourceData.page } : {}),
-          ...(sourceData.bookId !== undefined ? { bookId: sourceData.bookId } : {})
+          ...(sourceData.page !== undefined ? { page: sourceData.page } : {})
         };
       } else {
         // Fallback for non-object source
@@ -129,6 +130,7 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
     createdAt: summary.createdat,
     cuisines: summary.cuisines,
     source: formattedSource,
+    cookbookId: summary.cookbook_id, // Map the direct foreign key
     lastMade: summary.last_made,
     timesCooked: summary.times_cooked || 0,
     user_id: summary.user_id
@@ -147,6 +149,7 @@ export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Ta
     createdat: dish.createdAt,
     cuisines: dish.cuisines,
     source: dish.source as any,
+    cookbook_id: dish.cookbookId, // Map to the database column name
     user_id: dish.user_id
   };
 };

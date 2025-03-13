@@ -62,8 +62,8 @@ export const deleteDish = (id: string): Dish[] => {
   return updatedDishes;
 };
 
-// Get dishes by cookbook ID
+// Get dishes by cookbook ID - updated to use the direct foreign key
 export const getDishesByBookId = (bookId: string): Dish[] => {
   const dishes = getDishes();
-  return dishes.filter((dish) => dish.source?.type === 'book' && dish.source?.bookId === bookId);
+  return dishes.filter((dish) => dish.cookbookId === bookId);
 };

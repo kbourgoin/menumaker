@@ -14,7 +14,6 @@ export const importMealHistory = (
       type: 'url' | 'book' | 'none';
       value: string;
       page?: number;
-      bookId?: string;
     };
   }[]
 ): { success: number; skipped: number } => {
@@ -51,6 +50,8 @@ export const importMealHistory = (
         value: ''
       };
       
+      let cookbookId = undefined;
+      
       // If it's a book source, try to find or create cookbook
       if (source.type === 'book' && source.value) {
         // Check if cookbook already exists
@@ -67,11 +68,8 @@ export const importMealHistory = (
           saveCookbooks(cookbooks);
         }
         
-        // Link dish to cookbook
-        source = {
-          ...source,
-          bookId: cookbook.id
-        };
+        // Set cookbookId for the dish
+        cookbookId = cookbook.id;
       }
       
       dish = {
@@ -80,7 +78,8 @@ export const importMealHistory = (
         createdAt: firstEntry.date, // Use the earliest historical date as creation date
         timesCooked: 0,
         cuisines: ['Other'], // Default cuisine
-        source
+        source,
+        cookbookId // Using the direct foreign key relationship
       };
       updatedDishes.push(dish);
     }
@@ -91,6 +90,7 @@ export const importMealHistory = (
     dishEntries.forEach(entry => {
       // Create history entry for each cooking date
       const historyEntry = {
+        id: generateId(),
         date: entry.date,
         dishId: dish!.id,
         notes: entry.notes

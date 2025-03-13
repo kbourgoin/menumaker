@@ -15,6 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown, Link as LinkIcon, Book } from "lucide-react";
+import { useCookbooks } from "@/hooks/useCookbooks";
+import { useQuery } from "@tanstack/react-query";
 
 // List of supported cuisines
 const CUISINES: CuisineType[] = [
@@ -30,6 +32,7 @@ const formSchema = z.object({
   sourceType: z.enum(["none", "url", "book"]),
   sourceValue: z.string().optional(),
   sourcePage: z.string().optional(),
+  cookbookId: z.string().optional(),
 });
 
 interface DishFormProps {
@@ -39,12 +42,20 @@ interface DishFormProps {
 
 const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const { dishes, addDish, updateDish } = useDishes();
+  const { getCookbooks } = useCookbooks();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSourceFields, setShowSourceFields] = useState(
     existingDish?.source ? (existingDish.source.type === "url" || existingDish.source.type === "book") : false
   );
+
+  // Fetch cookbooks for the book source type
+  const { data: cookbooks = [] } = useQuery({
+    queryKey: ['cookbooks'],
+    queryFn: getCookbooks,
+    enabled: true, // Always fetch cookbooks
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,6 +65,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
       sourceType: existingDish?.source?.type || "none",
       sourceValue: existingDish?.source?.value || "",
       sourcePage: existingDish?.source?.page?.toString() || "",
+      cookbookId: existingDish?.cookbookId || "",
     },
   });
 
@@ -83,7 +95,8 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         await updateDish(existingDish.id, {
           name: data.name,
           cuisines: data.cuisines,
-          source
+          source,
+          cookbookId: data.sourceType === "book" ? data.cookbookId : undefined,
         });
         
         toast({
@@ -99,7 +112,8 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         const newDish = await addDish({
           name: data.name,
           cuisines: data.cuisines,
-          source
+          source,
+          cookbookId: data.sourceType === "book" ? data.cookbookId : undefined,
         });
         
         toast({
@@ -237,7 +251,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {watchSourceType === "url" ? "URL" : "Book Title"}
+                    {watchSourceType === "url" ? "URL" : "Book Title/Notes"}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -245,7 +259,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
                       placeholder={
                         watchSourceType === "url"
                           ? "https://example.com/recipe"
-                          : "Cookbook title"
+                          : "Notes about the cookbook source"
                       }
                     />
                   </FormControl>
@@ -255,23 +269,83 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
             />
 
             {watchSourceType === "book" && (
-              <FormField
-                control={form.control}
-                name="sourcePage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Page Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Page number"
-                        type="number"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="cookbookId"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Select Cookbook</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="justify-between"
+                            >
+                              {field.value && cookbooks.length > 0
+                                ? cookbooks.find(
+                                    (cookbook) => cookbook.id === field.value
+                                  )?.name || "Select cookbook"
+                                : "Select cookbook"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command>
+                            <CommandInput placeholder="Search cookbooks..." />
+                            <CommandEmpty>No cookbook found.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {cookbooks.map((cookbook) => (
+                                  <CommandItem
+                                    key={cookbook.id}
+                                    value={cookbook.id}
+                                    onSelect={() => {
+                                      form.setValue("cookbookId", cookbook.id);
+                                    }}
+                                  >
+                                    <Check
+                                      className={`mr-2 h-4 w-4 ${
+                                        field.value === cookbook.id
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      }`}
+                                    />
+                                    {cookbook.name}
+                                    {cookbook.author && ` by ${cookbook.author}`}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="sourcePage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Page Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Page number"
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
           </div>
         )}

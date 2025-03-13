@@ -42,22 +42,19 @@ export const updateCookbook = (id: string, updates: Partial<Cookbook>): Cookbook
   return updatedCookbooks;
 };
 
-// Delete a cookbook
+// Delete a cookbook - updated to clear the cookbookId reference
 export const deleteCookbook = (id: string): Cookbook[] => {
   const cookbooks = getCookbooks();
   const updatedCookbooks = cookbooks.filter((cookbook) => cookbook.id !== id);
   saveCookbooks(updatedCookbooks);
   
-  // Update any dish references
+  // Update dish references - now using the direct cookbookId field
   const dishes = getDishes();
   const updatedDishes = dishes.map((dish) => {
-    if (dish.source?.type === 'book' && dish.source?.bookId === id) {
+    if (dish.cookbookId === id) {
       return {
         ...dish,
-        source: {
-          ...dish.source,
-          bookId: undefined,
-        }
+        cookbookId: undefined
       };
     }
     return dish;

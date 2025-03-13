@@ -38,6 +38,7 @@ export type Database = {
       }
       dishes: {
         Row: {
+          cookbook_id: string | null
           createdat: string
           cuisines: string[]
           id: string
@@ -46,6 +47,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cookbook_id?: string | null
           createdat?: string
           cuisines?: string[]
           id?: string
@@ -54,6 +56,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cookbook_id?: string | null
           createdat?: string
           cuisines?: string[]
           id?: string
@@ -61,7 +64,15 @@ export type Database = {
           source?: Json | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dishes_cookbook_id_fkey"
+            columns: ["cookbook_id"]
+            isOneToOne: false
+            referencedRelation: "cookbooks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meal_history: {
         Row: {

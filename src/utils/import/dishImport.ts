@@ -54,10 +54,12 @@ export const findOrCreateCookbook = async (cookbookName: string, userId: string)
 };
 
 // Find or create a dish by name - COMPLETELY avoid the dish_summary view
+// Updated to handle the cookbook_id as a direct column
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
   source: any, 
+  cookbookId: string | null | undefined,
   userId: string
 ) => {
   try {
@@ -102,12 +104,14 @@ export const findOrCreateDish = async (
       formattedSource = { type: 'none', value: '' };
     }
     
+    // Create dish data with the direct cookbook_id relationship
     const dishData = {
       name: dishName,
       createdat: date,
       cuisines: ['Other'], // Default cuisine
       source: formattedSource,
-      user_id: userId
+      user_id: userId,
+      cookbook_id: cookbookId || null
     };
     
     // Insert directly into dishes table and avoid using single() which can cause errors
