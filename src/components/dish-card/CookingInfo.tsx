@@ -1,5 +1,5 @@
 
-import { Calendar } from "lucide-react";
+import { Calendar, UtensilsCrossed } from "lucide-react";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { 
   Tooltip,
@@ -38,6 +38,11 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
   return (
     <div className={`text-sm text-muted-foreground ${compact ? "text-xs" : ""}`}>
       <div className="flex items-center space-x-1">
+        <UtensilsCrossed className="w-3.5 h-3.5 mr-1" />
+        <span>Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}</span>
+      </div>
+      
+      <div className="flex items-center space-x-1 mt-1">
         <Calendar className="w-3.5 h-3.5 mr-1" />
         <span>Last made: </span>
         {lastMade ? (
@@ -54,9 +59,6 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
         ) : (
           <span>Never</span>
         )}
-      </div>
-      <div className="mt-1">
-        Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}
       </div>
     </div>
   );
