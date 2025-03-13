@@ -1,10 +1,9 @@
 
 import React from "react";
 import Layout from "@/components/Layout";
-import CSVImport from "@/components/CSVImport";
-import { ClearDataDialog } from "@/components/ClearDataDialog";
 import SourceManager from "@/components/SourceManager";
 import AccountSettings from "@/components/AccountSettings";
+import { DataManagement } from "@/components/data/DataManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -48,23 +47,7 @@ const Settings = () => {
                 
                 <Separator />
                 
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Import Data</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Import your meal history from a CSV file
-                  </p>
-                  <CSVImport />
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Reset Data</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Clear all your meal data from the app
-                  </p>
-                  <ClearDataDialog />
-                </div>
+                <DataManagement />
               </CardContent>
             </Card>
           </TabsContent>
