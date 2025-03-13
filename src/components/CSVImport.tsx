@@ -23,8 +23,10 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
     
@@ -43,13 +45,22 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const csvData = event.target?.result as string;
-        const lines = csvData.split(/\r?\n/).slice(0, 5);
+        const lines = csvData.split(/\r?\n/).filter(line => line.trim() !== '').slice(0, 5);
         // Use the improved CSV parsing for preview data as well
         setPreviewData(lines.map(line => parseCSVLine(line)));
+        
+        // Check if the file appears to have the right structure
+        if (lines.length > 0) {
+          const firstLineFields = parseCSVLine(lines[0]);
+          if (firstLineFields.length < 2) {
+            setError("CSV format may be incorrect. Expected at least date and dish columns.");
+          }
+        }
       };
       reader.readAsText(selectedFile);
     } catch (error) {
       console.error("Failed to read CSV for preview", error);
+      setError("Failed to read the CSV file. Please check the file and try again.");
     }
   };
   
@@ -58,10 +69,16 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
     
     setIsUploading(true);
     setProgress(0);
+    setError(null);
     setTotalItems(1); // Initialize with 1 to show some progress immediately
     
     try {
       const entries = await processCSVFile(file);
+      
+      if (entries.length === 0) {
+        throw new Error("No valid entries found in the CSV file. Please check the format.");
+      }
+      
       // Show how many entries we're going to process
       setTotalItems(Math.max(1, entries.length)); 
       
@@ -78,7 +95,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         setProgress(0);
         
         toast({
-          title: "Import successful",
+          title: "Import complete",
           description: `Imported ${result.success} meals. Skipped ${result.skipped} duplicates.`,
         });
         
@@ -87,6 +104,8 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         }
       }, 500);
     } catch (error) {
+      console.error("Import failed:", error);
+      setError(error instanceof Error ? error.message : "An unknown error occurred");
       toast({
         title: "Import failed",
         description: error instanceof Error ? error.message : "An unknown error occurred",
@@ -122,8 +141,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
             <Alert>
               <AlertDescription>
                 Your CSV file should have columns for date, dish name, and notes (optional). 
-                The app will automatically remove double quotes around dish names.
-                The app will also extract source information if your dish name contains it in parentheses (e.g., "Mapo Tofu (RICE80)").
+                The app will extract source information if your dish name contains it in parentheses (e.g., "Mapo Tofu (RICE80)").
               </AlertDescription>
             </Alert>
             
@@ -139,6 +157,12 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
                 className="cursor-pointer"
               />
             </div>
+            
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             
             {previewData.length > 0 && (
               <div className="border rounded p-3 text-sm space-y-1">
@@ -172,7 +196,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
             </Button>
             <Button 
               onClick={handleImport} 
-              disabled={!file || isUploading}
+              disabled={!file || isUploading || !!error}
               className="bg-terracotta-500 hover:bg-terracotta-600"
             >
               {isUploading ? (

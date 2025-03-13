@@ -3,20 +3,6 @@
  * Utility functions for CSV import
  */
 
-import { generateId } from "./mealUtils";
-
-interface CSVDishEntry {
-  date: string;
-  dish: string;
-  notes?: string;
-  source?: {
-    type: 'url' | 'book' | 'none';
-    value: string;
-    page?: number;
-    bookId?: string; // Added bookId property to match the type in types/index.ts
-  };
-}
-
 /**
  * Extract source information from dish name if it contains parentheses
  * Example: "Mapo Tofu (RICE80)" -> { dishName: "Mapo Tofu", source: { type: "book", value: "RICE", page: 80 } }
@@ -107,67 +93,77 @@ export const parseCSVLine = (line: string): string[] => {
   result.push(currentField);
   
   // Clean up each field
-  return result.map(field => field.trim());
+  return result.map(field => removeDoubleQuotes(field.trim()));
 };
 
 /**
  * Parse CSV data from a string
  * Expected format: date,dish,notes (optional)
  */
-export const parseCSVData = (csvData: string): CSVDishEntry[] => {
+export const parseCSVData = (csvData: string): { date: string; dish: string; notes?: string; source?: { type: 'url' | 'book' | 'none'; value: string; page?: number } }[] => {
   const lines = csvData.split(/\r?\n/).filter(line => line.trim() !== '');
   
-  // Skip header row if it exists
-  const startIndex = lines[0].toLowerCase().includes('date') ? 1 : 0;
+  // Skip header row if it exists (case insensitive check for "date" or "dish" in first row)
+  const startIndex = (lines[0].toLowerCase().includes('date') || lines[0].toLowerCase().includes('dish')) ? 1 : 0;
   
-  return lines.slice(startIndex).map(line => {
+  console.log(`CSV data has ${lines.length} lines, starting at index ${startIndex}`);
+  
+  return lines.slice(startIndex).map((line, idx) => {
     // Use the more robust CSV parsing function that handles quoted fields
-    const [date, dish, notes] = parseCSVLine(line);
+    const fields = parseCSVLine(line);
+    const [date, dish, notes] = fields;
+    
+    if (!date || !dish) {
+      console.warn(`Line ${idx + startIndex + 1} is missing date or dish: ${line}`);
+      return null;
+    }
     
     // Validate date
     let parsedDate = new Date(date);
     // If invalid date, use today
     if (isNaN(parsedDate.getTime())) {
+      console.warn(`Invalid date in line ${idx + startIndex + 1}: ${date}, using current date instead`);
       parsedDate = new Date();
     }
     
     // Remove double quotes from dish name if present
-    const cleanedDish = removeDoubleQuotes(dish || 'Unknown meal');
+    const cleanedDish = dish || 'Unknown meal';
     
     // Extract source information from dish name if available
     const { dishName, source } = extractSourceFromDish(cleanedDish);
     
-    // Also remove double quotes from notes if present
-    const cleanedNotes = notes ? removeDoubleQuotes(notes) : undefined;
-    
     return {
       date: parsedDate.toISOString(),
       dish: dishName,
-      notes: cleanedNotes,
+      notes: notes,
       source
     };
-  }).filter(entry => entry.dish !== 'Unknown meal');
+  }).filter(entry => entry !== null && entry.dish !== 'Unknown meal');
 };
 
 /**
  * Process CSV file and return parsed data
  */
-export const processCSVFile = (file: File): Promise<CSVDishEntry[]> => {
+export const processCSVFile = (file: File): Promise<{ date: string; dish: string; notes?: string; source?: { type: 'url' | 'book' | 'none'; value: string; page?: number } }[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
     reader.onload = (event) => {
       try {
         const csvData = event.target?.result as string;
+        console.log(`Processing CSV file of size ${csvData.length} bytes`);
         const parsedData = parseCSVData(csvData);
+        console.log(`Successfully parsed ${parsedData.length} entries from CSV`);
         resolve(parsedData);
       } catch (error) {
-        reject(new Error('Failed to parse CSV file'));
+        console.error('Failed to parse CSV file:', error);
+        reject(new Error('Failed to parse CSV file. Please check the format and try again.'));
       }
     };
     
-    reader.onerror = () => {
-      reject(new Error('Failed to read CSV file'));
+    reader.onerror = (event) => {
+      console.error('Failed to read CSV file:', event);
+      reject(new Error('Failed to read CSV file. The file might be corrupted.'));
     };
     
     reader.readAsText(file);

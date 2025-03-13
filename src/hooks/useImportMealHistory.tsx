@@ -1,9 +1,11 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export function useImportMealHistory() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Import meal history with progress reporting
   const importMealHistory = async (
@@ -25,6 +27,8 @@ export function useImportMealHistory() {
     
     if (!user_id) throw new Error("User not authenticated");
     
+    console.log(`Starting import of ${entries.length} entries`);
+    
     let successCount = 0;
     let skippedCount = 0;
     const BATCH_SIZE = 10; // Process entries in batches of 10
@@ -44,24 +48,51 @@ export function useImportMealHistory() {
       const totalDishes = Object.keys(entriesByDish).length;
       let processedDishes = 0;
       
+      console.log(`Grouped ${entries.length} entries into ${totalDishes} dishes`);
+      
       // Process dishes in batches
       const dishEntries = Object.entries(entriesByDish);
       
       for (let i = 0; i < dishEntries.length; i += BATCH_SIZE) {
         const batch = dishEntries.slice(i, i + BATCH_SIZE);
         
+        console.log(`Processing batch ${i/BATCH_SIZE + 1} of ${Math.ceil(dishEntries.length/BATCH_SIZE)}`);
+        
         // Process each batch in parallel
         await Promise.all(batch.map(async ([dishLower, dishEntries]) => {
-          // Check if dish already exists
-          const { data: existingDishes } = await supabase
+          // Use a more forgiving search to find dishes with similar names
+          const { data: existingDishes, error: dishError } = await supabase
             .from('dishes')
             .select('*')
-            .ilike('name', dishEntries[0].dish);
+            .ilike('name', `%${dishEntries[0].dish.substring(0, Math.min(dishEntries[0].dish.length, 10))}%`)
+            .limit(5);
+          
+          if (dishError) {
+            console.error(`Error finding dish '${dishEntries[0].dish}':`, dishError);
+            return;
+          }
+          
+          console.log(`Search for '${dishEntries[0].dish}' found ${existingDishes?.length || 0} potential matches`);
           
           let dishId;
+          let exactMatch = false;
           
-          // If dish doesn't exist, create it
-          if (!existingDishes || existingDishes.length === 0) {
+          // Check for an exact match (case insensitive)
+          if (existingDishes && existingDishes.length > 0) {
+            const exactDish = existingDishes.find(d => 
+              d.name.toLowerCase() === dishEntries[0].dish.toLowerCase()
+            );
+            
+            if (exactDish) {
+              dishId = exactDish.id;
+              exactMatch = true;
+              console.log(`Found exact match for dish '${dishEntries[0].dish}' with ID ${dishId}`);
+            }
+          }
+          
+          // If no exact match, create a new dish
+          if (!exactMatch) {
+            console.log(`Creating new dish '${dishEntries[0].dish}'`);
             const firstEntry = dishEntries[0];
             let source = firstEntry.source || {
               type: 'none',
@@ -70,16 +101,22 @@ export function useImportMealHistory() {
             
             // If it's a book source, try to find or create cookbook
             if (source.type === 'book' && source.value) {
-              const { data: existingCookbooks } = await supabase
+              console.log(`Looking for cookbook '${source.value}'`);
+              const { data: existingCookbooks, error: cookbookError } = await supabase
                 .from('cookbooks')
                 .select('*')
-                .ilike('name', source.value);
+                .ilike('name', `%${source.value}%`);
+              
+              if (cookbookError) {
+                console.error(`Error finding cookbook '${source.value}':`, cookbookError);
+              }
               
               let cookbookId;
               
               if (!existingCookbooks || existingCookbooks.length === 0) {
                 // Create new cookbook
-                const { data: newCookbook } = await supabase
+                console.log(`Creating new cookbook '${source.value}'`);
+                const { data: newCookbook, error: newCookbookError } = await supabase
                   .from('cookbooks')
                   .insert({ 
                     name: source.value,
@@ -88,11 +125,20 @@ export function useImportMealHistory() {
                   .select('id')
                   .single();
                   
-                if (newCookbook) {
+                if (newCookbookError) {
+                  console.error(`Error creating cookbook '${source.value}':`, newCookbookError);
+                } else if (newCookbook) {
                   cookbookId = newCookbook.id;
+                  console.log(`Created cookbook '${source.value}' with ID ${cookbookId}`);
                 }
               } else {
-                cookbookId = existingCookbooks[0].id;
+                // Find the best match (exact match preferred)
+                const exactCookbook = existingCookbooks.find(c => 
+                  c.name.toLowerCase() === source.value.toLowerCase()
+                );
+                
+                cookbookId = exactCookbook ? exactCookbook.id : existingCookbooks[0].id;
+                console.log(`Using existing cookbook '${exactCookbook?.name || existingCookbooks[0].name}' with ID ${cookbookId}`);
               }
               
               if (cookbookId) {
@@ -104,7 +150,7 @@ export function useImportMealHistory() {
             }
             
             // Create new dish
-            const { data: newDish } = await supabase
+            const { data: newDish, error: newDishError } = await supabase
               .from('dishes')
               .insert({
                 name: firstEntry.dish,
@@ -116,68 +162,45 @@ export function useImportMealHistory() {
               .select('id')
               .single();
               
-            if (newDish) {
+            if (newDishError) {
+              console.error(`Error creating dish '${firstEntry.dish}':`, newDishError);
+              return;
+            } else if (newDish) {
               dishId = newDish.id;
+              console.log(`Created new dish '${firstEntry.dish}' with ID ${dishId}`);
             }
-          } else {
-            dishId = existingDishes[0].id;
           }
           
           if (dishId) {
-            // Create meal history entries in one batch
+            // Create meal history entries for this dish
             const historyEntries = [];
             
             // Use a Set for existing entries to avoid duplicates
             const existingEntries = new Set();
             
-            // We need to paginate through all meal history entries for this dish
-            // to properly check for duplicates, due to the 1000 row limit
-            let hasMoreEntries = true;
-            let lastDate = null;
-            
-            while (hasMoreEntries) {
-              let query = supabase
-                .from('meal_history')
-                .select('date')
-                .eq('dishid', dishId)
-                .order('date', { ascending: false });
+            // Get all existing meal history entries for this dish to check for duplicates
+            const { data: existingMealHistory, error: historyError } = await supabase
+              .from('meal_history')
+              .select('date')
+              .eq('dishid', dishId);
               
-              // Apply pagination using the start_after parameter if we have a lastDate
-              if (lastDate) {
-                query = query.lt('date', lastDate);
-              }
-              
-              // Limit to max rows to get a full page
-              query = query.limit(1000);
-              
-              const { data: existingMealHistory, error } = await query;
-              
-              if (error) {
-                console.error("Error fetching meal history:", error);
-                break;
-              }
-              
-              // If we got fewer rows than the limit, we've reached the end
-              if (!existingMealHistory || existingMealHistory.length < 1000) {
-                hasMoreEntries = false;
-              }
-              
-              // Add all dates to our set
-              if (existingMealHistory && existingMealHistory.length > 0) {
-                existingMealHistory.forEach(entry => {
-                  existingEntries.add(entry.date);
-                });
-                
-                // Update lastDate for next page
-                lastDate = existingMealHistory[existingMealHistory.length - 1].date;
-              } else {
-                hasMoreEntries = false;
-              }
+            if (historyError) {
+              console.error(`Error fetching meal history for dish ${dishId}:`, historyError);
+            } else if (existingMealHistory) {
+              existingMealHistory.forEach(entry => {
+                // Store just the date part to simplify comparison
+                const dateOnly = new Date(entry.date).toISOString().split('T')[0];
+                existingEntries.add(dateOnly);
+              });
+              console.log(`Found ${existingMealHistory.length} existing history entries for dish ${dishId}`);
             }
             
             // Prepare new entries that don't exist yet
             for (const entry of dishEntries) {
-              if (!existingEntries.has(entry.date)) {
+              // Compare just the date part
+              const entryDateOnly = new Date(entry.date).toISOString().split('T')[0];
+              
+              if (!existingEntries.has(entryDateOnly)) {
                 historyEntries.push({
                   dishid: dishId,
                   date: entry.date,
@@ -189,23 +212,19 @@ export function useImportMealHistory() {
               }
             }
             
+            console.log(`Adding ${historyEntries.length} new history entries for dish ${dishId} (skipped ${dishEntries.length - historyEntries.length})`);
+            
             // Insert all new entries in a single batch
             if (historyEntries.length > 0) {
-              // Split into chunks of 1000 if needed to avoid the limit
-              const CHUNK_SIZE = 500; // Using 500 to be safe with Supabase limits
-              
-              for (let i = 0; i < historyEntries.length; i += CHUNK_SIZE) {
-                const chunk = historyEntries.slice(i, i + CHUNK_SIZE);
+              const { data: newHistory, error: insertError } = await supabase
+                .from('meal_history')
+                .insert(historyEntries);
                 
-                const { data, error } = await supabase
-                  .from('meal_history')
-                  .insert(chunk);
-                  
-                if (!error) {
-                  successCount += chunk.length;
-                } else {
-                  console.error("Error inserting history entries:", error);
-                }
+              if (insertError) {
+                console.error(`Error inserting history entries for dish ${dishId}:`, insertError);
+              } else {
+                successCount += historyEntries.length;
+                console.log(`Successfully added ${historyEntries.length} history entries for dish ${dishId}`);
               }
             }
           }
@@ -218,14 +237,27 @@ export function useImportMealHistory() {
         }));
       }
       
+      console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}`);
+      
       // Refresh data
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       
+      // Show toast notification with results
+      toast({
+        title: `Import complete`,
+        description: `Successfully imported ${successCount} entries. Skipped ${skippedCount} duplicates.`,
+      });
+      
       return { success: successCount, skipped: skippedCount };
     } catch (error) {
       console.error("Import error:", error);
+      toast({
+        title: "Import failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
       throw error;
     }
   };
