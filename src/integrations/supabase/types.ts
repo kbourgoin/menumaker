@@ -140,6 +140,12 @@ export type Database = {
       }
     }
     Functions: {
+      clear_user_data: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
       increment_by: {
         Args: {
           dish_id: string
