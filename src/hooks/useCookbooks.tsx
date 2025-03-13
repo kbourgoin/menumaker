@@ -69,7 +69,11 @@ export function useCookbooks() {
       : [];
   };
 
-  const createCookbook = async (cookbook: Omit<Cookbook, "id" | "createdAt">, userId: string): Promise<Cookbook> => {
+  // Update the signature here - the userId parameter will be handled by the function internally
+  const createCookbook = async (
+    cookbook: Omit<Cookbook, "id" | "createdAt" | "user_id">, 
+    userId: string
+  ): Promise<Cookbook> => {
     // Ensure name is provided (required field)
     if (!cookbook.name) {
       throw new Error("Cookbook name is required");
