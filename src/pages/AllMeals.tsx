@@ -9,7 +9,7 @@ import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AllDishes = () => {
-  const { dishes } = useDishes();
+  const { dishes, isLoading } = useDishes();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Filter dishes based on search query
@@ -44,11 +44,11 @@ const AllDishes = () => {
         </div>
         
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredDishes.map((dish) => (
+          {!isLoading && filteredDishes.map((dish) => (
             <DishCard key={dish.id} dish={dish} />
           ))}
           
-          {filteredDishes.length === 0 && (
+          {!isLoading && filteredDishes.length === 0 && (
             <div className="col-span-full text-center p-8 border rounded-lg">
               <p className="text-muted-foreground">
                 {dishes.length === 0 
