@@ -86,7 +86,7 @@ export const findOrCreateDish = async (
     }
   }
   
-  // Create a new dish - directly insert into dishes table, not the materialized view
+  // Create a new dish - directly insert into dishes table
   console.log(`Creating new dish '${dishName}'`);
   
   // Prepare the dish data
@@ -98,17 +98,22 @@ export const findOrCreateDish = async (
     user_id: userId
   };
   
+  // IMPORTANT: Use .maybeSingle() instead of .single() to avoid errors when no rows are returned
   const { data: newDish, error: newDishError } = await supabase
     .from('dishes')
     .insert(dishData)
-    .select('id')
-    .single();
+    .select('id');
     
   if (newDishError) {
     console.error(`Error creating dish '${dishName}':`, newDishError);
     return null;
   }
   
-  console.log(`Created new dish '${dishName}' with ID ${newDish.id}`);
-  return newDish.id;
+  if (!newDish || newDish.length === 0) {
+    console.error(`Failed to create dish '${dishName}': No ID returned`);
+    return null;
+  }
+  
+  console.log(`Created new dish '${dishName}' with ID ${newDish[0].id}`);
+  return newDish[0].id;
 };

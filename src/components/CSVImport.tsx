@@ -58,15 +58,21 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         setPreviewData([]);
         setProgress(0);
         
-        // Show success message
+        // Show appropriate success or warning message
         if (result.success > 0) {
           toast({
             title: "Import complete",
-            description: `Successfully imported ${result.success} meals. Skipped ${result.skipped} duplicates or invalid entries.`,
+            description: `Successfully imported ${result.success} meals. ${result.skipped} duplicates or invalid entries were skipped.${result.errors ? ` ${result.errors} dishes had errors.` : ''}`,
+          });
+        } else if (result.errors > 0) {
+          toast({
+            title: "Import failed",
+            description: `No meals imported due to errors. Please check the console logs for details.`,
+            variant: "destructive",
           });
         } else {
           toast({
-            title: "Import complete",
+            title: "Nothing to import",
             description: `No new meals were imported. ${result.skipped} entries were skipped (already exist or invalid format).`,
             variant: "destructive", 
           });

@@ -34,6 +34,7 @@ export function useImportMealHistory() {
     
     let successCount = 0;
     let skippedCount = 0;
+    let errorCount = 0;
     
     try {
       // Group entries by dish name
@@ -66,6 +67,7 @@ export function useImportMealHistory() {
             return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
           } catch (error) {
             console.error(`Error processing dish ${dishEntries[0].dish}:`, error);
+            errorCount += 1;
             return { success: 0, skipped: dishEntries.length };
           }
         }));
@@ -85,7 +87,7 @@ export function useImportMealHistory() {
         }
       }
       
-      console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}`);
+      console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
       
       // Refresh data regardless of success count
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
@@ -93,7 +95,7 @@ export function useImportMealHistory() {
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       
       // Always return a result even if nothing was imported
-      return { success: successCount, skipped: skippedCount };
+      return { success: successCount, skipped: skippedCount, errors: errorCount };
     } catch (error) {
       console.error("Import error:", error);
       throw error;
