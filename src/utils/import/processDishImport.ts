@@ -37,7 +37,7 @@ export const processDishImport = async (
       }
     }
     
-    // Find or create the dish
+    // Find or create the dish - this function is now updated to avoid the view
     const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, userId);
     
     if (!dishId) {
@@ -48,10 +48,16 @@ export const processDishImport = async (
     // Get existing meal history entries for this dish
     const existingEntries = await getExistingMealEntries(dishId, userId);
     
-    // Create new meal history entries
+    // Create new meal history entries - this function is now updated to avoid the view
     return await createMealHistoryEntries(dishId, dishEntries, existingEntries, userId);
   } catch (err) {
-    console.error(`Error processing dish '${dishEntries[0].dish}':`, err);
+    // Log the specific error for debugging
+    const error = err as any;
+    if (error?.message?.includes('dish_summary')) {
+      console.error(`Permission error with materialized view when processing dish '${dishEntries[0].dish}':`, error);
+    } else {
+      console.error(`Error processing dish '${dishEntries[0].dish}':`, error);
+    }
     return { success: 0, skipped: dishEntries.length };
   }
 };

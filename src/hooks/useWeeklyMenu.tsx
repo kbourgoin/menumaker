@@ -1,10 +1,9 @@
-
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 export function useWeeklyMenu() {
-  // Get dish data using React Query and the materialized view
+  // Get dish data using React Query and the materialized view (READ ONLY)
   const { data: allDishes = [], isLoading } = useQuery({
     queryKey: ['dishes'],
     queryFn: async () => {
@@ -15,19 +14,46 @@ export function useWeeklyMenu() {
         return [];
       }
       
-      // Use the materialized view for much faster performance
-      const { data: summaryData, error: summaryError } = await supabase
-        .from('dish_summary')
-        .select('*')
-        .eq('user_id', user_id);
-      
-      if (summaryError) {
-        console.error("Error fetching from dish_summary:", summaryError);
+      try {
+        // Use the materialized view for much faster performance (READ ONLY)
+        const { data: summaryData, error: summaryError } = await supabase
+          .from('dish_summary')
+          .select('*')
+          .eq('user_id', user_id);
+        
+        if (summaryError) {
+          console.error("Error fetching from dish_summary:", summaryError);
+          
+          // Fallback to direct table query if view access fails
+          const { data: dishesData, error: dishesError } = await supabase
+            .from('dishes')
+            .select('*')
+            .eq('user_id', user_id);
+            
+          if (dishesError) {
+            console.error("Error fetching from dishes table:", dishesError);
+            return [];
+          }
+          
+          // Map the dish data without using the view
+          return dishesData ? dishesData.map(dish => ({
+            id: dish.id,
+            name: dish.name,
+            createdAt: dish.createdat,
+            cuisines: dish.cuisines,
+            source: dish.source,
+            lastMade: null, // Not available without joining meal_history
+            timesCooked: 0,  // Not available without counting meal_history
+            user_id: dish.user_id
+          })) : [];
+        }
+        
+        // Map the summary data to our Dish type
+        return summaryData ? summaryData.map(summary => mapDishFromSummary(summary)) : [];
+      } catch (error) {
+        console.error("Error in useWeeklyMenu query:", error);
         return [];
       }
-      
-      // Map the summary data to our Dish type
-      return summaryData ? summaryData.map(summary => mapDishFromSummary(summary)) : [];
     },
     // Enable stale time for caching
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -38,7 +64,7 @@ export function useWeeklyMenu() {
     if (!allDishes || allDishes.length === 0) return [];
     if (allDishes.length <= count) return [...allDishes];
     
-    // Calculate weights for dish suggestions
+    // Weight calculations and suggestion logic - READ ONLY, no writes
     const today = new Date();
     
     // Weight calculations

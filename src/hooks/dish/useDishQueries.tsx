@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 export function useDishQueries() {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Query to fetch dishes from the materialized view for better performance
+  // Query to fetch dishes from the materialized view for better performance (READ ONLY)
   const { data: dishes = [] } = useQuery({
     queryKey: ['dishes'],
     queryFn: async (): Promise<Dish[]> => {
@@ -27,29 +27,35 @@ export function useDishQueries() {
           return [];
         }
         
-        // Get dishes from the materialized view (much faster)
-        const { data: summaryData, error: summaryError } = await supabase
-          .from('dish_summary')
-          .select('*')
-          .eq('user_id', user_id)
-          .order('name');
-        
-        if (summaryError) {
-          console.error("Error fetching from dish_summary:", summaryError);
-          // Fallback to the original method if materialized view fails
+        try {
+          // Get dishes from the materialized view (READ ONLY)
+          const { data: summaryData, error: summaryError } = await supabase
+            .from('dish_summary')
+            .select('*')
+            .eq('user_id', user_id)
+            .order('name');
+          
+          if (summaryError) {
+            console.error("Error fetching from dish_summary:", summaryError);
+            // Fallback to the original method if materialized view fails
+            return await fetchDishesOriginalMethod(user_id);
+          }
+          
+          if (!summaryData) {
+            setIsLoading(false);
+            return [];
+          }
+          
+          // Map the summary data to our Dish type
+          const mappedDishes = summaryData.map(summary => mapDishFromSummary(summary));
+          
+          setIsLoading(false);
+          return mappedDishes;
+        } catch (viewError) {
+          console.error("Error with dish_summary view:", viewError);
+          // Fallback if there's any issue with the view
           return await fetchDishesOriginalMethod(user_id);
         }
-        
-        if (!summaryData) {
-          setIsLoading(false);
-          return [];
-        }
-        
-        // Map the summary data to our Dish type
-        const mappedDishes = summaryData.map(summary => mapDishFromSummary(summary));
-        
-        setIsLoading(false);
-        return mappedDishes;
       } catch (error) {
         console.error("Error fetching dishes:", error);
         setIsLoading(false);
@@ -65,6 +71,7 @@ export function useDishQueries() {
   // Get dish by ID - only from Supabase, no localStorage fallback
   const getDish = async (id: string): Promise<Dish | null> => {
     try {
+      // Always read directly from the dishes table for a single dish (not the view)
       const { data, error } = await supabase
         .from('dishes')
         .select('*')
@@ -131,7 +138,7 @@ export function useDishQueries() {
 // Fallback method if the materialized view fails - extracted as a separate function
 export const fetchDishesOriginalMethod = async (user_id: string): Promise<Dish[]> => {
   try {
-    // First get the dishes
+    // First get the dishes directly from the dishes table
     const { data: dishesData, error: dishesError } = await supabase
       .from('dishes')
       .select('*')

@@ -98,6 +98,13 @@ export function useImportMealHistory() {
       return { success: successCount, skipped: skippedCount, errors: errorCount };
     } catch (error) {
       console.error("Import error:", error);
+      
+      // Check if the error is related to the dish_summary view
+      const errorObj = error as any;
+      if (errorObj?.message?.includes("dish_summary")) {
+        throw new Error("Error interacting with dish summary. This is a database permission issue.");
+      }
+      
       throw error;
     }
   };

@@ -24,12 +24,12 @@ export function useDishMutations() {
       const newDish = {
         name: dish.name, // Ensure required field is present
         cuisines: dish.cuisines || ['Other'],
-        timescooked: 0,
         createdat: new Date().toISOString(),
         source: dish.source,
         user_id
       };
       
+      // Insert directly into dishes table only, never the view
       const { data, error } = await supabase
         .from('dishes')
         .insert(newDish)
@@ -51,6 +51,7 @@ export function useDishMutations() {
       const dbUpdates = mapDishToDB(updates);
       delete dbUpdates.id; // Don't try to update the ID
       
+      // Update directly in dishes table only, never the view
       const { error } = await supabase
         .from('dishes')
         .update(dbUpdates)
@@ -72,7 +73,7 @@ export function useDishMutations() {
         .delete()
         .eq('dishid', id);
         
-      // Then delete the dish
+      // Then delete the dish - directly from dishes table only
       const { error } = await supabase
         .from('dishes')
         .delete()

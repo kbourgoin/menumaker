@@ -97,7 +97,7 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
           errorMessage = "Database permission error. You don't have the required permissions.";
         } else if (supabaseError.message && typeof supabaseError.message === 'string') {
           if (supabaseError.message.includes('dish_summary')) {
-            errorMessage = "Cannot write to the dish summary view. Please contact support.";
+            errorMessage = "Cannot interact with the dish summary view. Please contact support.";
           }
         }
       }
