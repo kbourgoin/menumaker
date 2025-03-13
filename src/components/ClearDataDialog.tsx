@@ -26,7 +26,7 @@ export function ClearDataDialog() {
       
       if (result.success) {
         setOpen(false);
-        toast.success("All dish data has been cleared from the database");
+        toast.success("All data has been cleared from the database");
       } else {
         const errorMessage = result.error?.message || "Failed to clear data";
         toast.error(`Error: ${errorMessage}. Please try again.`);
@@ -48,7 +48,7 @@ export function ClearDataDialog() {
         <DialogHeader>
           <DialogTitle>Clear All Data</DialogTitle>
           <DialogDescription>
-            This will delete all dishes and dish history from the database.
+            This will delete all dishes, meal history, and sources from the database.
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>

@@ -16,7 +16,7 @@ export function useClearData() {
       
       console.log("Clearing data for user:", userId);
       
-      // Use the stored procedure without referencing cookbooks
+      // Call the updated stored procedure
       const { error } = await supabase.rpc('clear_user_data', { 
         p_user_id: userId
       });
