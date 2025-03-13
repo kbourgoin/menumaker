@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Upload } from "lucide-react";
-import { useDataImport } from "@/hooks/useDataImport";
+import { useDataImport } from "@/hooks/import";
 import { CSVPreview } from "./csv/CSVPreview";
 import { CSVFileUploader } from "./csv/CSVFileUploader";
 import { CSVImportProgress } from "./csv/CSVImportProgress";

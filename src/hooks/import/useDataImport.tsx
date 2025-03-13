@@ -1,7 +1,10 @@
 
-import { useImportMealHistory } from "./useImportMealHistory";
-import { useClearData } from "./useClearData";
+import { useImportMealHistory } from "../useImportMealHistory";
+import { useClearData } from "../useClearData";
 
+/**
+ * Hook that provides all data import and management functionality
+ */
 export function useDataImport() {
   const { importMealHistory } = useImportMealHistory();
   const { clearData } = useClearData();
