@@ -1,3 +1,4 @@
+
 import { Dish, MealHistory } from "@/types";
 import { generateId } from "./storageUtils";
 
@@ -64,8 +65,8 @@ export const importDish = (
     createdAt: dishData.createdAt || new Date().toISOString(),
     timesCooked: dishData.timesCooked || 0,
     lastMade: dishData.lastMade || undefined,
-    source: dishData.source || undefined,
     sourceId: dishData.sourceId || undefined,
+    location: dishData.location,
     user_id: userId
   };
 

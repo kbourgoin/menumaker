@@ -120,13 +120,13 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
           </div>
           
           {/* Placeholder div to ensure consistent height when no source */}
-          {(!dish.source || dish.source.type === 'none') && !compact && (
+          {!dish.sourceId && !compact && (
             <div className="mt-2 h-6"></div>
           )}
           
-          {dish.source && dish.source.type !== 'none' && !compact && (
+          {dish.sourceId && !compact && (
             <div className="mt-2">
-              <SourceLink source={dish.source} />
+              <SourceLink sourceId={dish.sourceId} />
             </div>
           )}
         </div>

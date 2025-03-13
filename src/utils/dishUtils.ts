@@ -7,14 +7,6 @@ export const getSourceInfo = (dish: Dish): string => {
     return dish.sourceId;
   }
   
-  if (dish.source) {
-    if (dish.source.type === 'book') {
-      return `${dish.source.value}${dish.source.page ? `, p.${dish.source.page}` : ''}`;
-    } else if (dish.source.type === 'url') {
-      return dish.source.value;
-    }
-  }
-  
   return 'No source';
 };
 
