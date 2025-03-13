@@ -15,16 +15,48 @@ export function useStats() {
           
         if (dishesError) throw dishesError;
         
-        // Fetch meal history data
-        const { data: historyData, error: historyError } = await supabase
-          .from('meal_history')
-          .select('*');
+        // Fetch ALL meal history data with pagination to handle the 1000 row limit
+        let allHistoryData: any[] = [];
+        let hasMoreEntries = true;
+        let lastDate: string | null = null;
+        
+        while (hasMoreEntries) {
+          let query = supabase
+            .from('meal_history')
+            .select('*');
           
-        if (historyError) throw historyError;
+          // Apply pagination if we have a lastDate
+          if (lastDate) {
+            query = query.lt('date', lastDate);
+          }
+          
+          // Limit to max rows per query
+          query = query.order('date', { ascending: false })
+            .limit(1000);
+          
+          const { data: historyPage, error: historyError } = await query;
+          
+          if (historyError) throw historyError;
+          
+          // If we got data, add it to our results
+          if (historyPage && historyPage.length > 0) {
+            allHistoryData = [...allHistoryData, ...historyPage];
+            
+            // Update lastDate for next page
+            lastDate = historyPage[historyPage.length - 1].date;
+            
+            // If we got fewer rows than the limit, we've reached the end
+            if (historyPage.length < 1000) {
+              hasMoreEntries = false;
+            }
+          } else {
+            hasMoreEntries = false;
+          }
+        }
         
         // Group meal history by dish ID
         const historyByDishId: Record<string, any[]> = {};
-        historyData.forEach(entry => {
+        allHistoryData.forEach(entry => {
           if (!historyByDishId[entry.dishid]) {
             historyByDishId[entry.dishid] = [];
           }
@@ -36,7 +68,7 @@ export function useStats() {
           mapDishFromDB(dish, historyByDishId[dish.id] || [])
         );
         
-        // Fetch recent meal history
+        // Fetch recent meal history - only need the most recent 5 entries
         const { data: recentHistoryData, error: recentHistoryError } = await supabase
           .from('meal_history')
           .select('*, dishes(*)') // Join with dishes to get dish details
@@ -65,7 +97,7 @@ export function useStats() {
         
         return {
           totalDishes: dishes.length,
-          totalTimesCooked: historyData.length, // Total count of meal history entries
+          totalTimesCooked: allHistoryData.length, // Total count of ALL meal history entries
           mostCooked,
           cuisineBreakdown,
           recentlyCooked
