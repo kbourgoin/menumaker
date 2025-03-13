@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import { useAuth } from "@/components/AuthProvider";
 import MergeSourceDialog from "./MergeSourceDialog";
 import LinkedDishesSection from "./LinkedDishesSection";
 import SourceFormFields from "./SourceFormFields";
-import { useSourceEdit, SourceFormData } from "@/hooks/useSourceEdit";
+import { useSourceEdit, SourceFormData } from "@/hooks/source";
 
 interface EditSourceDialogProps {
   source: Source | null;

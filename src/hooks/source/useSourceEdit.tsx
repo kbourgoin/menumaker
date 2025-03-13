@@ -1,27 +1,29 @@
 
-import { useState } from "react";
-import { Source, Dish } from "@/types";
+import { Source } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useSources } from "@/hooks/useSources";
-
-export interface SourceFormData {
-  name: string;
-  type: 'book' | 'website' | 'document';
-  description: string;
-}
+import { useSourceValidation, SourceFormData } from "./useSourceValidation";
+import { useSourceMerge } from "./useSourceMerge";
 
 export function useSourceEdit(
   source: Source | null,
   onComplete: () => void
 ) {
-  const [duplicateSource, setDuplicateSource] = useState<Source | null>(null);
-  const [affectedDishesCount, setAffectedDishesCount] = useState(0);
-  const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
-  
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { updateSource, findSourceByName, mergeSources, getDishesBySource } = useSources();
+  const { updateSource } = useSources();
+  const { validateSourceName } = useSourceValidation();
+  
+  const {
+    duplicateSource,
+    setDuplicateSource,
+    affectedDishesCount,
+    setAffectedDishesCount,
+    isMergeDialogOpen,
+    setIsMergeDialogOpen,
+    handleMergeConfirm
+  } = useSourceMerge(onComplete);
 
   // Mutation for updating a source
   const updateSourceMutation = useMutation({
@@ -58,19 +60,18 @@ export function useSourceEdit(
       return;
     }
     
-    // Check if the name has changed and if there's a duplicate
-    if (formData.name.trim() !== source.name) {
-      const existingSource = await findSourceByName(formData.name.trim(), source.id);
-      
-      if (existingSource) {
-        // Get the number of dishes affected by the merge
-        const dishes = await getDishesBySource(source.id);
-        setAffectedDishesCount(dishes.length);
-        setDuplicateSource(existingSource);
+    // Validate the source name for duplicates
+    const isValid = await validateSourceName(
+      formData, 
+      source, 
+      (duplicate, dishCount) => {
+        setDuplicateSource(duplicate);
+        setAffectedDishesCount(dishCount);
         setIsMergeDialogOpen(true);
-        return;
       }
-    }
+    );
+    
+    if (!isValid) return;
 
     // If no duplicate, just update the source
     updateSourceMutation.mutate({
@@ -81,29 +82,9 @@ export function useSourceEdit(
     });
   };
   
-  const handleMergeConfirm = async () => {
-    if (!source || !duplicateSource) return;
-    
-    try {
-      await mergeSources({
-        sourceToMergeId: source.id,
-        targetSourceId: duplicateSource.id
-      });
-      
-      toast({
-        title: "Sources merged",
-        description: `Sources have been merged successfully.`,
-      });
-      
-      onComplete();
-    } catch (error) {
-      console.error('Error merging sources:', error);
-      toast({
-        title: "Error merging sources",
-        description: "There was a problem merging the sources.",
-        variant: "destructive",
-      });
-    }
+  const handleMergeConfirmWithSource = async () => {
+    if (!source) return;
+    await handleMergeConfirm(source.id);
   };
 
   return {
@@ -113,6 +94,9 @@ export function useSourceEdit(
     setIsMergeDialogOpen,
     updateSourceMutation,
     handleSubmit,
-    handleMergeConfirm
+    handleMergeConfirm: handleMergeConfirmWithSource
   };
 }
+
+// Re-export the SourceFormData type
+export type { SourceFormData } from "./useSourceValidation";
