@@ -126,18 +126,53 @@ export function useImportMealHistory() {
           if (dishId) {
             // Create meal history entries in one batch
             const historyEntries = [];
+            
+            // Use a Set for existing entries to avoid duplicates
             const existingEntries = new Set();
             
-            // First, get all existing entries for this dish to avoid duplicates
-            const { data: existingMealHistory } = await supabase
-              .from('meal_history')
-              .select('date')
-              .eq('dishid', dishId);
+            // We need to paginate through all meal history entries for this dish
+            // to properly check for duplicates, due to the 1000 row limit
+            let hasMoreEntries = true;
+            let lastDate = null;
+            
+            while (hasMoreEntries) {
+              let query = supabase
+                .from('meal_history')
+                .select('date')
+                .eq('dishid', dishId)
+                .order('date', { ascending: false });
               
-            if (existingMealHistory) {
-              existingMealHistory.forEach(entry => {
-                existingEntries.add(entry.date);
-              });
+              // Apply pagination using the start_after parameter if we have a lastDate
+              if (lastDate) {
+                query = query.lt('date', lastDate);
+              }
+              
+              // Limit to max rows to get a full page
+              query = query.limit(1000);
+              
+              const { data: existingMealHistory, error } = await query;
+              
+              if (error) {
+                console.error("Error fetching meal history:", error);
+                break;
+              }
+              
+              // If we got fewer rows than the limit, we've reached the end
+              if (!existingMealHistory || existingMealHistory.length < 1000) {
+                hasMoreEntries = false;
+              }
+              
+              // Add all dates to our set
+              if (existingMealHistory && existingMealHistory.length > 0) {
+                existingMealHistory.forEach(entry => {
+                  existingEntries.add(entry.date);
+                });
+                
+                // Update lastDate for next page
+                lastDate = existingMealHistory[existingMealHistory.length - 1].date;
+              } else {
+                hasMoreEntries = false;
+              }
             }
             
             // Prepare new entries that don't exist yet
@@ -156,14 +191,21 @@ export function useImportMealHistory() {
             
             // Insert all new entries in a single batch
             if (historyEntries.length > 0) {
-              const { data, error } = await supabase
-                .from('meal_history')
-                .insert(historyEntries);
+              // Split into chunks of 1000 if needed to avoid the limit
+              const CHUNK_SIZE = 500; // Using 500 to be safe with Supabase limits
+              
+              for (let i = 0; i < historyEntries.length; i += CHUNK_SIZE) {
+                const chunk = historyEntries.slice(i, i + CHUNK_SIZE);
                 
-              if (!error) {
-                successCount += historyEntries.length;
-              } else {
-                console.error("Error inserting history entries:", error);
+                const { data, error } = await supabase
+                  .from('meal_history')
+                  .insert(chunk);
+                  
+                if (!error) {
+                  successCount += chunk.length;
+                } else {
+                  console.error("Error inserting history entries:", error);
+                }
               }
             }
           }

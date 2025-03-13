@@ -26,26 +26,57 @@ export function useDishes() {
         
         if (dishesError) throw dishesError;
         
-        // Fetch meal history for all dishes
-        const { data: historyData, error: historyError } = await supabase
-          .from('meal_history')
-          .select('*');
+        // Create an array to store all mapped dishes
+        const mappedDishes: Dish[] = [];
+        
+        // Process each dish one by one to avoid hitting the 1000 row limit for all meal history at once
+        for (const dish of dishesData) {
+          // For each dish, get its meal history with pagination to handle the 1000 row limit
+          let historyForDish: any[] = [];
+          let hasMoreEntries = true;
+          let lastDate = null;
           
-        if (historyError) throw historyError;
-        
-        // Group meal history by dish ID
-        const historyByDishId: Record<string, any[]> = {};
-        historyData.forEach(entry => {
-          if (!historyByDishId[entry.dishid]) {
-            historyByDishId[entry.dishid] = [];
+          while (hasMoreEntries) {
+            let query = supabase
+              .from('meal_history')
+              .select('*')
+              .eq('dishid', dish.id)
+              .order('date', { ascending: false });
+            
+            // Apply pagination if we have a lastDate
+            if (lastDate) {
+              query = query.lt('date', lastDate);
+            }
+            
+            // Limit to max rows per query
+            query = query.limit(1000);
+            
+            const { data: historyPage, error: historyError } = await query;
+            
+            if (historyError) {
+              console.error("Error fetching meal history for dish:", dish.id, historyError);
+              break;
+            }
+            
+            // If we got data, add it to our results
+            if (historyPage && historyPage.length > 0) {
+              historyForDish = [...historyForDish, ...historyPage];
+              
+              // Update lastDate for next page
+              lastDate = historyPage[historyPage.length - 1].date;
+              
+              // If we got fewer rows than the limit, we've reached the end
+              if (historyPage.length < 1000) {
+                hasMoreEntries = false;
+              }
+            } else {
+              hasMoreEntries = false;
+            }
           }
-          historyByDishId[entry.dishid].push(entry);
-        });
-        
-        // Map dishes with their meal history data
-        const mappedDishes = dishesData.map(dish => 
-          mapDishFromDB(dish, historyByDishId[dish.id] || [])
-        );
+          
+          // Map the dish with its complete history
+          mappedDishes.push(mapDishFromDB(dish, historyForDish));
+        }
         
         setIsLoading(false);
         return mappedDishes;

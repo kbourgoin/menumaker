@@ -40,30 +40,102 @@ export function useMealHistory() {
     }
   });
 
-  // Get meal history for a dish
+  // Get meal history for a dish with pagination to handle 1000 row limit
   const getMealHistoryForDish = async (dishId: string) => {
-    const { data, error } = await supabase
-      .from('meal_history')
-      .select('*')
-      .eq('dishid', dishId)
-      .order('date', { ascending: false });
+    let allHistory = [];
+    let hasMoreEntries = true;
+    let lastDate = null;
+    
+    while (hasMoreEntries) {
+      let query = supabase
+        .from('meal_history')
+        .select('*')
+        .eq('dishid', dishId)
+        .order('date', { ascending: false });
       
-    if (error) throw error;
-    return data.map(entry => ({
-      date: entry.date,
-      notes: entry.notes
-    }));
+      // Apply pagination if we have a lastDate
+      if (lastDate) {
+        query = query.lt('date', lastDate);
+      }
+      
+      // Limit to max rows per query
+      query = query.limit(1000);
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      // If we got data, add it to our results
+      if (data && data.length > 0) {
+        allHistory = [...allHistory, ...data.map(entry => ({
+          date: entry.date,
+          notes: entry.notes
+        }))];
+        
+        // Update lastDate for next page
+        lastDate = data[data.length - 1].date;
+        
+        // If we got fewer rows than the limit, we've reached the end
+        if (data.length < 1000) {
+          hasMoreEntries = false;
+        }
+      } else {
+        hasMoreEntries = false;
+      }
+    }
+    
+    return allHistory;
   };
 
-  // Get count of entries for a dish
+  // Get count of entries for a dish - account for 1000 row limit with count queries
   const getTimesCooked = async (dishId: string) => {
-    const { count, error } = await supabase
-      .from('meal_history')
-      .select('*', { count: 'exact', head: true })
-      .eq('dishid', dishId);
+    let totalCount = 0;
+    let hasMoreEntries = true;
+    let lastDate = null;
+    
+    while (hasMoreEntries) {
+      let query = supabase
+        .from('meal_history')
+        .select('id', { count: 'exact', head: true })
+        .eq('dishid', dishId);
       
-    if (error) throw error;
-    return count || 0;
+      // Apply pagination if we have a lastDate
+      if (lastDate) {
+        query = query.lt('date', lastDate);
+      }
+      
+      // Limit to max rows per query
+      query = query.limit(1000);
+      
+      const { count, error, data } = await query;
+      
+      if (error) throw error;
+      
+      if (count !== null) {
+        totalCount += count;
+      }
+      
+      // Check if we need another page by getting the last date
+      if (count === 1000) {
+        // We need to get the actual data to find the last date
+        const { data: dateData } = await supabase
+          .from('meal_history')
+          .select('date')
+          .eq('dishid', dishId)
+          .order('date', { ascending: false })
+          .limit(1000);
+          
+        if (dateData && dateData.length > 0) {
+          lastDate = dateData[dateData.length - 1].date;
+        } else {
+          hasMoreEntries = false;
+        }
+      } else {
+        hasMoreEntries = false;
+      }
+    }
+    
+    return totalCount;
   };
 
   return {
