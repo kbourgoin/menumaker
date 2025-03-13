@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useMeals";
-import DishForm from "@/components/MealForm";
+import DishForm from "@/components/dish-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

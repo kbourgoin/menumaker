@@ -1,6 +1,6 @@
 
 import Layout from "@/components/Layout";
-import DishForm from "@/components/MealForm";
+import DishForm from "@/components/dish-form";
 import { Card } from "@/components/ui/card";
 
 const AddDish = () => {
