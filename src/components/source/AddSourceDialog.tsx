@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
   
   const { toast } = useToast();
   const { session } = useAuth();
-  const { createSource } = useSources();
+  const { addSource } = useSources();
   const queryClient = useQueryClient();
 
   // Mutation for adding a source
@@ -51,7 +50,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
         throw new Error("User not authenticated");
       }
       
-      return createSource(source, session.user.id);
+      return addSource(source);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sources'] });

@@ -6,7 +6,7 @@ import {
   mapSourceToDB,
   mapDishFromDB 
 } from "@/integrations/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, UseMutateAsyncFunction } from "@tanstack/react-query";
 
 export function useSources() {
   const queryClient = useQueryClient();

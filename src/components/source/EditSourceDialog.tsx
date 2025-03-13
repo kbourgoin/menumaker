@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
         throw new Error("User not authenticated");
       }
       
-      return updateSource(data, session.user.id);
+      return updateSource(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sources'] });
