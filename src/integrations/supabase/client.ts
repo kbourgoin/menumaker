@@ -91,26 +91,33 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
 
 // Updated function to map from our materialized view
 export const mapDishFromSummary = (summary: DishSummary): Dish => {
-  // Ensure source property is properly formatted
+  // Ensure source property is properly formatted with more robust error handling
   let formattedSource = undefined;
   
-  if (summary.source) {
-    // If source exists, ensure it matches the expected format
-    const source = summary.source as any;
-    
-    // Make sure source has the expected structure
-    if (typeof source === 'object' && (
-        source.type === 'url' || 
-        source.type === 'book' || 
-        source.type === 'none'
-      )) {
-      formattedSource = {
-        type: source.type,
-        value: source.value || '',
-        ...(source.page !== undefined ? { page: source.page } : {}),
-        ...(source.bookId !== undefined ? { bookId: source.bookId } : {})
-      };
+  try {
+    if (summary.source) {
+      // Parse the source if it's a string (sometimes JSON comes as a string from the database)
+      const sourceData = typeof summary.source === 'string' 
+        ? JSON.parse(summary.source)
+        : summary.source;
+      
+      // Ensure source has the correct structure for the Dish type
+      if (typeof sourceData === 'object') {
+        formattedSource = {
+          type: sourceData.type === 'url' || sourceData.type === 'book' ? sourceData.type : 'none',
+          value: sourceData.value || '',
+          ...(sourceData.page !== undefined ? { page: sourceData.page } : {}),
+          ...(sourceData.bookId !== undefined ? { bookId: sourceData.bookId } : {})
+        };
+      }
     }
+  } catch (error) {
+    console.error("Error formatting source data:", error);
+    // Default to a safe empty source object if parsing fails
+    formattedSource = {
+      type: 'none',
+      value: ''
+    };
   }
   
   return {

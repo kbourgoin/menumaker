@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -90,15 +89,14 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         errorMessage = error.message;
       }
       
-      // Check for specific Supabase database errors
+      // Check for common database errors with improved detection
       if (typeof error === 'object' && error !== null) {
         const supabaseError = error as any;
-        if (supabaseError.code === '42501') {
+        if (supabaseError.code === '42501' || 
+            (supabaseError.message && typeof supabaseError.message === 'string' && 
+             (supabaseError.message.includes('permission denied') || 
+              supabaseError.message.includes('must be owner')))) {
           errorMessage = "Database permission error. You don't have the required permissions.";
-        } else if (supabaseError.message && typeof supabaseError.message === 'string') {
-          if (supabaseError.message.includes('dish_summary')) {
-            errorMessage = "Cannot interact with the dish summary view. Please contact support.";
-          }
         }
       }
       

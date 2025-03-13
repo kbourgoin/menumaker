@@ -61,12 +61,17 @@ export function useImportMealHistory() {
         
         console.log(`Processing batch ${i/BATCH_SIZE + 1} of ${Math.ceil(dishEntries.length/BATCH_SIZE)}`);
         
-        // Process each batch in parallel
+        // Process each batch in parallel with improved error handling
         const results = await Promise.allSettled(batch.map(async ([dishLower, dishEntries]) => {
           try {
+            // Pass explicit dishName and entries to processDishImport
             return await processDishImport(dishEntries[0].dish, dishEntries, user_id);
           } catch (error) {
             console.error(`Error processing dish ${dishEntries[0].dish}:`, error);
+            // Return detailed error info for debugging
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error(`Import error details: ${errorMessage}`);
+            
             errorCount += 1;
             return { success: 0, skipped: dishEntries.length };
           }
@@ -89,7 +94,7 @@ export function useImportMealHistory() {
       
       console.log(`Import complete. Success: ${successCount}, Skipped: ${skippedCount}, Errors: ${errorCount}`);
       
-      // Refresh data once after all processing is complete
+      // Refresh data once after all processing is complete - ONLY invalidate queries, do not try to refresh view
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
@@ -99,10 +104,17 @@ export function useImportMealHistory() {
     } catch (error) {
       console.error("Import error:", error);
       
-      // Check if the error is related to the dish_summary view
+      // Enhanced error logging
       const errorObj = error as any;
-      if (errorObj?.message?.includes("dish_summary")) {
-        throw new Error("Error interacting with dish summary. This is a database permission issue.");
+      if (errorObj?.message) {
+        console.error("Error message:", errorObj.message);
+        
+        // Check if the error is related to the dish_summary view
+        if (errorObj.message.includes("dish_summary") || 
+            errorObj.message.includes("permission denied") || 
+            errorObj.message.includes("must be owner")) {
+          throw new Error("Database permission error. Please contact support.");
+        }
       }
       
       throw error;
