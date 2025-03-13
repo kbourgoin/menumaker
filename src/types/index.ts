@@ -10,9 +10,10 @@ export interface Dish {
     page?: number;
     // bookId removed from here as it's now a top-level property
   };
-  cookbookId?: string; // New direct foreign key to cookbooks
+  cookbookId?: string; // Direct foreign key to cookbooks
   lastMade?: string;
   timesCooked: number;
+  user_id: string; // Added user_id property
 }
 
 export interface MealHistory {
@@ -20,6 +21,7 @@ export interface MealHistory {
   dishId: string;
   date: string;
   notes?: string;
+  user_id: string; // Added user_id property
 }
 
 export interface Cookbook {
@@ -28,6 +30,7 @@ export interface Cookbook {
   author?: string;
   description?: string;
   createdAt: string;
+  user_id: string; // Added user_id property
 }
 
 export type CuisineType = 
