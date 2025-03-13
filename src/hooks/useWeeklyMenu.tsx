@@ -1,3 +1,4 @@
+
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -35,17 +36,17 @@ export function useWeeklyMenu() {
             return [];
           }
           
-          // Map the dish data without using the view
+          // Map the dish data without using the view - properly convert source to expected format
           return dishesData ? dishesData.map(dish => ({
             id: dish.id,
             name: dish.name,
             createdAt: dish.createdat,
             cuisines: dish.cuisines,
-            source: dish.source,
+            source: dish.source ? dish.source : undefined, // Convert source to expected format
             lastMade: null, // Not available without joining meal_history
             timesCooked: 0,  // Not available without counting meal_history
             user_id: dish.user_id
-          })) : [];
+          } as Dish)) : [];
         }
         
         // Map the summary data to our Dish type
