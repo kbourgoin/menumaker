@@ -97,10 +97,18 @@ const CSVImport = ({ onImportComplete }: CSVImportProps) => {
         setProgress(0);
         
         // Show success message
-        toast({
-          title: "Import complete",
-          description: `Successfully imported ${result.success} meals. Skipped ${result.skipped} duplicates or invalid entries.`,
-        });
+        if (result.success > 0) {
+          toast({
+            title: "Import complete",
+            description: `Successfully imported ${result.success} meals. Skipped ${result.skipped} duplicates or invalid entries.`,
+          });
+        } else {
+          toast({
+            title: "Import complete",
+            description: `No new meals were imported. ${result.skipped} entries were skipped (already exist or invalid format).`,
+            variant: "destructive", 
+          });
+        }
         
         if (onImportComplete) {
           onImportComplete();

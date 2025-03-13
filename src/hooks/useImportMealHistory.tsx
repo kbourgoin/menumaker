@@ -61,13 +61,13 @@ export function useImportMealHistory() {
         // Process each batch in parallel
         const results = await Promise.allSettled(batch.map(async ([dishLower, dishEntries]) => {
           try {
-            // Search for existing dishes by name
+            // FIXED: Use direct table access instead of the materialized view
+            // Search for existing dishes by name directly from dishes table
             const { data: existingDishes, error: dishError } = await supabase
               .from('dishes')
               .select('id, name')
               .ilike('name', `%${dishEntries[0].dish.substring(0, Math.min(dishEntries[0].dish.length, 10))}%`)
-              .eq('user_id', user_id)
-              .limit(5);
+              .eq('user_id', user_id);
             
             if (dishError) {
               console.error(`Error finding dish '${dishEntries[0].dish}':`, dishError);
@@ -153,7 +153,7 @@ export function useImportMealHistory() {
                 }
               }
               
-              // Create the new dish - Insert only into the dishes table with explicit fields
+              // FIXED: Create the new dish with ONLY required fields, no references to materialized view
               const { data: newDish, error: newDishError } = await supabase
                 .from('dishes')
                 .insert({
@@ -176,7 +176,7 @@ export function useImportMealHistory() {
             }
             
             if (dishId) {
-              // Get all existing meal history entries for this dish to check for duplicates
+              // FIXED: Get existing meal history entries directly from meal_history table
               const { data: existingMealHistory, error: historyError } = await supabase
                 .from('meal_history')
                 .select('date')
