@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Trash } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Trash, Pencil } from "lucide-react";
 import { CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -53,48 +54,52 @@ const DishCardActions = ({ dish, compact = false, onDeleted }: DishCardActionsPr
           compact={compact}
         />
         
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size={compact ? "sm" : "default"} 
-              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent onClick={(e) => e.stopPropagation()}>
-            <DialogHeader>
-              <DialogTitle>Delete {dish.name}</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p>Are you sure you want to delete this dish? This action cannot be undone.</p>
-            </div>
-            <DialogFooter>
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size={compact ? "sm" : "default"}
+            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+            asChild
+          >
+            <Link to={`/meal/${dish.id}`}>
+              <Pencil className="h-4 w-4" />
+            </Link>
+          </Button>
+          
+          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <DialogTrigger asChild>
               <Button 
-                variant="outline" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsDeleteDialogOpen(false);
-                }}
+                variant="ghost" 
+                size={compact ? "sm" : "default"} 
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
               >
-                Cancel
+                <Trash className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="destructive" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteDish();
-                }}
-              >
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent onClick={(e) => e.stopPropagation()}>
+              <DialogHeader>
+                <DialogTitle>Delete {dish.name}</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <p>Are you sure you want to delete this dish? This action cannot be undone.</p>
+              </div>
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeleteDish}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </CardFooter>
   );
