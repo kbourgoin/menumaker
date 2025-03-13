@@ -1,4 +1,3 @@
-
 import { Link, Globe, Book, FileText, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
@@ -6,10 +5,11 @@ import { useSources } from "@/hooks/useSources";
 
 interface SourceLinkProps {
   sourceId?: string;
+  location?: string;
   className?: string;
 }
 
-const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
+const SourceLink = ({ sourceId, location, className = "" }: SourceLinkProps) => {
   const [source, setSource] = useState<{name: string, type: string, url?: string} | null>(null);
   const { getSource } = useSources();
   
@@ -39,11 +39,34 @@ const SourceLink = ({ sourceId, className = "" }: SourceLinkProps) => {
     return null;
   }
   
+  // Function to check if a string is likely a URL
+  const isUrl = (str: string | undefined): boolean => {
+    if (!str) return false;
+    return /^(https?:\/\/|www\.)[^\s]+\.[^\s]+/i.test(str);
+  };
+  
   // For website sources, make the name a clickable external link
-  if (source.type === 'website' && source.name) {
-    // For websites, use the name as URL if no explicit URL is provided
-    const url = source.url || source.name;
-    const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+  if (source.type === 'website') {
+    // For websites, use the location as URL if it's a URL,
+    // otherwise use the source name as fallback
+    let linkUrl = '';
+    
+    if (isUrl(location)) {
+      // Use the location as the URL
+      linkUrl = location!;
+    } else if (isUrl(source.url)) {
+      // Use the source's URL if available
+      linkUrl = source.url;
+    } else if (isUrl(source.name)) {
+      // Use the source name as last resort if it looks like a URL
+      linkUrl = source.name;
+    } else {
+      // Default case: use the source name but ensure it has http prefix
+      linkUrl = source.name;
+    }
+    
+    // Ensure URL has proper http prefix
+    const fullUrl = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
     
     return (
       <a 

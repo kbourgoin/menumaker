@@ -17,7 +17,7 @@ const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
   
   return (
     <div className="mt-2 flex items-center gap-2">
-      {sourceId && <SourceLink sourceId={sourceId} />}
+      {sourceId && <SourceLink sourceId={sourceId} location={location} />}
       {sourceId && location && <span className="text-gray-300">•</span>}
       {location && <LocationDisplay location={location} inline={true} />}
     </div>
