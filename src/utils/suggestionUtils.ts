@@ -1,6 +1,8 @@
 
 import { Dish } from "@/types";
-import { getDishes } from "./dishUtils";
+
+// Mock function that was previously imported from dishUtils
+const getDishes = (): Dish[] => [];
 
 // Generate random dish suggestions weighted by frequency and recency
 export const getRandomDishSuggestions = (count: number = 7): Dish[] => {

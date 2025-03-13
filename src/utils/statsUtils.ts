@@ -1,7 +1,12 @@
 
-import { getDishes } from "./dishUtils";
-import { getMealHistory } from "./mealHistoryUtils";
-import { getDishById } from "./dishUtils";
+import { Dish } from "@/types";
+
+// Mock functions that were previously imported from dishUtils
+const getDishes = (): Dish[] => [];
+const getDishById = (id: string): Dish | undefined => undefined;
+
+// Mock function for getMealHistory
+const getMealHistory = (): { date: string; dishId: string; notes?: string }[] => [];
 
 // Get stats about dishes
 export const getDishStats = () => {

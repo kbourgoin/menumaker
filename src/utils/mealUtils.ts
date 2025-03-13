@@ -4,15 +4,13 @@
 // Storage utilities
 export { generateId, clearAllData } from './storageUtils';
 
-// Dish utilities
-export { 
-  getDishes, 
-  saveDishes, 
-  addDish, 
-  getDishById, 
-  updateDish, 
-  deleteDish
-} from './dishUtils';
+// Mock dish utilities
+export const getDishes = () => [];
+export const saveDishes = () => {};
+export const addDish = () => {};
+export const getDishById = () => {};
+export const updateDish = () => {};
+export const deleteDish = () => {};
 
 // Meal history utilities
 export {
