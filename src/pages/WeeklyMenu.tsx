@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Shuffle, Plus, RefreshCw } from "lucide-react";
 import { format, addDays, startOfWeek } from "date-fns";
-import DishCard from "@/components/MealCard";
+import DishCard from "@/components/dish-card";
 import { Dish } from "@/types";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";

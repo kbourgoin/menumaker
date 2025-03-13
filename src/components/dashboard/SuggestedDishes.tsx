@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Plus, Shuffle, Utensils } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import DishCard from "@/components/MealCard";
+import DishCard from "@/components/dish-card";
 import { Dish } from "@/types";
 
 interface SuggestedDishesProps {

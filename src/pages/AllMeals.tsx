@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useDishes";
-import DishCard from "@/components/MealCard";
+import DishCard from "@/components/dish-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";

@@ -7,7 +7,7 @@ import { useDishMutations } from "./dish/useDishMutations";
  */
 export function useDishes() {
   const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
-  const { addDish, updateDish, deleteDish } = useDishMutations();
+  const { addDish, updateDish, deleteDish, recordDishCooked } = useDishMutations();
 
   return {
     dishes,
@@ -15,6 +15,7 @@ export function useDishes() {
     addDish,
     updateDish,
     deleteDish,
+    recordDishCooked,
     getDish,
     getMealHistoryForDish
   };
