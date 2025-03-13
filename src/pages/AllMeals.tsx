@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import { useDishes } from "@/hooks/useMeals";
+import { useDishes } from "@/hooks/useDishes";
 import DishCard from "@/components/MealCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,12 @@ const AllDishes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Filter dishes based on search query
-  const filteredDishes = dishes.filter(dish => 
+  const filteredDishes = dishes?.filter(dish => 
     dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     dish.cuisines.some(cuisine => 
       cuisine.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  );
+  ) || [];
   
   // Create loading skeletons for dishes
   const LoadingSkeletons = () => (
@@ -78,7 +78,7 @@ const AllDishes = () => {
               ) : (
                 <div className="col-span-full text-center p-8 border rounded-lg">
                   <p className="text-muted-foreground">
-                    {dishes.length === 0 
+                    {dishes?.length === 0 
                       ? "No dishes found. Add your first dish or import from CSV." 
                       : "No dishes match your search."}
                   </p>
