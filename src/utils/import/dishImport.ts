@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Find or create a source for a dish
@@ -35,7 +34,7 @@ export const findOrCreateSource = async (sourceName: string, sourceType: 'book' 
     }
   }
   
-  // Create new source
+  // Create new source - note: keep location field for backward compatibility
   console.log(`Creating new source '${sourceName}' of type ${sourceType}`);
   const { data: newSource, error: newSourceError } = await supabase
     .from('sources')
@@ -59,13 +58,14 @@ export const findOrCreateSource = async (sourceName: string, sourceType: 'book' 
 };
 
 // Find or create a dish by name - COMPLETELY avoid the dish_summary view
-// Updated to handle the source_id as a direct column
+// Updated to handle the location field
 export const findOrCreateDish = async (
   dishName: string, 
   date: string, 
   source: any, 
   sourceId: string | null | undefined,
-  userId: string
+  userId: string,
+  location?: string
 ) => {
   try {
     // Search for existing dishes by name directly from dishes table only
@@ -116,7 +116,8 @@ export const findOrCreateDish = async (
       cuisines: ['Other'], // Default cuisine
       source: formattedSource,
       user_id: userId,
-      source_id: sourceId || null
+      source_id: sourceId || null,
+      location: location // Include the location field
     };
     
     // Insert directly into dishes table and avoid using single() which can cause errors

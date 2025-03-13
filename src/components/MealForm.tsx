@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Link as LinkIcon, Book } from "lucide-react";
+import { Check, ChevronsUpDown, Link as LinkIcon, Book, MapPin } from "lucide-react";
 import { useSources } from "@/hooks/useSources";
 import { useQuery } from "@tanstack/react-query";
 
@@ -31,6 +31,7 @@ const formSchema = z.object({
   sourceValue: z.string().optional(),
   sourcePage: z.string().optional(),
   sourceId: z.string().optional(),
+  location: z.string().optional(),
 });
 
 interface DishFormProps {
@@ -63,6 +64,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
       sourceValue: existingDish?.source?.value || "",
       sourcePage: existingDish?.source?.page?.toString() || "",
       sourceId: existingDish?.sourceId || "",
+      location: existingDish?.location || "",
     },
   });
 
@@ -92,6 +94,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           cuisines: data.cuisines,
           source,
           sourceId: data.sourceType === "book" ? data.sourceId : undefined,
+          location: data.location,
         });
         
         toast({
@@ -108,6 +111,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           cuisines: data.cuisines,
           source,
           sourceId: data.sourceType === "book" ? data.sourceId : undefined,
+          location: data.location,
         });
         
         toast({
@@ -301,6 +305,26 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
                     </FormLabel>
                   </FormItem>
                 ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <div className="flex items-center space-x-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="Where is this dish from? (e.g., 'Mom's kitchen', 'Italy trip 2023')" 
+                  />
+                </FormControl>
               </div>
               <FormMessage />
             </FormItem>

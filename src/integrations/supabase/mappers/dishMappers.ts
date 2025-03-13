@@ -30,6 +30,7 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: any[]): Dish => {
     cuisines: dish.cuisines,
     source: dish.source as any,
     sourceId: dish.source_id, // Map from the direct foreign key
+    location: dish.location, // Include the location field
     lastMade,  // Derived value
     timesCooked, // Derived value
     user_id: dish.user_id
@@ -76,6 +77,7 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
     cuisines: summary.cuisines,
     source: formattedSource,
     sourceId: summary.source_id, // Map the direct foreign key
+    location: summary.location, // Include the location field
     lastMade: summary.last_made,
     timesCooked: summary.times_cooked || 0,
     user_id: summary.user_id
@@ -95,6 +97,7 @@ export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Ta
     cuisines: dish.cuisines,
     source: dish.source as any,
     source_id: dish.sourceId, // Map to the database column name
+    location: dish.location, // Map the location field
     user_id: dish.user_id
   };
 };

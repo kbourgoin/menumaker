@@ -13,7 +13,8 @@ export const processDishImport = async (
       type: 'url' | 'book' | 'none';
       value: string;
       page?: number;
-    }; 
+    };
+    location?: string; 
   }[],
   userId: string
 ) => {
@@ -34,8 +35,15 @@ export const processDishImport = async (
       sourceId = await findOrCreateSource(source.value, 'website', source.value, userId);
     }
     
-    // Find or create the dish - using updated implementation to handle the new sourceId field
-    const dishId = await findOrCreateDish(firstEntry.dish, firstEntry.date, source, sourceId, userId);
+    // Find or create the dish - now passes the location field
+    const dishId = await findOrCreateDish(
+      firstEntry.dish, 
+      firstEntry.date, 
+      source, 
+      sourceId, 
+      userId,
+      firstEntry.location
+    );
     
     if (!dishId) {
       console.error(`Failed to find or create dish '${firstEntry.dish}'`);

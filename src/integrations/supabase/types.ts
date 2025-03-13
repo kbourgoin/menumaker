@@ -14,6 +14,7 @@ export type Database = {
           createdat: string
           cuisines: string[]
           id: string
+          location: string | null
           name: string
           source: Json | null
           source_id: string | null
@@ -23,6 +24,7 @@ export type Database = {
           createdat?: string
           cuisines?: string[]
           id?: string
+          location?: string | null
           name: string
           source?: Json | null
           source_id?: string | null
@@ -32,6 +34,7 @@ export type Database = {
           createdat?: string
           cuisines?: string[]
           id?: string
+          location?: string | null
           name?: string
           source?: Json | null
           source_id?: string | null

@@ -15,6 +15,7 @@ export type DishSummary = {
   cuisines: string[];
   source?: any;
   source_id?: string;
+  location?: string;
   user_id: string;
   times_cooked: number;
   last_made?: string;

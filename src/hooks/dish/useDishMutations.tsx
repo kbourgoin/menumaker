@@ -27,6 +27,7 @@ export function useDishMutations() {
         createdat: new Date().toISOString(),
         source: dish.source,
         source_id: dish.sourceId, // Using the source_id field 
+        location: dish.location, // Include the location field
         user_id
       };
       
