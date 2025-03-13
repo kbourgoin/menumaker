@@ -10,15 +10,17 @@ export function useClearData() {
   const clearData = async () => {
     try {
       const user = await supabase.auth.getUser();
-      const user_id = user.data.user?.id;
+      const userId = user.data.user?.id;
       
-      if (!user_id) throw new Error("User not authenticated");
+      if (!userId) throw new Error("User not authenticated");
       
-      console.log("Clearing data for user:", user_id);
+      console.log("Clearing data for user:", userId);
       
-      // Use a single transaction for deleting all user data
-      // Adding type assertion to handle TypeScript error with our custom function
-      const { error } = await supabase.rpc('clear_user_data', { user_id }) as any;
+      // Use a stored procedure for deleting all user data
+      // The parameter name here should match the function parameter in SQL (but with camelCase)
+      const { error } = await supabase.rpc('clear_user_data', { 
+        user_id: userId  // Make sure we pass with the exact parameter name expected by the function
+      }) as any;
       
       if (error) {
         console.error("Error clearing data:", error);
