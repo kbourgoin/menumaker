@@ -37,16 +37,34 @@ export function useWeeklyMenu() {
           }
           
           // Map the dish data without using the view - properly convert source to expected format
-          return dishesData ? dishesData.map(dish => ({
-            id: dish.id,
-            name: dish.name,
-            createdAt: dish.createdat,
-            cuisines: dish.cuisines,
-            source: dish.source ? dish.source : undefined, // Convert source to expected format
-            lastMade: null, // Not available without joining meal_history
-            timesCooked: 0,  // Not available without counting meal_history
-            user_id: dish.user_id
-          } as Dish)) : [];
+          return dishesData ? dishesData.map(dish => {
+            // Format source to match the expected Dish type structure
+            let formattedSource = undefined;
+            
+            if (dish.source) {
+              const sourceData = dish.source as any;
+              if (typeof sourceData === 'object') {
+                // Ensure source has the required structure
+                formattedSource = {
+                  type: sourceData.type || 'none',
+                  value: sourceData.value || '',
+                  ...(sourceData.page !== undefined ? { page: sourceData.page } : {}),
+                  ...(sourceData.bookId !== undefined ? { bookId: sourceData.bookId } : {})
+                };
+              }
+            }
+            
+            return {
+              id: dish.id,
+              name: dish.name,
+              createdAt: dish.createdat,
+              cuisines: dish.cuisines,
+              source: formattedSource,
+              lastMade: null, // Not available without joining meal_history
+              timesCooked: 0,  // Not available without counting meal_history
+              user_id: dish.user_id
+            } as Dish;
+          }) : [];
         }
         
         // Map the summary data to our Dish type
