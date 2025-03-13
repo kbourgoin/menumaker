@@ -1,42 +1,32 @@
-
 import { Dish } from "@/types";
-import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
+import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 export function useWeeklyMenu() {
-  // Get dish data using React Query
+  // Get dish data using React Query and the materialized view
   const { data: allDishes = [], isLoading } = useQuery({
     queryKey: ['dishes'],
     queryFn: async () => {
-      // Fetch dishes
-      const { data: dishesData, error: dishesError } = await supabase
-        .from('dishes')
-        .select('*');
+      const user = await supabase.auth.getUser();
+      const user_id = user.data.user?.id;
       
-      if (dishesError) throw dishesError;
-      
-      // Fetch meal history for all dishes
-      const { data: historyData, error: historyError } = await supabase
-        .from('meal_history')
-        .select('*');
-        
-      if (historyError) throw historyError;
-      
-      // Group meal history by dish ID
-      const historyByDishId: Record<string, any[]> = {};
-      if (historyData) {
-        historyData.forEach(entry => {
-          if (!historyByDishId[entry.dishid]) {
-            historyByDishId[entry.dishid] = [];
-          }
-          historyByDishId[entry.dishid].push(entry);
-        });
+      if (!user_id) {
+        return [];
       }
       
-      // Map dishes with their meal history data
-      return dishesData 
-        ? dishesData.map(dish => mapDishFromDB(dish, historyByDishId[dish.id] || []))
-        : [];
+      // Use the materialized view for much faster performance
+      const { data: summaryData, error: summaryError } = await supabase
+        .from('dish_summary')
+        .select('*')
+        .eq('user_id', user_id);
+      
+      if (summaryError) {
+        console.error("Error fetching from dish_summary:", summaryError);
+        return [];
+      }
+      
+      // Map the summary data to our Dish type
+      return summaryData ? summaryData.map(summary => mapDishFromSummary(summary)) : [];
     }
   });
 

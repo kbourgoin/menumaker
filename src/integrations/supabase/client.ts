@@ -46,6 +46,18 @@ export type Cookbook = {
   user_id: string;
 };
 
+// Type for our materialized view
+export type DishSummary = {
+  id: string;
+  name: string;
+  createdat: string;
+  cuisines: string[];
+  source?: any;
+  user_id: string;
+  times_cooked: number;
+  last_made?: string;
+};
+
 // Mapping functions to convert between database and client formats
 export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'], mealHistory?: any[]): Dish => {
   // Default values for derived fields
@@ -75,6 +87,20 @@ export const mapDishFromDB = (dish: Database['public']['Tables']['dishes']['Row'
     lastMade,  // Derived value
     timesCooked, // Derived value
     user_id: dish.user_id
+  };
+};
+
+// New function to map from our materialized view
+export const mapDishFromSummary = (summary: DishSummary): Dish => {
+  return {
+    id: summary.id,
+    name: summary.name,
+    createdAt: summary.createdat,
+    cuisines: summary.cuisines,
+    source: summary.source,
+    lastMade: summary.last_made,
+    timesCooked: summary.times_cooked || 0,
+    user_id: summary.user_id
   };
 };
 

@@ -90,6 +90,13 @@ export type Database = {
             foreignKeyName: "meal_history_dishid_fkey"
             columns: ["dishid"]
             isOneToOne: false
+            referencedRelation: "dish_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_history_dishid_fkey"
+            columns: ["dishid"]
+            isOneToOne: false
             referencedRelation: "dishes"
             referencedColumns: ["id"]
           },
@@ -118,7 +125,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dish_summary: {
+        Row: {
+          createdat: string | null
+          cuisines: string[] | null
+          id: string | null
+          last_made: string | null
+          name: string | null
+          source: Json | null
+          times_cooked: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       increment_by: {
