@@ -4,6 +4,7 @@ import Header from "./Header";
 import { motion } from "framer-motion";
 import { useAuth } from "./AuthProvider";
 import { Navigate } from "react-router-dom";
+import { Progress } from "./ui/progress";
 
 interface LayoutProps {
   children: ReactNode;
@@ -20,6 +21,11 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-sage-50">
       <Header />
+      {isLoading && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <Progress className="h-1 bg-terracotta-100" value={100} />
+        </div>
+      )}
       <motion.main 
         className="flex-1 container mx-auto px-4 py-6"
         initial={{ opacity: 0, y: 10 }}
@@ -28,8 +34,9 @@ const Layout = ({ children }: LayoutProps) => {
         transition={{ duration: 0.3 }}
       >
         {isLoading ? (
-          <div className="flex justify-center items-center h-[50vh]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta-500"></div>
+          <div className="flex flex-col justify-center items-center h-[50vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-terracotta-500 mb-4"></div>
+            <p className="text-muted-foreground">Loading your data...</p>
           </div>
         ) : (
           children
