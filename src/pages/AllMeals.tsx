@@ -71,17 +71,27 @@ const AllDishes = () => {
             <LoadingSkeletons />
           ) : (
             <>
-              {filteredDishes.length > 0 ? (
-                filteredDishes.map((dish) => (
-                  <DishCard key={dish.id} dish={dish} />
-                ))
+              {dishes && dishes.length > 0 ? (
+                filteredDishes.length > 0 ? (
+                  filteredDishes.map((dish) => (
+                    <DishCard key={dish.id} dish={dish} />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center p-8 border rounded-lg">
+                    <p className="text-muted-foreground">No dishes match your search.</p>
+                  </div>
+                )
               ) : (
                 <div className="col-span-full text-center p-8 border rounded-lg">
-                  <p className="text-muted-foreground">
-                    {dishes?.length === 0 
-                      ? "No dishes found. Add your first dish or import from CSV." 
-                      : "No dishes match your search."}
+                  <p className="text-muted-foreground mb-4">
+                    No dishes found. Add your first dish to get started.
                   </p>
+                  <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
+                    <Link to="/add-meal">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Dish
+                    </Link>
+                  </Button>
                 </div>
               )}
             </>
