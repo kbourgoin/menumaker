@@ -20,10 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSources } from "@/hooks/useSources";
 import { useAuth } from "@/components/AuthProvider";
 import MergeSourceDialog from "./MergeSourceDialog";
+import LinkedDishesSection from "./LinkedDishesSection";
 
 interface EditSourceDialogProps {
   source: Source | null;
@@ -56,6 +57,13 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       });
     }
   }, [source]);
+
+  // Query to fetch linked dishes
+  const { data: linkedDishes = [] } = useQuery({
+    queryKey: ['sourceLinkedDishes', source?.id],
+    queryFn: () => source ? getDishesBySource(source.id) : Promise.resolve([]),
+    enabled: isOpen && !!source?.id,
+  });
 
   // Mutation for updating a source
   const updateSourceMutation = useMutation({
@@ -158,7 +166,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Source</DialogTitle>
             <DialogDescription>
@@ -209,6 +217,9 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
                 rows={3}
               />
             </div>
+            
+            {/* Linked Dishes Section */}
+            <LinkedDishesSection dishes={linkedDishes} />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
