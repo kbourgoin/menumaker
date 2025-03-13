@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Dish } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Trash } from "lucide-react";
+import { Calendar, Trash, ExternalLink } from "lucide-react";
 import CuisineTag from "./CuisineTag";
 import SourceLink from "./SourceLink";
 import { useDishes } from "@/hooks/useMeals";
@@ -84,6 +84,46 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
     }
   };
 
+  // Helper function to render location as a link if it looks like a URL
+  const renderLocation = () => {
+    if (!dish.location) return null;
+    
+    // Simple check if it's a URL
+    const isUrl = dish.location.startsWith('http') || 
+                  dish.location.startsWith('www.') || 
+                  dish.location.includes('.com') || 
+                  dish.location.includes('.org') || 
+                  dish.location.includes('.net');
+    
+    if (isUrl) {
+      const href = dish.location.startsWith('http') 
+        ? dish.location 
+        : `https://${dish.location}`;
+        
+      return (
+        <div className="mt-1 text-sm">
+          <a 
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-terracotta-500 hover:text-terracotta-600 hover:underline inline-flex items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLink className="w-3.5 h-3.5 mr-1" />
+            <span className="truncate">Recipe Link</span>
+          </a>
+        </div>
+      );
+    }
+    
+    // If it's not a URL, just show as plain text
+    return (
+      <div className="mt-1 text-sm text-muted-foreground">
+        <span>Page: {dish.location}</span>
+      </div>
+    );
+  };
+
   console.log(`Rendering dish card for ${dish.name} with times cooked:`, dish.timesCooked);
 
   return (
@@ -119,14 +159,10 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
             <div className="mt-1">Made {dish.timesCooked || 0} {dish.timesCooked === 1 ? "time" : "times"}</div>
           </div>
           
-          {/* Placeholder div to ensure consistent height when no source */}
-          {!dish.sourceId && !compact && (
-            <div className="mt-2 h-6"></div>
-          )}
-          
-          {dish.sourceId && !compact && (
+          {dish.sourceId && (
             <div className="mt-2">
               <SourceLink sourceId={dish.sourceId} />
+              {dish.location && renderLocation()}
             </div>
           )}
         </div>
