@@ -18,7 +18,8 @@ export function useClearData() {
       
       // Use a single transaction for deleting all user data
       // This avoids issues with the materialized view refresh triggers
-      const { error } = await supabase.rpc('clear_user_data', { user_id });
+      // Using a raw query with the function call since TypeScript doesn't know about our custom function
+      const { error } = await supabase.rpc('clear_user_data', { user_id: user_id }) as any;
       
       if (error) {
         console.error("Error clearing data:", error);
