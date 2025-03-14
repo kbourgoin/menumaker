@@ -153,7 +153,7 @@ const AllDishes = () => {
                 <SelectValue placeholder="All Sources" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Sources</SelectItem>
+                <SelectItem value="all-sources">All Sources</SelectItem>
                 <SelectItem value="none">No Source</SelectItem>
                 {!isLoadingSources && sources.map(source => (
                   <SelectItem key={source.id} value={source.id}>
