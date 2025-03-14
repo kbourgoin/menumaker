@@ -1,20 +1,11 @@
 
 import DishCard from "./DishCard";
-import DishCardHeader from "./DishCardHeader";
-import DishCardContent from "./DishCardContent";
-import BulkEditDialog from "./BulkEditDialog";
-import CuisinesList from "./CuisinesList";
-import CookingInfo from "./CookingInfo";
-import SourceInfo from "./SourceInfo";
-
-export {
-  DishCard,
-  DishCardHeader,
-  DishCardContent,
-  BulkEditDialog,
-  CuisinesList,
-  CookingInfo,
-  SourceInfo,
-};
 
 export default DishCard;
+export { default as DishCardHeader } from "./DishCardHeader";
+export { default as DishCardContent } from "./DishCardContent";
+export { default as DishCardActions } from "./DishCardActions";
+export { default as CookingInfo } from "./CookingInfo";
+export { default as CuisinesList } from "./CuisinesList";
+export { default as SourceInfo } from "./SourceInfo";
+export { default as LocationDisplay } from "./LocationDisplay";
