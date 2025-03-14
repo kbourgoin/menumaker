@@ -8,12 +8,13 @@ import CookingInfo from "./CookingInfo";
 import SourceInfo from "./SourceInfo";
 
 export {
-  CuisinesList,
-  CookingInfo,
-  SourceInfo,
+  DishCard,
   DishCardHeader,
   DishCardContent,
   BulkEditDialog,
+  CuisinesList,
+  CookingInfo,
+  SourceInfo,
 };
 
 export default DishCard;
