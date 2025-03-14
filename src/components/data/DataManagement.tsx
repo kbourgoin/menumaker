@@ -16,15 +16,27 @@ export function DataManagement() {
             Export your data for backup or transfer between accounts
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6">
-          <JSONExport />
-          <Separator />
-          <JSONImport />
-          <Separator />
-          <div>
-            <h3 className="text-lg font-medium mb-2">Legacy Import</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Import your meal history from a CSV file (older format)
+        <CardContent className="space-y-6">
+          <div className="space-y-4 border rounded-lg p-4 bg-slate-50 dark:bg-slate-950">
+            <h3 className="text-lg font-medium">Export Data</h3>
+            <p className="text-sm text-muted-foreground">
+              Download all your meal data as a JSON file for backup or transfer
+            </p>
+            <JSONExport />
+          </div>
+          
+          <div className="space-y-4 border rounded-lg p-4 bg-slate-50 dark:bg-slate-950">
+            <h3 className="text-lg font-medium">Import Data</h3>
+            <p className="text-sm text-muted-foreground">
+              Restore data from a previously exported JSON file
+            </p>
+            <JSONImport />
+          </div>
+          
+          <div className="space-y-4 border rounded-lg p-4 bg-slate-50 dark:bg-slate-950">
+            <h3 className="text-lg font-medium">Legacy Import</h3>
+            <p className="text-sm text-muted-foreground">
+              Import meal history from a CSV file (older format)
             </p>
             <CSVImportLegacy />
           </div>

@@ -39,46 +39,37 @@ export function JSONExport() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex items-center justify-between">
       <div>
-        <h3 className="text-lg font-medium">Export Data as JSON</h3>
-        <p className="text-sm text-muted-foreground">
-          Download all your meal data as a JSON file for backup or transfer
-        </p>
+        {Object.keys(exportCount).length > 0 && (
+          <div className="text-sm">
+            <p>Last export:</p>
+            <ul className="list-disc pl-5 mt-1">
+              <li>{exportCount.dishes} dishes</li>
+              <li>{exportCount.meals} meal entries</li>
+              <li>{exportCount.sources} sources</li>
+            </ul>
+          </div>
+        )}
       </div>
       
-      <div className="flex items-center justify-between">
-        <div>
-          {Object.keys(exportCount).length > 0 && (
-            <div className="text-sm">
-              <p>Last export included:</p>
-              <ul className="list-disc pl-5 mt-1">
-                <li>{exportCount.dishes} dishes</li>
-                <li>{exportCount.meals} meal entries</li>
-                <li>{exportCount.sources} sources</li>
-              </ul>
-            </div>
-          )}
-        </div>
-        
-        <Button
-          onClick={handleExport}
-          disabled={isExporting}
-          className="gap-2"
-        >
-          {isExporting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Exporting...
-            </>
-          ) : (
-            <>
-              <Download className="h-4 w-4" />
-              Export
-            </>
-          )}
-        </Button>
-      </div>
+      <Button
+        onClick={handleExport}
+        disabled={isExporting}
+        className="gap-2"
+      >
+        {isExporting ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Exporting...
+          </>
+        ) : (
+          <>
+            <Download className="h-4 w-4" />
+            Export Data
+          </>
+        )}
+      </Button>
     </div>
   );
 }

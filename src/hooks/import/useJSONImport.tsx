@@ -41,18 +41,19 @@ export function useJSONImport() {
       // Process sources in batches
       for (let i = 0; i < jsonData.sources.length; i += BATCH_SIZE) {
         const batch = jsonData.sources.slice(i, i + BATCH_SIZE);
+        // Create properly typed source objects
         const sourcesToDB = batch.map(source => {
           const sourceToDB = mapSourceToDB(updateUserIds(source));
-          // Return only the fields needed for the upsert
+          // Ensure all required fields are present
           return {
             id: sourceToDB.id,
-            name: sourceToDB.name,
-            type: sourceToDB.type,
+            name: sourceToDB.name || 'Unknown Source', // Default name if missing
+            type: sourceToDB.type || 'other', // Default type if missing
             description: sourceToDB.description,
-            created_at: sourceToDB.created_at,
+            created_at: sourceToDB.created_at || new Date().toISOString(),
             user_id: sourceToDB.user_id
           };
-        }).filter(s => s.name && s.type && s.user_id); // Filter out invalid entries
+        });
         
         if (sourcesToDB.length > 0) {
           try {
@@ -82,19 +83,20 @@ export function useJSONImport() {
       console.log(`Importing ${jsonData.dishes.length} dishes...`);
       for (let i = 0; i < jsonData.dishes.length; i += BATCH_SIZE) {
         const batch = jsonData.dishes.slice(i, i + BATCH_SIZE);
+        // Create properly typed dish objects
         const dishesToDB = batch.map(dish => {
           const dishToDB = mapDishToDB(updateUserIds(dish));
-          // Return only the fields needed for the upsert
+          // Ensure all required fields are present
           return {
             id: dishToDB.id,
-            name: dishToDB.name,
+            name: dishToDB.name || 'Unknown Dish', // Default name if missing
             createdat: dishToDB.createdat || new Date().toISOString(),
             cuisines: dishToDB.cuisines || ['Other'],
             source_id: dishToDB.source_id,
             location: dishToDB.location,
             user_id: dishToDB.user_id
           };
-        }).filter(d => d.name && d.user_id); // Filter out invalid entries
+        });
         
         if (dishesToDB.length > 0) {
           try {
@@ -124,17 +126,18 @@ export function useJSONImport() {
       console.log(`Importing ${jsonData.mealHistory.length} meal history entries...`);
       for (let i = 0; i < jsonData.mealHistory.length; i += BATCH_SIZE) {
         const batch = jsonData.mealHistory.slice(i, i + BATCH_SIZE);
+        // Create properly typed history objects
         const historyToDB = batch.map(history => {
           const historyEntry = mapMealHistoryToDB(updateUserIds(history));
-          // Return only the fields needed for the upsert
+          // Ensure all required fields are present
           return {
             id: historyEntry.id,
-            dishid: historyEntry.dishid,
+            dishid: historyEntry.dishid, // This is required
             date: historyEntry.date || new Date().toISOString(),
             notes: historyEntry.notes,
             user_id: historyEntry.user_id
           };
-        }).filter(h => h.dishid && h.user_id); // Filter out invalid entries
+        }).filter(h => h.dishid); // Filter out invalid entries without dishid
         
         if (historyToDB.length > 0) {
           try {
@@ -158,6 +161,15 @@ export function useJSONImport() {
         processedItems += batch.length;
         if (onProgress) onProgress(processedItems, totalItems);
         setProgress(Math.floor((processedItems / totalItems) * 100));
+      }
+      
+      // Manually refresh the materialized view to ensure dashboard works correctly
+      try {
+        await supabase.rpc('refresh_dish_summary_secure');
+        console.log("Materialized view refreshed successfully");
+      } catch (error) {
+        console.warn("Could not refresh materialized view:", error);
+        // This is non-fatal, the triggers should handle it
       }
       
       // Refresh all queries to update data

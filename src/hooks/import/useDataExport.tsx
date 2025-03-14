@@ -28,37 +28,115 @@ export function useDataExport() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      // Fetch all dishes with limit override
-      const { data: dishesData, error: dishesError } = await supabase
-        .from('dishes')
-        .select('*')
-        .eq('user_id', userId)
-        .limit(10000); // Override default 1000 limit
-        
-      if (dishesError) throw dishesError;
+      // Fetch all dishes with pagination to overcome any limits
+      let allDishes: any[] = [];
+      let hasMoreDishes = true;
+      let lastDishId: string | null = null;
       
-      // Fetch all meal history with limit override
-      const { data: mealHistoryData, error: mealHistoryError } = await supabase
-        .from('meal_history')
-        .select('*')
-        .eq('user_id', userId)
-        .limit(10000); // Override default 1000 limit
+      while (hasMoreDishes) {
+        let query = supabase
+          .from('dishes')
+          .select('*')
+          .eq('user_id', userId)
+          .order('id', { ascending: true })
+          .limit(1000);
         
-      if (mealHistoryError) throw mealHistoryError;
+        if (lastDishId) {
+          query = query.gt('id', lastDishId);
+        }
+        
+        const { data: dishesPage, error: dishesError } = await query;
+        
+        if (dishesError) throw dishesError;
+        
+        if (dishesPage && dishesPage.length > 0) {
+          allDishes = [...allDishes, ...dishesPage];
+          lastDishId = dishesPage[dishesPage.length - 1].id;
+          
+          if (dishesPage.length < 1000) {
+            hasMoreDishes = false;
+          }
+        } else {
+          hasMoreDishes = false;
+        }
+      }
       
-      // Fetch all sources with limit override
-      const { data: sourcesData, error: sourcesError } = await supabase
-        .from('sources')
-        .select('*')
-        .eq('user_id', userId)
-        .limit(10000); // Override default 1000 limit
+      console.log(`Exported ${allDishes.length} dishes`);
+      
+      // Fetch all meal history with pagination
+      let allMealHistory: any[] = [];
+      let hasMoreHistory = true;
+      let lastHistoryId: string | null = null;
+      
+      while (hasMoreHistory) {
+        let query = supabase
+          .from('meal_history')
+          .select('*')
+          .eq('user_id', userId)
+          .order('id', { ascending: true })
+          .limit(1000);
         
-      if (sourcesError) throw sourcesError;
+        if (lastHistoryId) {
+          query = query.gt('id', lastHistoryId);
+        }
+        
+        const { data: historyPage, error: historyError } = await query;
+        
+        if (historyError) throw historyError;
+        
+        if (historyPage && historyPage.length > 0) {
+          allMealHistory = [...allMealHistory, ...historyPage];
+          lastHistoryId = historyPage[historyPage.length - 1].id;
+          
+          if (historyPage.length < 1000) {
+            hasMoreHistory = false;
+          }
+        } else {
+          hasMoreHistory = false;
+        }
+      }
+      
+      console.log(`Exported ${allMealHistory.length} meal history entries`);
+      
+      // Fetch all sources with pagination
+      let allSources: any[] = [];
+      let hasMoreSources = true;
+      let lastSourceId: string | null = null;
+      
+      while (hasMoreSources) {
+        let query = supabase
+          .from('sources')
+          .select('*')
+          .eq('user_id', userId)
+          .order('id', { ascending: true })
+          .limit(1000);
+        
+        if (lastSourceId) {
+          query = query.gt('id', lastSourceId);
+        }
+        
+        const { data: sourcesPage, error: sourcesError } = await query;
+        
+        if (sourcesError) throw sourcesError;
+        
+        if (sourcesPage && sourcesPage.length > 0) {
+          allSources = [...allSources, ...sourcesPage];
+          lastSourceId = sourcesPage[sourcesPage.length - 1].id;
+          
+          if (sourcesPage.length < 1000) {
+            hasMoreSources = false;
+          }
+        } else {
+          hasMoreSources = false;
+        }
+      }
+      
+      console.log(`Exported ${allSources.length} sources`);
       
       // Map data to our app types
-      const dishes = dishesData.map(dish => mapDishFromDB(dish));
-      const mealHistory = mealHistoryData.map(history => mapMealHistoryFromDB(history));
-      const sources = sourcesData.map(source => mapSourceFromDB(source));
+      const dishes = allDishes.map(dish => mapDishFromDB(dish));
+      const mealHistory = allMealHistory.map(history => mapMealHistoryFromDB(history));
+      const sources = allSources.map(source => mapSourceFromDB(source));
       
       // Create export object
       const exportData: ExportData = {
