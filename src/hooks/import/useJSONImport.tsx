@@ -5,6 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { ExportData } from "./useDataExport";
 import { mapDishToDB, mapMealHistoryToDB, mapSourceToDB } from "@/integrations/supabase/client";
 
+// Number of items to process in a single batch
+const BATCH_SIZE = 50;
+
 export function useJSONImport() {
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,103 +38,124 @@ export function useJSONImport() {
       let successCount = 0;
       let errorCount = 0;
       
-      // Process sources
-      for (const source of jsonData.sources) {
-        try {
+      // Process sources in batches
+      for (let i = 0; i < jsonData.sources.length; i += BATCH_SIZE) {
+        const batch = jsonData.sources.slice(i, i + BATCH_SIZE);
+        const sourcesToDB = batch.map(source => {
           const sourceToDB = mapSourceToDB(updateUserIds(source));
-          
-          // Ensure required fields are present
-          if (!sourceToDB.name || !sourceToDB.type || !sourceToDB.user_id) {
-            throw new Error("Missing required fields for source");
+          // Return only the fields needed for the upsert
+          return {
+            id: sourceToDB.id,
+            name: sourceToDB.name,
+            type: sourceToDB.type,
+            description: sourceToDB.description,
+            created_at: sourceToDB.created_at,
+            user_id: sourceToDB.user_id
+          };
+        }).filter(s => s.name && s.type && s.user_id); // Filter out invalid entries
+        
+        if (sourcesToDB.length > 0) {
+          try {
+            const { error, count } = await supabase
+              .from('sources')
+              .upsert(sourcesToDB, { 
+                onConflict: 'id',
+                count: 'exact'
+              });
+              
+            if (error) throw error;
+            successCount += count || 0;
+          } catch (error) {
+            console.error("Error importing sources batch:", error);
+            errorCount += batch.length;
           }
-          
-          const { error } = await supabase
-            .from('sources')
-            .upsert({
-              id: sourceToDB.id,
-              name: sourceToDB.name,
-              type: sourceToDB.type,
-              description: sourceToDB.description,
-              created_at: sourceToDB.created_at,
-              user_id: sourceToDB.user_id
-            }, { onConflict: 'id' });
-            
-          if (error) throw error;
-          successCount++;
-        } catch (error) {
-          console.error("Error importing source:", error);
-          errorCount++;
+        } else {
+          errorCount += batch.length;
         }
         
-        processedItems++;
+        processedItems += batch.length;
         if (onProgress) onProgress(processedItems, totalItems);
         setProgress(Math.floor((processedItems / totalItems) * 100));
       }
       
-      // Import dishes
+      // Import dishes in batches
       console.log(`Importing ${jsonData.dishes.length} dishes...`);
-      for (const dish of jsonData.dishes) {
-        try {
+      for (let i = 0; i < jsonData.dishes.length; i += BATCH_SIZE) {
+        const batch = jsonData.dishes.slice(i, i + BATCH_SIZE);
+        const dishesToDB = batch.map(dish => {
           const dishToDB = mapDishToDB(updateUserIds(dish));
-          
-          // Ensure required fields are present
-          if (!dishToDB.name || !dishToDB.user_id) {
-            throw new Error("Missing required fields for dish");
+          // Return only the fields needed for the upsert
+          return {
+            id: dishToDB.id,
+            name: dishToDB.name,
+            createdat: dishToDB.createdat || new Date().toISOString(),
+            cuisines: dishToDB.cuisines || ['Other'],
+            source_id: dishToDB.source_id,
+            location: dishToDB.location,
+            user_id: dishToDB.user_id
+          };
+        }).filter(d => d.name && d.user_id); // Filter out invalid entries
+        
+        if (dishesToDB.length > 0) {
+          try {
+            const { error, count } = await supabase
+              .from('dishes')
+              .upsert(dishesToDB, { 
+                onConflict: 'id',
+                count: 'exact'
+              });
+              
+            if (error) throw error;
+            successCount += count || 0;
+          } catch (error) {
+            console.error("Error importing dishes batch:", error);
+            errorCount += batch.length;
           }
-          
-          const { error } = await supabase
-            .from('dishes')
-            .upsert({
-              id: dishToDB.id,
-              name: dishToDB.name,
-              createdat: dishToDB.createdat || new Date().toISOString(),
-              cuisines: dishToDB.cuisines || ['Other'],
-              source_id: dishToDB.source_id,
-              location: dishToDB.location,
-              user_id: dishToDB.user_id
-            }, { onConflict: 'id' });
-            
-          if (error) throw error;
-          successCount++;
-        } catch (error) {
-          console.error("Error importing dish:", error);
-          errorCount++;
+        } else {
+          errorCount += batch.length;
         }
         
-        processedItems++;
+        processedItems += batch.length;
         if (onProgress) onProgress(processedItems, totalItems);
         setProgress(Math.floor((processedItems / totalItems) * 100));
       }
       
-      // Import meal history
+      // Import meal history in batches
       console.log(`Importing ${jsonData.mealHistory.length} meal history entries...`);
-      for (const history of jsonData.mealHistory) {
-        try {
-          const historyToDB = mapMealHistoryToDB(updateUserIds(history));
-          
-          // Ensure required fields are present
-          if (!historyToDB.dishid || !historyToDB.user_id) {
-            throw new Error("Missing required fields for meal history entry");
+      for (let i = 0; i < jsonData.mealHistory.length; i += BATCH_SIZE) {
+        const batch = jsonData.mealHistory.slice(i, i + BATCH_SIZE);
+        const historyToDB = batch.map(history => {
+          const historyEntry = mapMealHistoryToDB(updateUserIds(history));
+          // Return only the fields needed for the upsert
+          return {
+            id: historyEntry.id,
+            dishid: historyEntry.dishid,
+            date: historyEntry.date || new Date().toISOString(),
+            notes: historyEntry.notes,
+            user_id: historyEntry.user_id
+          };
+        }).filter(h => h.dishid && h.user_id); // Filter out invalid entries
+        
+        if (historyToDB.length > 0) {
+          try {
+            const { error, count } = await supabase
+              .from('meal_history')
+              .upsert(historyToDB, { 
+                onConflict: 'id',
+                count: 'exact'
+              });
+              
+            if (error) throw error;
+            successCount += count || 0;
+          } catch (error) {
+            console.error("Error importing meal history batch:", error);
+            errorCount += batch.length;
           }
-          
-          const { error } = await supabase
-            .from('meal_history')
-            .upsert({
-              id: historyToDB.id,
-              dishid: historyToDB.dishid,
-              date: historyToDB.date || new Date().toISOString(),
-              notes: historyToDB.notes,
-              user_id: historyToDB.user_id
-            }, { onConflict: 'id' });
-            
-          if (error) throw error;
-          successCount++;
-        } catch (error) {
-          console.error("Error importing meal history:", error);
-          errorCount++;
+        } else {
+          errorCount += batch.length;
         }
         
-        processedItems++;
+        processedItems += batch.length;
         if (onProgress) onProgress(processedItems, totalItems);
         setProgress(Math.floor((processedItems / totalItems) * 100));
       }

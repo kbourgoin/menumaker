@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useDataImport } from "@/hooks/import";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -40,35 +39,16 @@ export function JSONExport() {
   };
 
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-medium">Export Data as JSON</h3>
-              <p className="text-sm text-muted-foreground">
-                Download all your meal data as a JSON file for backup or transfer
-              </p>
-            </div>
-            <Button
-              onClick={handleExport}
-              disabled={isExporting}
-              className="gap-2"
-            >
-              {isExporting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  Export
-                </>
-              )}
-            </Button>
-          </div>
-          
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium">Export Data as JSON</h3>
+        <p className="text-sm text-muted-foreground">
+          Download all your meal data as a JSON file for backup or transfer
+        </p>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div>
           {Object.keys(exportCount).length > 0 && (
             <div className="text-sm">
               <p>Last export included:</p>
@@ -80,7 +60,25 @@ export function JSONExport() {
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+        
+        <Button
+          onClick={handleExport}
+          disabled={isExporting}
+          className="gap-2"
+        >
+          {isExporting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Exporting...
+            </>
+          ) : (
+            <>
+              <Download className="h-4 w-4" />
+              Export
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
   );
 }

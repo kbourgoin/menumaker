@@ -28,27 +28,30 @@ export function useDataExport() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      // Fetch all dishes
+      // Fetch all dishes with limit override
       const { data: dishesData, error: dishesError } = await supabase
         .from('dishes')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .limit(10000); // Override default 1000 limit
         
       if (dishesError) throw dishesError;
       
-      // Fetch all meal history
+      // Fetch all meal history with limit override
       const { data: mealHistoryData, error: mealHistoryError } = await supabase
         .from('meal_history')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .limit(10000); // Override default 1000 limit
         
       if (mealHistoryError) throw mealHistoryError;
       
-      // Fetch all sources
+      // Fetch all sources with limit override
       const { data: sourcesData, error: sourcesError } = await supabase
         .from('sources')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .limit(10000); // Override default 1000 limit
         
       if (sourcesError) throw sourcesError;
       

@@ -3,7 +3,6 @@ import { useState, useRef } from "react";
 import { useDataImport } from "@/hooks/import";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, Upload } from "lucide-react";
@@ -87,73 +86,69 @@ export function JSONImport() {
   };
 
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-medium">Import Data from JSON</h3>
-            <p className="text-sm text-muted-foreground">
-              Import data from a previously exported JSON file
-            </p>
-          </div>
-          
-          <div className="grid gap-4">
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileChange}
-              className="cursor-pointer"
-              disabled={isImporting}
-            />
-            
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            {isImporting && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Importing...</span>
-                  <span>{importProgress}%</span>
-                </div>
-                <Progress value={importProgress} className="h-2" />
-              </div>
-            )}
-            
-            {importStats && (
-              <Alert>
-                <AlertDescription>
-                  Import complete: {importStats.success} items imported successfully, 
-                  {importStats.errors} errors occurred out of {importStats.total} total items.
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            <div>
-              <Button
-                onClick={handleImport}
-                disabled={!selectedFile || isImporting}
-                className="gap-2"
-              >
-                {isImporting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Importing...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="h-4 w-4" />
-                    Import
-                  </>
-                )}
-              </Button>
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium">Import Data from JSON</h3>
+        <p className="text-sm text-muted-foreground">
+          Import data from a previously exported JSON file
+        </p>
+      </div>
+      
+      <div className="grid gap-4">
+        <Input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          className="cursor-pointer"
+          disabled={isImporting}
+        />
+        
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        {isImporting && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Importing...</span>
+              <span>{importProgress}%</span>
             </div>
+            <Progress value={importProgress} className="h-2" />
           </div>
+        )}
+        
+        {importStats && (
+          <Alert>
+            <AlertDescription>
+              Import complete: {importStats.success} items imported successfully, 
+              {importStats.errors} errors occurred out of {importStats.total} total items.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        <div className="flex justify-end">
+          <Button
+            onClick={handleImport}
+            disabled={!selectedFile || isImporting}
+            className="gap-2"
+          >
+            {isImporting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Importing...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                Import
+              </>
+            )}
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
