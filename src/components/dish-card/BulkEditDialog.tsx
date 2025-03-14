@@ -117,7 +117,7 @@ const BulkEditDialog = ({
                 <SelectValue placeholder="Select a source" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No source</SelectItem>
+                <SelectItem value="none">No source</SelectItem>
                 {sources.map(source => (
                   <SelectItem key={source.id} value={source.id}>
                     {source.name}
