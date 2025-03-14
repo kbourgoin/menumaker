@@ -2,16 +2,46 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useDishes";
+import { useSources } from "@/hooks/useSources";
 import DishCard from "@/components/dish-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Plus, Search, SortAsc } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { sortDishes } from "@/utils/dishUtils";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useDishes();
+  const { getSources } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("name");
+  const [sourceFilter, setSourceFilter] = useState("");
+  const [sources, setSources] = useState<any[]>([]);
+  const [isLoadingSources, setIsLoadingSources] = useState(true);
+  
+  // Load sources
+  useEffect(() => {
+    const loadSources = async () => {
+      try {
+        const sourcesData = await getSources();
+        setSources(sourcesData);
+      } catch (error) {
+        console.error("Error loading sources:", error);
+      } finally {
+        setIsLoadingSources(false);
+      }
+    };
+    
+    loadSources();
+  }, [getSources]);
   
   // Log dishes when they load
   useEffect(() => {
@@ -28,13 +58,30 @@ const AllDishes = () => {
     }
   }, [dishes]);
   
-  // Filter dishes based on search query
-  const filteredDishes = dishes?.filter(dish => 
-    dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dish.cuisines.some(cuisine => 
-      cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  ) || [];
+  // Apply sorting and filtering
+  const processedDishes = () => {
+    if (!dishes) return [];
+    
+    // First filter by search query and source
+    let filtered = dishes.filter(dish => {
+      // Apply text search filter
+      const matchesSearch = !searchQuery || 
+        dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dish.cuisines.some(cuisine => 
+          cuisine.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      
+      // Apply source filter
+      const matchesSource = !sourceFilter || dish.sourceId === sourceFilter;
+      
+      return matchesSearch && matchesSource;
+    });
+    
+    // Then sort the filtered results
+    return sortDishes(filtered, sortOption);
+  };
+  
+  const filteredDishes = processedDishes();
   
   // Create loading skeletons for dishes
   const LoadingSkeletons = () => (
@@ -71,14 +118,51 @@ const AllDishes = () => {
           </Button>
         </div>
         
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by dish name or cuisine..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+        <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Search bar */}
+          <div className="relative col-span-full sm:col-span-1 lg:col-span-2">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by dish name or cuisine..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          
+          {/* Sort dropdown */}
+          <div className="sm:col-span-1">
+            <Select value={sortOption} onValueChange={setSortOption}>
+              <SelectTrigger>
+                <SortAsc className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by name" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name (A-Z)</SelectItem>
+                <SelectItem value="lastCooked">Last Cooked</SelectItem>
+                <SelectItem value="timesCooked">Times Cooked</SelectItem>
+                <SelectItem value="cuisine">Cuisine</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Source filter */}
+          <div className="sm:col-span-1">
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Sources" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Sources</SelectItem>
+                <SelectItem value="none">No Source</SelectItem>
+                {!isLoadingSources && sources.map(source => (
+                  <SelectItem key={source.id} value={source.id}>
+                    {source.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -96,7 +180,7 @@ const AllDishes = () => {
                   ))
                 ) : (
                   <div className="col-span-full text-center p-8 border rounded-lg">
-                    <p className="text-muted-foreground">No dishes match your search.</p>
+                    <p className="text-muted-foreground">No dishes match your filters.</p>
                   </div>
                 )
               ) : (
@@ -115,6 +199,13 @@ const AllDishes = () => {
             </>
           )}
         </div>
+        
+        {/* Results count */}
+        {dishes && dishes.length > 0 && (
+          <div className="mt-6 text-sm text-muted-foreground">
+            Showing {filteredDishes.length} of {dishes.length} dishes
+          </div>
+        )}
       </div>
     </Layout>
   );
