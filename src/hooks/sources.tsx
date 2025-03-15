@@ -10,7 +10,7 @@ export function useSources() {
   // Get all sources with React Query for better caching and error handling
   const { data: sources = [], isLoading: isLoadingSources, error: sourcesError } = useQuery({
     queryKey: ['sources'],
-    mutationFn: async (): Promise<Source[]> => {
+    queryFn: async (): Promise<Source[]> => {
       try {
         const { data: userData } = await supabase.auth.getUser();
         const user_id = userData.user?.id;
@@ -281,7 +281,7 @@ export function useSources() {
     sources,
     isLoadingSources,
     sourcesError,
-    getSources: async () => sources,
+    getSources: async (): Promise<Source[]> => sources || [],
     getSource,
     getDishesBySource,
     findSourceByName,

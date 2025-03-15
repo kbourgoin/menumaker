@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
-import { Dish } from "@/types";
+import { Dish, Source } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -14,7 +14,7 @@ import { formSchema, FormValues } from "./FormSchema";
 import CuisineSelector from "./CuisineSelector";
 import SourceSelector from "./SourceSelector";
 import LocationField from "./LocationField";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 
 interface DishFormProps {
   existingDish?: Dish;
@@ -28,7 +28,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: sources = [] } = useQuery({
+  const { data: sources = [] } = useQuery<Source[]>({
     queryKey: ['sources'],
     queryFn: getSources,
     enabled: true,

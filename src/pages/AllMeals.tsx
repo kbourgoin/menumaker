@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useDishes";
@@ -17,13 +16,17 @@ import { Plus, Search, SortAsc } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { sortDishes } from "@/utils/dishUtils";
+import { Source } from "@/types";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useDishes();
-  const { sources, isLoadingSources } = useSources();
+  const { sources: sourcesData, isLoadingSources } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name");
   const [sourceFilter, setSourceFilter] = useState("all-sources");
+  
+  // Ensure sources is always an array
+  const sources = Array.isArray(sourcesData) ? sourcesData : [];
   
   // Log dishes when they load
   useEffect(() => {
@@ -139,7 +142,7 @@ const AllDishes = () => {
               <SelectContent>
                 <SelectItem value="all-sources">All Sources</SelectItem>
                 <SelectItem value="none">No Source</SelectItem>
-                {!isLoadingSources && sources && sources.map(source => (
+                {!isLoadingSources && sources && sources.map((source: Source) => (
                   <SelectItem key={source.id} value={source.id}>
                     {source.name}
                   </SelectItem>

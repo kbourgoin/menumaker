@@ -47,7 +47,7 @@ const SourceManager = () => {
 
       {isLoading ? (
         <SourceLoading />
-      ) : sources.length === 0 ? (
+      ) : sources && sources.length === 0 ? (
         <SourceEmptyState />
       ) : (
         <SourceTable 
