@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Trash, Pencil } from "lucide-react";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import CookDishDialog from "../CookDishDialog";
 import { Dish } from "@/types";
-import { useDishes } from "@/hooks/useMeals";
+import { useMeals } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 
 interface DishCardActionsProps {
@@ -17,7 +16,7 @@ interface DishCardActionsProps {
 }
 
 const DishCardActions = ({ dish, compact = false, onDeleted }: DishCardActionsProps) => {
-  const { deleteDish } = useDishes();
+  const { deleteDish } = useMeals();
   const { toast } = useToast();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   

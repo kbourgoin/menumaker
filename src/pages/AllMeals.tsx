@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { useDishes } from "@/hooks/useDishes";
-import { useSources } from "@/hooks/useSources";
+import { useMeals } from "@/hooks/useMeals";
+import { useSources } from "@/hooks/sources";
 import DishCard from "@/components/dish-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { sortDishes } from "@/utils/dishUtils";
 import { Source } from "@/types";
 
 const AllDishes = () => {
-  const { dishes, isLoading } = useDishes();
+  const { dishes, isLoading } = useMeals();
   const { sources: sourcesData, isLoadingSources } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name");

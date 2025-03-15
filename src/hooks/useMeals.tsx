@@ -10,7 +10,7 @@ import { useDataImport } from "./import";
  * This is a composite hook that combines all meal-related functionality.
  * It imports from individual hook files and provides a unified API.
  */
-export function useDishes() {
+export function useMeals() {
   const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
   const { addDish, updateDish, deleteDish } = useDishMutations();
   const { recordDishCooked } = useMealHistory();
@@ -49,3 +49,6 @@ export function useDishes() {
     clearData: dataImportHook.clearData
   };
 }
+
+// Also export the hook as useDishes for backward compatibility
+export { useMeals as useDishes };
