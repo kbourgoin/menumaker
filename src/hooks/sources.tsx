@@ -2,12 +2,15 @@
 import { Source, Dish } from "@/types";
 import { supabase, mapSourceFromDB, mapDishFromDB } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useSources() {
+  const queryClient = useQueryClient();
+
   // Get all sources with React Query for better caching and error handling
   const { data: sources = [], isLoading: isLoadingSources, error: sourcesError } = useQuery({
     queryKey: ['sources'],
-    queryFn: async (): Promise<Source[]> => {
+    mutationFn: async (): Promise<Source[]> => {
       try {
         const { data: userData } = await supabase.auth.getUser();
         const user_id = userData.user?.id;
@@ -142,13 +145,151 @@ export function useSources() {
     }
   };
 
+  // Add a new source
+  const addSource = async (source: Omit<Source, 'id' | 'createdAt' | 'user_id'>) => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id) throw new Error('User not authenticated');
+    
+    const sourceToInsert = {
+      ...source,
+      user_id
+    };
+    
+    const { data, error } = await supabase
+      .from('sources')
+      .insert(sourceToInsert)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    
+    queryClient.invalidateQueries({ queryKey: ['sources'] });
+    return mapSourceFromDB(data);
+  };
+
+  // Update an existing source
+  const updateSource = async (source: Partial<Source> & { id: string }) => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id) throw new Error('User not authenticated');
+    
+    // Prepare data for update
+    const updateData: any = {};
+    if (source.name !== undefined) updateData.name = source.name;
+    if (source.type !== undefined) updateData.type = source.type;
+    if (source.description !== undefined) updateData.description = source.description;
+    
+    const { data, error } = await supabase
+      .from('sources')
+      .update(updateData)
+      .eq('id', source.id)
+      .eq('user_id', user_id)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    
+    queryClient.invalidateQueries({ queryKey: ['sources'] });
+    return mapSourceFromDB(data);
+  };
+
+  // Delete a source
+  const deleteSource = async (id: string) => {
+    // First update any dishes that reference this source
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id) throw new Error('User not authenticated');
+    
+    await supabase
+      .from('dishes')
+      .update({ source_id: null })
+      .eq('source_id', id)
+      .eq('user_id', user_id);
+      
+    // Then delete the source
+    const { error } = await supabase
+      .from('sources')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user_id);
+      
+    if (error) throw error;
+    
+    queryClient.invalidateQueries({ queryKey: ['sources'] });
+    queryClient.invalidateQueries({ queryKey: ['dishes'] });
+    return id;
+  };
+
+  // Merge two sources
+  const mergeSources = async ({ 
+    sourceToMergeId, 
+    targetSourceId 
+  }: { 
+    sourceToMergeId: string, 
+    targetSourceId: string 
+  }) => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user_id = userData.user?.id;
+    
+    if (!user_id) throw new Error('User not authenticated');
+    
+    // 1. Get all dishes linked to the source to be merged
+    const { data: dishesData, error: dishesError } = await supabase
+      .from('dishes')
+      .select('*')
+      .eq('source_id', sourceToMergeId)
+      .eq('user_id', user_id);
+      
+    if (dishesError) throw dishesError;
+    
+    // 2. Update all dishes to the target source
+    if (dishesData && dishesData.length > 0) {
+      const { error: updateError } = await supabase
+        .from('dishes')
+        .update({ source_id: targetSourceId })
+        .eq('source_id', sourceToMergeId)
+        .eq('user_id', user_id);
+        
+      if (updateError) throw updateError;
+    }
+    
+    // 3. Delete the source that is being merged
+    const { error: deleteError } = await supabase
+      .from('sources')
+      .delete()
+      .eq('id', sourceToMergeId)
+      .eq('user_id', user_id);
+      
+    if (deleteError) throw deleteError;
+    
+    queryClient.invalidateQueries({ queryKey: ['sources'] });
+    queryClient.invalidateQueries({ queryKey: ['dishes'] });
+    
+    return { 
+      sourceToMergeId, 
+      targetSourceId, 
+      affectedDishesCount: dishesData?.length || 0 
+    };
+  };
+
   return {
+    // Source queries
     sources,
     isLoadingSources,
     sourcesError,
-    getSources: async () => sources, // Return the cached sources
+    getSources: async () => sources,
     getSource,
     getDishesBySource,
-    findSourceByName
+    findSourceByName,
+    
+    // Source mutations
+    addSource,
+    updateSource,
+    deleteSource,
+    mergeSources
   };
 }

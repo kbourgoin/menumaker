@@ -2,7 +2,7 @@
 import { Source } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 import { useSourceValidation, SourceFormData } from "./useSourceValidation";
 import { useSourceMerge } from "./useSourceMerge";
 

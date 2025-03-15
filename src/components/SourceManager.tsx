@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Source } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/components/AuthProvider";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 
 // Import our new components
 import AddSourceDialog from "./source/AddSourceDialog";

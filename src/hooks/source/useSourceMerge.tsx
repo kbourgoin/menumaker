@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Source } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 
 export function useSourceMerge(onCompleteMerge: () => void) {
   const [duplicateSource, setDuplicateSource] = useState<Source | null>(null);

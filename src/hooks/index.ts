@@ -4,7 +4,7 @@ export * from './use-mobile';
 export * from './use-toast';
 export * from './useDishes';
 export * from './useMealHistory';
-export * from './useSources';
+export * from './sources';
 export * from './useStats';
 export * from './useWeeklyMenu';
 export * from './useImportMealHistory';

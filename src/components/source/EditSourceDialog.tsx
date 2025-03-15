@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 import { useAuth } from "@/components/AuthProvider";
 import MergeSourceDialog from "./MergeSourceDialog";
 import LinkedDishesSection from "./LinkedDishesSection";

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ import {
 import { PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 import { useAuth } from "@/components/AuthProvider";
 
 interface AddSourceDialogProps {
