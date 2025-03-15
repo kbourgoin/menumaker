@@ -2,7 +2,7 @@
 import { useDishQueries, useDishMutations } from "./dish";
 import { useMealHistory } from "./useMealHistory";
 import { useWeeklyMenu } from "./useWeeklyMenu";
-import { useSources } from "./useSources";
+import { useSources } from "./sources";
 import { useStats } from "./useStats";
 import { useDataImport } from "./import";
 
