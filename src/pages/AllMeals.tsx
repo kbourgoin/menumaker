@@ -20,28 +20,10 @@ import { sortDishes } from "@/utils/dishUtils";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useDishes();
-  const { getSources } = useSources();
+  const { sources, isLoadingSources } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name");
-  const [sourceFilter, setSourceFilter] = useState("");
-  const [sources, setSources] = useState<any[]>([]);
-  const [isLoadingSources, setIsLoadingSources] = useState(true);
-  
-  // Load sources
-  useEffect(() => {
-    const loadSources = async () => {
-      try {
-        const sourcesData = await getSources();
-        setSources(sourcesData);
-      } catch (error) {
-        console.error("Error loading sources:", error);
-      } finally {
-        setIsLoadingSources(false);
-      }
-    };
-    
-    loadSources();
-  }, [getSources]);
+  const [sourceFilter, setSourceFilter] = useState("all-sources");
   
   // Log dishes when they load
   useEffect(() => {
@@ -72,7 +54,9 @@ const AllDishes = () => {
         );
       
       // Apply source filter
-      const matchesSource = !sourceFilter || dish.sourceId === sourceFilter;
+      const matchesSource = sourceFilter === "all-sources" || 
+                           (sourceFilter === "none" && !dish.sourceId) ||
+                           (dish.sourceId === sourceFilter);
       
       return matchesSearch && matchesSource;
     });
@@ -155,7 +139,7 @@ const AllDishes = () => {
               <SelectContent>
                 <SelectItem value="all-sources">All Sources</SelectItem>
                 <SelectItem value="none">No Source</SelectItem>
-                {!isLoadingSources && sources.map(source => (
+                {!isLoadingSources && sources && sources.map(source => (
                   <SelectItem key={source.id} value={source.id}>
                     {source.name}
                   </SelectItem>
@@ -166,7 +150,7 @@ const AllDishes = () => {
         </div>
         
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {isLoading && dishes === undefined ? (
+          {isLoading ? (
             <LoadingSkeletons />
           ) : (
             <>
