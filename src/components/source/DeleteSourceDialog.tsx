@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSources } from "@/hooks/useSources";
+import { useSources } from "@/hooks/sources";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DeleteSourceDialogProps {

@@ -25,14 +25,11 @@ const AllDishes = () => {
   const [sortOption, setSortOption] = useState("name");
   const [sourceFilter, setSourceFilter] = useState("all-sources");
   
-  // Ensure sources is always an array
   const sources = Array.isArray(sourcesData) ? sourcesData : [];
   
-  // Log dishes when they load
   useEffect(() => {
     if (dishes && dishes.length > 0) {
       console.log("Dishes loaded in AllMeals:", dishes);
-      // Check for source and location in the first few dishes
       dishes.slice(0, 3).forEach((dish, index) => {
         console.log(`Dish ${index} details:`, {
           name: dish.name,
@@ -43,20 +40,16 @@ const AllDishes = () => {
     }
   }, [dishes]);
   
-  // Apply sorting and filtering
   const processedDishes = () => {
     if (!dishes) return [];
     
-    // First filter by search query and source
     let filtered = dishes.filter(dish => {
-      // Apply text search filter
       const matchesSearch = !searchQuery || 
         dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         dish.cuisines.some(cuisine => 
           cuisine.toLowerCase().includes(searchQuery.toLowerCase())
         );
       
-      // Apply source filter
       const matchesSource = sourceFilter === "all-sources" || 
                            (sourceFilter === "none" && !dish.sourceId) ||
                            (dish.sourceId === sourceFilter);
@@ -64,13 +57,11 @@ const AllDishes = () => {
       return matchesSearch && matchesSource;
     });
     
-    // Then sort the filtered results
     return sortDishes(filtered, sortOption);
   };
   
   const filteredDishes = processedDishes();
   
-  // Create loading skeletons for dishes
   const LoadingSkeletons = () => (
     <>
       {Array(8).fill(0).map((_, index) => (
@@ -106,7 +97,6 @@ const AllDishes = () => {
         </div>
         
         <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Search bar */}
           <div className="relative col-span-full sm:col-span-1 lg:col-span-2">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -117,7 +107,6 @@ const AllDishes = () => {
             />
           </div>
           
-          {/* Sort dropdown */}
           <div className="sm:col-span-1">
             <Select value={sortOption} onValueChange={setSortOption}>
               <SelectTrigger>
@@ -133,7 +122,6 @@ const AllDishes = () => {
             </Select>
           </div>
           
-          {/* Source filter */}
           <div className="sm:col-span-1">
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
               <SelectTrigger>
@@ -187,7 +175,6 @@ const AllDishes = () => {
           )}
         </div>
         
-        {/* Results count */}
         {dishes && dishes.length > 0 && (
           <div className="mt-6 text-sm text-muted-foreground">
             Showing {filteredDishes.length} of {dishes.length} dishes

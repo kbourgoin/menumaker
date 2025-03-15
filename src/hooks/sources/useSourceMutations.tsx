@@ -49,6 +49,7 @@ export function useSourceMutations() {
         .from('sources')
         .update(sourceToUpdate)
         .eq('id', source.id)
+        .eq('user_id', user_id)
         .select()
         .single();
         
@@ -64,19 +65,28 @@ export function useSourceMutations() {
   // Delete a source
   const deleteSource = useMutation({
     mutationFn: async (id: string) => {
+      const { data: userData } = await supabase.auth.getUser();
+      const user_id = userData.user?.id;
+      
+      if (!user_id) throw new Error('User not authenticated');
+      
       // First update any dishes that reference this source
       await supabase
         .from('dishes')
         .update({ source_id: null })
-        .eq('source_id', id);
+        .eq('source_id', id)
+        .eq('user_id', user_id);
         
       // Then delete the source
       const { error } = await supabase
         .from('sources')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user_id);
         
       if (error) throw error;
+      
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sources'] });
