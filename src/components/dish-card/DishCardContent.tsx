@@ -21,16 +21,14 @@ const DishCardContent = ({
   location, 
   compact = false 
 }: DishCardContentProps) => {
-  console.log("DishCardContent received:", { sourceId, location });
-  
   return (
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
       <div className="space-y-3">
-        <CuisinesList cuisines={cuisines} compact={compact} />
+        <CuisinesList cuisines={cuisines || []} compact={compact} />
         
         <CookingInfo 
           lastMade={lastMade} 
-          timesCooked={timesCooked} 
+          timesCooked={timesCooked || 0} 
           compact={compact} 
         />
         

@@ -13,6 +13,12 @@ interface DishCardProps {
 }
 
 const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: DishCardProps) => {
+  // Safety check for valid dish object
+  if (!dish || typeof dish !== 'object' || !dish.id) {
+    console.error("Invalid dish passed to DishCard:", dish);
+    return null;
+  }
+
   return (
     <Card className="transition-all duration-300 hover:shadow-md overflow-hidden group flex flex-col h-full">
       <DishCardHeader 
@@ -22,9 +28,9 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       />
       
       <DishCardContent 
-        cuisines={dish.cuisines}
+        cuisines={dish.cuisines || []}
         lastMade={dish.lastMade}
-        timesCooked={dish.timesCooked}
+        timesCooked={dish.timesCooked || 0}
         sourceId={dish.sourceId}
         location={dish.location}
         compact={compact}

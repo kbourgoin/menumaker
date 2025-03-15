@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
@@ -16,7 +17,7 @@ import { Plus, Search, SortAsc } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { sortDishes } from "@/utils/dishUtils";
-import { Source } from "@/types";
+import { Source, Dish } from "@/types";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useMeals();
@@ -29,9 +30,10 @@ const AllDishes = () => {
   
   useEffect(() => {
     if (dishes && dishes.length > 0) {
-      console.log("Dishes loaded in AllMeals:", dishes);
+      console.log("Dishes loaded in AllMeals:", dishes.length);
       dishes.slice(0, 3).forEach((dish, index) => {
         console.log(`Dish ${index} details:`, {
+          id: dish.id,
           name: dish.name,
           sourceId: dish.sourceId,
           location: dish.location
@@ -41,14 +43,23 @@ const AllDishes = () => {
   }, [dishes]);
   
   const processedDishes = () => {
-    if (!dishes) return [];
+    if (!dishes || !Array.isArray(dishes)) {
+      console.log("No dishes array available:", dishes);
+      return [];
+    }
     
     let filtered = dishes.filter(dish => {
+      // Safety check for valid dish objects
+      if (!dish || typeof dish !== 'object') {
+        console.log("Invalid dish object:", dish);
+        return false;
+      }
+      
       const matchesSearch = !searchQuery || 
-        dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        dish.cuisines.some(cuisine => 
-          cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        (dish.name && dish.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (dish.cuisines && Array.isArray(dish.cuisines) && dish.cuisines.some(cuisine => 
+          cuisine && cuisine.toLowerCase().includes(searchQuery.toLowerCase())
+        ));
       
       const matchesSource = sourceFilter === "all-sources" || 
                            (sourceFilter === "none" && !dish.sourceId) ||
@@ -145,9 +156,9 @@ const AllDishes = () => {
             <LoadingSkeletons />
           ) : (
             <>
-              {dishes && dishes.length > 0 ? (
+              {dishes && Array.isArray(dishes) && dishes.length > 0 ? (
                 filteredDishes.length > 0 ? (
-                  filteredDishes.map((dish) => (
+                  filteredDishes.map((dish: Dish) => (
                     <DishCard 
                       key={dish.id} 
                       dish={dish} 
