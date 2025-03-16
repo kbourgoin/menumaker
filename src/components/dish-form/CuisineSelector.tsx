@@ -1,6 +1,6 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CUISINES } from "./constants";
 import { UseFormReturn } from "react-hook-form";
 import { FormValues } from "./FormSchema";
@@ -16,32 +16,24 @@ const CuisineSelector = ({ form }: CuisineSelectorProps) => {
       name="cuisines"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Cuisines</FormLabel>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-            {CUISINES.map((cuisine) => (
-              <FormItem
-                key={cuisine}
-                className="flex items-center space-x-2 space-y-0"
-              >
-                <FormControl>
-                  <Checkbox
-                    checked={field.value?.includes(cuisine)}
-                    onCheckedChange={(checked) => {
-                      const updatedCuisines = checked
-                        ? [...field.value, cuisine]
-                        : field.value.filter(
-                            (value) => value !== cuisine
-                          );
-                      field.onChange(updatedCuisines);
-                    }}
-                  />
-                </FormControl>
-                <FormLabel className="text-sm font-normal cursor-pointer">
+          <FormLabel>Cuisine</FormLabel>
+          <Select
+            onValueChange={(value) => field.onChange([value])}
+            defaultValue={field.value[0] || ""}
+          >
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a cuisine" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {CUISINES.map((cuisine) => (
+                <SelectItem key={cuisine} value={cuisine}>
                   {cuisine}
-                </FormLabel>
-              </FormItem>
-            ))}
-          </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}

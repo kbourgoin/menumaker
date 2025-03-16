@@ -34,11 +34,16 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
     enabled: true,
   });
 
+  // Format the existing dish cuisine as an array to match the form schema
+  const defaultCuisine = existingDish?.cuisines && existingDish.cuisines.length > 0 
+    ? [existingDish.cuisines[0]] 
+    : ["Other"];
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: existingDish?.name || "",
-      cuisines: existingDish?.cuisines || [],
+      cuisines: defaultCuisine,
       sourceId: existingDish?.sourceId || "",
       location: existingDish?.location || "",
     },
