@@ -9,10 +9,11 @@ import { fetchDishesOriginalMethod, fetchDishById, fetchMealHistoryForDish } fro
  * Hook that provides query functions for dishes
  */
 export function useDishQueries() {
-  const [isLoading, setIsLoading] = useState(true);
+  // Remove this local state as it conflicts with React Query's built-in loading state
+  // const [isLoading, setIsLoading] = useState(true);
 
   // Query to fetch dishes from the materialized view for better performance (READ ONLY)
-  const { data: dishes = [] } = useQuery({
+  const { data: dishes = [], isLoading } = useQuery({
     queryKey: ['dishes'],
     queryFn: async (): Promise<Dish[]> => {
       try {
@@ -20,7 +21,6 @@ export function useDishQueries() {
         const user_id = user.data.user?.id;
         
         if (!user_id) {
-          setIsLoading(false);
           return [];
         }
         
@@ -39,14 +39,12 @@ export function useDishQueries() {
           }
           
           if (!summaryData) {
-            setIsLoading(false);
             return [];
           }
           
           // Map the summary data to our Dish type
           const mappedDishes = summaryData.map(summary => mapDishFromSummary(summary));
           
-          setIsLoading(false);
           return mappedDishes;
         } catch (viewError) {
           console.error("Error with dish_summary view:", viewError);
@@ -55,7 +53,6 @@ export function useDishQueries() {
         }
       } catch (error) {
         console.error("Error fetching dishes:", error);
-        setIsLoading(false);
         return [];
       }
     },
@@ -67,7 +64,7 @@ export function useDishQueries() {
 
   return {
     dishes,
-    isLoading,
+    isLoading, // Now we're using React Query's built-in isLoading state
     getDish: fetchDishById,
     getMealHistoryForDish: fetchMealHistoryForDish
   };

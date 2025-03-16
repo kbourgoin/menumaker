@@ -73,6 +73,12 @@ const AllDishes = () => {
   
   const filteredDishes = processedDishes();
   
+  // Add debug log for isLoading state
+  useEffect(() => {
+    console.log("AllDishes component - isLoading state:", isLoading);
+    console.log("Dishes data available:", dishes ? dishes.length : 0);
+  }, [isLoading, dishes]);
+  
   const LoadingSkeletons = () => (
     <>
       {Array(8).fill(0).map((_, index) => (
