@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
 import Layout from "@/components/Layout";
@@ -15,24 +15,42 @@ const Home = () => {
   const { getWeeklyDishSuggestions, getStats } = useDishes();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
-  // Use React Query for suggestion data
+  // Use React Query for suggestion data with reduced staleTime
   const { data: suggestedDishes = [], isLoading: suggestionsLoading, refetch: refetchSuggestions } = 
     useQuery({
       queryKey: ['suggestedDishes'],
       queryFn: () => getWeeklyDishSuggestions(3),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 30 * 1000, // 30 seconds instead of 5 minutes
+      refetchOnMount: true, // Refetch when component mounts
+      refetchOnWindowFocus: true, // Refetch when window gets focus
     });
   
-  // Use React Query for stats data
+  // Use React Query for stats data with reduced staleTime
   const { data: stats, isLoading: statsLoading } = 
     useQuery({
       queryKey: ['dashboardStats'],
       queryFn: getStats,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 30 * 1000, // 30 seconds instead of 5 minutes
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
     });
 
   const isLoading = suggestionsLoading || statsLoading;
+  
+  // Add effect to invalidate the cache if data is empty when loaded
+  useEffect(() => {
+    if (!suggestionsLoading && suggestedDishes && suggestedDishes.length === 0) {
+      // If we've finished loading and still have no suggestions, invalidate the cache
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+    }
+    
+    if (!statsLoading && (!stats || !stats.totalDishes)) {
+      // If we've finished loading and have empty stats, invalidate the cache
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+    }
+  }, [suggestionsLoading, statsLoading, suggestedDishes, stats, queryClient]);
   
   const handleSuggestMoreDishes = async () => {
     try {

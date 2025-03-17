@@ -1,4 +1,3 @@
-
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -37,8 +36,10 @@ export function useWeeklyMenu() {
         return [];
       }
     },
-    // Enable stale time for caching
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Shorter stale time for better responsiveness
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Get weekly dish suggestions

@@ -65,8 +65,12 @@ export function useMealHistory() {
       return mapMealHistoryFromDB(data);
     },
     onSuccess: () => {
+      // Invalidate multiple queries to ensure all related data is refreshed
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
   });
 

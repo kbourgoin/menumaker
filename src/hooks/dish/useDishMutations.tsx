@@ -41,7 +41,11 @@ export function useDishMutations() {
       return mapDishFromDB(data);
     },
     onSuccess: () => {
+      // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
   });
 
@@ -61,7 +65,11 @@ export function useDishMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
   });
 
@@ -83,8 +91,12 @@ export function useDishMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
   });
 
