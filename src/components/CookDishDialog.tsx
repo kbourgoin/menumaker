@@ -90,11 +90,11 @@ export default function CookDishDialog({
                   {date ? format(date, "PPP") : "Select a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 z-50" align="start">
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(date) => date && setDate(date)}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
                   initialFocus
                 />
               </PopoverContent>
