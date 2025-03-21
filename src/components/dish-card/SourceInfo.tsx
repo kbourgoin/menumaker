@@ -9,10 +9,8 @@ interface SourceInfoProps {
 }
 
 const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
-  console.log("SourceInfo received:", { sourceId, location });
-  
+  // If there's no sourceId and no location, don't render anything
   if (!sourceId && !location) {
-    console.log("SourceInfo returning null - no data");
     return null;
   }
   

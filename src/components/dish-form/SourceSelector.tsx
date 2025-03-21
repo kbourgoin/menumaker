@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Check, ChevronsUpDown, Book, Globe } from "lucide-react";
 import { Source } from "@/types";
+import { useEffect } from "react";
 
 interface SourceSelectorProps {
   form: UseFormReturn<FormValues>;
@@ -24,6 +25,14 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
         return null;
     }
   };
+
+  // Hide location field when no source is selected
+  useEffect(() => {
+    const sourceId = form.getValues("sourceId");
+    if (!sourceId) {
+      form.setValue("location", "");
+    }
+  }, [form.watch("sourceId")]);
 
   return (
     <div className="space-y-4">
@@ -63,6 +72,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                         value="none"
                         onSelect={() => {
                           form.setValue("sourceId", "");
+                          form.setValue("location", "");
                         }}
                       >
                         <Check

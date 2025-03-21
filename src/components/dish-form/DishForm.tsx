@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -127,7 +126,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         
         <SourceSelector form={form} sources={sources} />
         
-        <LocationField form={form} />
+        <LocationField form={form} sources={sources} />
 
         <div className="flex justify-end space-x-3 pt-3">
           <Button
