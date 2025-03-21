@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
   const handleTypeChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      type: value as 'book' | 'website' | 'document',
+      type: value as 'book' | 'website',
     }));
   };
 
@@ -97,7 +98,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
 
     addSourceMutation.mutate({
       name: formData.name,
-      type: formData.type as 'book' | 'website' | 'document',
+      type: formData.type as 'book' | 'website',
       description: formData.description || undefined,
     });
   };
@@ -144,13 +145,11 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
               <SelectContent>
                 <SelectItem value="book">Book</SelectItem>
                 <SelectItem value="website">Website</SelectItem>
-                <SelectItem value="document">Document</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
               {formData.type === 'book' ? "Book or cookbook" : 
-               formData.type === 'website' ? "Online recipe source" : 
-               "Any other document type source"}
+               "Online recipe source"}
             </p>
           </div>
           

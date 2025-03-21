@@ -9,7 +9,9 @@ export type DBSource = Database['public']['Tables']['sources']['Row'] & {
 export const mapSourceFromDB = (source: DBSource): Source => ({
   id: source.id,
   name: source.name,
-  type: source.type as 'book' | 'website' | 'document',
+  type: source.type === 'book' || source.type === 'website' 
+    ? source.type 
+    : 'book', // Convert any old 'document' type to 'book'
   description: source.description || undefined,
   url: source.url || undefined,
   createdAt: source.created_at,

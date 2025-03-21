@@ -22,7 +22,7 @@ export interface MealHistory {
 export interface Source {
   id: string;
   name: string;
-  type: 'book' | 'website' | 'document';
+  type: 'book' | 'website';  // Removed 'document' from the type options
   description?: string;
   url?: string;
   createdAt: string;

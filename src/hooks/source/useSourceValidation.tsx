@@ -4,7 +4,7 @@ import { useSources } from "@/hooks/useSources";
 
 export interface SourceFormData {
   name: string;
-  type: 'book' | 'website' | 'document';
+  type: 'book' | 'website';
   description: string;
 }
 

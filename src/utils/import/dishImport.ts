@@ -2,7 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 // Find or create a source for a dish
-export const findOrCreateSource = async (sourceName: string, sourceType: 'book' | 'website' | 'document', userId: string) => {
+export const findOrCreateSource = async (sourceName: string, sourceType: 'book' | 'website', userId: string) => {
   console.log(`Looking for source '${sourceName}' of type ${sourceType}`);
   
   const { data: existingSources, error: sourceError } = await supabase

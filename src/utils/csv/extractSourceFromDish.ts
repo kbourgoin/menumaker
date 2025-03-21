@@ -31,17 +31,17 @@ export const extractSourceFromDish = (dish: string): { dishName: string; source?
   }
   
   // Check if it's a URL source
-  if (sourceInfo.toLowerCase() === 'pdf' || sourceInfo.toLowerCase().includes('http')) {
+  if (sourceInfo.toLowerCase().includes('http')) {
     return {
       dishName: dishName.trim(),
       source: {
         type: 'url',
-        value: sourceInfo.toLowerCase() === 'pdf' ? 'PDF Document' : sourceInfo
+        value: sourceInfo
       }
     };
   }
   
-  // If it's something else in parentheses, just treat it as a book
+  // If it's PDF or something else in parentheses, treat it as a book
   return {
     dishName: dishName.trim(),
     source: {

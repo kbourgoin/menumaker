@@ -12,7 +12,7 @@ import {
 
 interface SourceFormData {
   name: string;
-  type: 'book' | 'website' | 'document';
+  type: 'book' | 'website';
   description: string;
 }
 
@@ -55,7 +55,6 @@ const SourceFormFields: React.FC<SourceFormFieldsProps> = ({
           <SelectContent>
             <SelectItem value="book">Book</SelectItem>
             <SelectItem value="website">Website</SelectItem>
-            <SelectItem value="document">Document</SelectItem>
           </SelectContent>
         </Select>
       </div>
