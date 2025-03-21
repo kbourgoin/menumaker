@@ -67,6 +67,8 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         
         if (onSuccess) {
           onSuccess(existingDish);
+        } else {
+          navigate("/all-meals");
         }
       } else {
         const newDish = await addDish({
@@ -83,11 +85,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         
         if (onSuccess && newDish) {
           onSuccess(newDish);
+        } else {
+          navigate("/all-meals");
         }
-      }
-      
-      if (!onSuccess) {
-        navigate("/all-meals");
       }
     } catch (error) {
       console.error("Error saving dish:", error);
