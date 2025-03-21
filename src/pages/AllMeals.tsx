@@ -23,7 +23,7 @@ const AllDishes = () => {
   const { dishes, isLoading } = useMeals();
   const { sources: sourcesData, isLoadingSources } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("name");
+  const [sortOption, setSortOption] = useState("lastCooked");
   const [sourceFilter, setSourceFilter] = useState("all-sources");
   
   const sources = Array.isArray(sourcesData) ? sourcesData : [];
@@ -128,7 +128,7 @@ const AllDishes = () => {
             <Select value={sortOption} onValueChange={setSortOption}>
               <SelectTrigger>
                 <SortAsc className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by name" />
+                <SelectValue placeholder="Sort by last cooked" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="name">Name (A-Z)</SelectItem>
@@ -203,3 +203,4 @@ const AllDishes = () => {
 };
 
 export default AllDishes;
+
