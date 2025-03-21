@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,6 +15,13 @@ interface CuisineSelectorProps {
 const CuisineSelector = ({ form }: CuisineSelectorProps) => {
   const { cuisines, isLoading } = useUserCuisines();
   const [open, setOpen] = useState(false);
+
+  // Sort cuisines alphabetically, but keep "Other" at the end
+  const sortedCuisines = [...cuisines].sort((a, b) => {
+    if (a === "Other") return 1;
+    if (b === "Other") return -1;
+    return a.localeCompare(b);
+  });
 
   return (
     <FormField
@@ -46,7 +52,7 @@ const CuisineSelector = ({ form }: CuisineSelectorProps) => {
                     {isLoading ? (
                       <CommandItem disabled>Loading cuisines...</CommandItem>
                     ) : (
-                      cuisines.map((cuisine) => (
+                      sortedCuisines.map((cuisine) => (
                         <CommandItem
                           key={cuisine}
                           value={cuisine}
