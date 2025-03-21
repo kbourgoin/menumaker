@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Check, ChevronsUpDown, Book, Globe } from "lucide-react";
 import { Source } from "@/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface SourceSelectorProps {
   form: UseFormReturn<FormValues>;
@@ -15,6 +15,8 @@ interface SourceSelectorProps {
 }
 
 const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
+  const [open, setOpen] = useState(false);
+  
   const getSourceIcon = (type: string) => {
     switch (type) {
       case 'book':
@@ -42,7 +44,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Recipe Source</FormLabel>
-            <Popover>
+            <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
@@ -73,6 +75,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                         onSelect={() => {
                           form.setValue("sourceId", "");
                           form.setValue("location", "");
+                          setOpen(false);
                         }}
                       >
                         <Check
@@ -88,6 +91,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                           value={source.id}
                           onSelect={() => {
                             form.setValue("sourceId", source.id);
+                            setOpen(false);
                           }}
                         >
                           <Check
