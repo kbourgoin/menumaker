@@ -18,6 +18,8 @@ import LinkedDishesSection from "./LinkedDishesSection";
 import SourceFormFields from "./SourceFormFields";
 import { useSourceEdit, SourceFormData } from "@/hooks/source";
 import { useToast } from "@/hooks/use-toast";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface EditSourceDialogProps {
   source: Source | null;
@@ -31,6 +33,9 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
     type: "book" as 'book' | 'website',
     description: "",
   });
+  
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
   
   const { session } = useAuth();
   const { getDishesBySource, findSourceByName } = useSources();
@@ -53,6 +58,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
         type: source.type,
         description: source.description || "",
       });
+      setShowWarning(false); // Reset warning when dialog opens
     }
   }, [source]);
 
@@ -69,6 +75,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       ...prev,
       [name]: value,
     }));
+    setShowWarning(false); // Clear warning when user makes changes
   };
 
   const handleTypeChange = (value: string) => {
@@ -76,6 +83,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       ...prev,
       type: value as 'book' | 'website',
     }));
+    setShowWarning(false); // Clear warning when user makes changes
   };
 
   const handleFormSubmit = async () => {
@@ -98,11 +106,9 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       if (existingSource) {
         // If source exists with same name but different type, just warn the user
         if (existingSource.type !== formData.type) {
-          toast({
-            title: "Warning",
-            description: `A source with the name "${formData.name}" but different type already exists. Both will be kept as separate sources.`,
-            variant: "warning",
-          });
+          setWarningMessage(`A source with the name "${formData.name}" but different type already exists. Both will be kept as separate sources.`);
+          setShowWarning(true);
+          return;
         }
       }
     }
@@ -122,6 +128,16 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {showWarning && (
+              <Alert className="bg-amber-50 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+                <AlertTitle className="text-amber-800">Warning</AlertTitle>
+                <AlertDescription className="text-amber-700">
+                  {warningMessage}
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <SourceFormFields 
               formData={formData}
               handleInputChange={handleInputChange}
@@ -141,6 +157,18 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
             >
               {updateSourceMutation.isPending ? "Updating..." : "Update"}
             </Button>
+            {showWarning && (
+              <Button 
+                variant="default" 
+                className="bg-amber-500 hover:bg-amber-600"
+                onClick={() => {
+                  setShowWarning(false);
+                  handleSubmit(formData);
+                }}
+              >
+                Continue Anyway
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
