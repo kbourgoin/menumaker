@@ -134,20 +134,13 @@ const MealDetail = () => {
             <Card className="p-6">
               <DishForm 
                 existingDish={dish} 
-                onSuccess={async () => {
+                onSuccess={() => {
                   toast({
                     title: "Dish updated",
                     description: "The dish has been updated successfully.",
                   });
-                  // Refresh data
-                  if (id) {
-                    try {
-                      const updatedDish = await getDish(id);
-                      setDish(updatedDish);
-                    } catch (error) {
-                      console.error("Error refreshing dish data:", error);
-                    }
-                  }
+                  // Navigate directly rather than refreshing
+                  navigate("/all-meals");
                 }} 
               />
             </Card>

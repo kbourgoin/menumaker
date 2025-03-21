@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -60,14 +61,14 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           location: data.location,
         });
         
-        toast({
-          title: "Dish updated",
-          description: `${data.name} has been updated successfully.`,
-        });
-        
         if (onSuccess) {
           onSuccess(existingDish);
         } else {
+          // If no onSuccess handler, toast and navigate directly
+          toast({
+            title: "Dish updated",
+            description: `${data.name} has been updated successfully.`,
+          });
           navigate("/all-meals");
         }
       } else {
@@ -78,14 +79,14 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           location: data.location,
         });
         
-        toast({
-          title: "Dish added",
-          description: `${data.name} has been added to your dishes.`,
-        });
-        
         if (onSuccess && newDish) {
           onSuccess(newDish);
         } else {
+          // If no onSuccess handler, toast and navigate directly
+          toast({
+            title: "Dish added",
+            description: `${data.name} has been added to your dishes.`,
+          });
           navigate("/all-meals");
         }
       }
