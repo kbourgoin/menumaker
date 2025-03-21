@@ -17,6 +17,7 @@ import MergeSourceDialog from "./MergeSourceDialog";
 import LinkedDishesSection from "./LinkedDishesSection";
 import SourceFormFields from "./SourceFormFields";
 import { useSourceEdit, SourceFormData } from "@/hooks/source";
+import { useToast } from "@/hooks/use-toast";
 
 interface EditSourceDialogProps {
   source: Source | null;
@@ -32,7 +33,8 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
   });
   
   const { session } = useAuth();
-  const { getDishesBySource } = useSources();
+  const { getDishesBySource, findSourceByName } = useSources();
+  const { toast } = useToast();
   
   const {
     duplicateSource,
@@ -76,6 +78,39 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
     }));
   };
 
+  const handleFormSubmit = async () => {
+    if (!source) return;
+    
+    if (!formData.name.trim()) {
+      toast({
+        title: "Name is required",
+        description: "Please enter a source name.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // First check if name has changed
+    if (formData.name.trim() !== source.name) {
+      // Check for existing sources with the same name
+      const existingSource = await findSourceByName(formData.name.trim(), source.id);
+      
+      if (existingSource) {
+        // If source exists with same name but different type, just warn the user
+        if (existingSource.type !== formData.type) {
+          toast({
+            title: "Warning",
+            description: `A source with the name "${formData.name}" but different type already exists. Both will be kept as separate sources.`,
+            variant: "warning",
+          });
+        }
+      }
+    }
+    
+    // Continue with normal submit process which will handle merge if needed
+    handleSubmit(formData);
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -101,7 +136,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
               Cancel
             </Button>
             <Button 
-              onClick={() => handleSubmit(formData)}
+              onClick={handleFormSubmit}
               disabled={updateSourceMutation.isPending}
             >
               {updateSourceMutation.isPending ? "Updating..." : "Update"}

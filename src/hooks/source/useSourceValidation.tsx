@@ -22,7 +22,8 @@ export function useSourceValidation() {
     if (formData.name.trim() !== currentSource.name) {
       const existingSource = await findSourceByName(formData.name.trim(), currentSource.id);
       
-      if (existingSource) {
+      if (existingSource && existingSource.type === formData.type) {
+        // Only suggest merge if both name AND type match
         // Get the number of dishes affected by the merge
         const dishes = await getDishesBySource(currentSource.id);
         onDuplicateFound(existingSource, dishes.length);

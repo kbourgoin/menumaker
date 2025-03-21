@@ -62,7 +62,7 @@ const MergeSourceDialog = ({
             Merge Sources
           </DialogTitle>
           <DialogDescription>
-            A source with the name <strong>"{duplicateSource.name}"</strong> already exists.
+            A source with the same name and type already exists.
             Would you like to merge these sources?
           </DialogDescription>
         </DialogHeader>
