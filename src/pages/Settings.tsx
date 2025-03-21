@@ -7,7 +7,8 @@ import { DataManagement } from "@/components/data/DataManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Settings as SettingsIcon, BookOpen, UserCog } from "lucide-react";
+import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed } from "lucide-react";
+import CuisineSettings from "@/components/settings/CuisineSettings";
 
 const Settings = () => {
   return (
@@ -22,7 +23,7 @@ const Settings = () => {
           <TabsList>
             <TabsTrigger value="data">Data Management</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="preferences" disabled>Preferences</TabsTrigger>
+            <TabsTrigger value="preferences">Preferences</TabsTrigger>
           </TabsList>
           
           <TabsContent value="data" className="mt-6">
@@ -66,14 +67,28 @@ const Settings = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="preferences">
+          <TabsContent value="preferences" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Preferences</CardTitle>
                 <CardDescription>
-                  Customize your app experience (coming soon)
+                  Customize your app experience
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                      <UtensilsCrossed className="h-5 w-5 text-terracotta-500" />
+                      Cuisine Settings
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Manage the cuisines available for your dishes
+                    </p>
+                    <CuisineSettings />
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
