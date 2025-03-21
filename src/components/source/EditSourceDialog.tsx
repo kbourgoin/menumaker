@@ -27,7 +27,7 @@ interface EditSourceDialogProps {
 const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProps) => {
   const [formData, setFormData] = useState<SourceFormData>({
     name: "",
-    type: "book" as 'book' | 'website' | 'document',
+    type: "book" as 'book' | 'website',
     description: "",
   });
   
@@ -72,7 +72,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
   const handleTypeChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      type: value as 'book' | 'website' | 'document',
+      type: value as 'book' | 'website',
     }));
   };
 

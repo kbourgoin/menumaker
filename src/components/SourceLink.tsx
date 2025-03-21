@@ -1,5 +1,5 @@
 
-import { Link, Globe, Book, FileText, ExternalLink } from "lucide-react";
+import { Link, Globe, Book, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { useSources } from "@/hooks/sources";
@@ -83,16 +83,13 @@ const SourceLink = ({ sourceId, location, className = "" }: SourceLinkProps) => 
           <span className={`inline-flex items-center text-sm text-terracotta-500 ${className}`}>
             {source.type === 'book' && <Book className="w-4 h-4 mr-1.5" />}
             {source.type === 'website' && <Globe className="w-4 h-4 mr-1.5" />}
-            {source.type === 'document' && <FileText className="w-4 h-4 mr-1.5" />}
             <span className="truncate max-w-[200px]">
               {source.name}
             </span>
           </span>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{source.type === 'book' ? "Book reference" : 
-             source.type === 'website' ? "Website reference" : 
-             "Document reference"}</p>
+          <p>{source.type === 'book' ? "Book reference" : "Website reference"}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

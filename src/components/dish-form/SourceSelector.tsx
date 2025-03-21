@@ -5,7 +5,7 @@ import { FormValues } from "./FormSchema";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Check, ChevronsUpDown, Book, Globe, FileText } from "lucide-react";
+import { Check, ChevronsUpDown, Book, Globe } from "lucide-react";
 import { Source } from "@/types";
 
 interface SourceSelectorProps {
@@ -20,8 +20,6 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
         return <Book className="h-4 w-4 mr-2" />;
       case 'website':
         return <Globe className="h-4 w-4 mr-2" />;
-      case 'document':
-        return <FileText className="h-4 w-4 mr-2" />;
       default:
         return null;
     }
