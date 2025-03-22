@@ -134,7 +134,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
             <TableRow key={dish.id}>
               <TableCell>
                 <Link 
-                  to={`/edit-meal/${dish.id}`} 
+                  to={`/meal/${dish.id}`} 
                   className="text-primary hover:underline font-medium"
                 >
                   {dish.name}
