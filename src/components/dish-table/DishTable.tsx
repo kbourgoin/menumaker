@@ -27,7 +27,6 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
   const columnToSortMap: Record<Column, string> = {
     name: "name",
     source: "source",
-    location: "location",
     cuisine: "cuisine",
     timesCooked: "timesCooked",
     lastMade: "lastCooked",
@@ -104,15 +103,6 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
             </TableColumnHeader>
             
             <TableColumnHeader 
-              column="location" 
-              currentSort={currentSortColumn}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-            >
-              Location
-            </TableColumnHeader>
-            
-            <TableColumnHeader 
               column="cuisine" 
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
@@ -162,16 +152,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
                 </Link>
               </TableCell>
               <TableCell>
-                {dish.sourceId && (
-                  <SourceInfo sourceId={dish.sourceId} />
-                )}
-              </TableCell>
-              <TableCell>
-                {dish.location && (
-                  <span className="text-sm text-muted-foreground">
-                    {dish.location}
-                  </span>
-                )}
+                <SourceInfo sourceId={dish.sourceId} location={dish.location} />
               </TableCell>
               <TableCell>{dish.cuisines.join(", ")}</TableCell>
               <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
