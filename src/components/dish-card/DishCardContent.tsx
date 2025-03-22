@@ -36,7 +36,7 @@ const DishCardContent = ({
         
         {lastComment && (
           <div className="mt-2">
-            <p className="text-sm text-muted-foreground italic truncate">
+            <p className="text-sm text-muted-foreground italic break-words">
               "{lastComment}"
             </p>
           </div>

@@ -144,6 +144,7 @@ export type Database = {
           createdat: string | null
           cuisines: string[] | null
           id: string | null
+          last_comment: string | null
           last_made: string | null
           location: string | null
           name: string | null
