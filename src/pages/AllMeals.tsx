@@ -4,8 +4,10 @@ import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
 import { useSources } from "@/hooks/sources";
 import DishCard from "@/components/dish-card";
+import DishTable from "@/components/dish-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { 
   Select, 
   SelectContent, 
@@ -13,7 +15,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Plus, Search, SortAsc } from "lucide-react";
+import { Plus, Search, SortAsc, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { sortDishes } from "@/utils/dishUtils";
@@ -25,6 +27,7 @@ const AllDishes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("lastCooked");
   const [sourceFilter, setSourceFilter] = useState("all-sources");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   
   const sources = Array.isArray(sourcesData) ? sourcesData : [];
   
@@ -157,40 +160,65 @@ const AllDishes = () => {
           </div>
         </div>
         
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {isLoading ? (
-            <LoadingSkeletons />
-          ) : (
-            <>
-              {dishes && Array.isArray(dishes) && dishes.length > 0 ? (
-                filteredDishes.length > 0 ? (
-                  filteredDishes.map((dish: Dish) => (
-                    <DishCard 
-                      key={dish.id} 
-                      dish={dish} 
-                    />
-                  ))
-                ) : (
-                  <div className="col-span-full text-center p-8 border rounded-lg">
-                    <p className="text-muted-foreground">No dishes match your filters.</p>
+        <div className="flex justify-end mb-4">
+          <div className="bg-muted rounded-md p-1">
+            <Toggle
+              pressed={viewMode === "cards"}
+              onPressedChange={() => setViewMode("cards")}
+              aria-label="Switch to cards view"
+              className="data-[state=on]:bg-white data-[state=on]:text-foreground"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Toggle>
+            <Toggle
+              pressed={viewMode === "table"}
+              onPressedChange={() => setViewMode("table")}
+              aria-label="Switch to table view"
+              className="data-[state=on]:bg-white data-[state=on]:text-foreground"
+            >
+              <TableIcon className="h-4 w-4" />
+            </Toggle>
+          </div>
+        </div>
+        
+        {isLoading ? (
+          <LoadingSkeletons />
+        ) : (
+          <>
+            {dishes && Array.isArray(dishes) && dishes.length > 0 ? (
+              filteredDishes.length > 0 ? (
+                viewMode === "cards" ? (
+                  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {filteredDishes.map((dish: Dish) => (
+                      <DishCard 
+                        key={dish.id} 
+                        dish={dish} 
+                      />
+                    ))}
                   </div>
+                ) : (
+                  <DishTable dishes={filteredDishes} />
                 )
               ) : (
                 <div className="col-span-full text-center p-8 border rounded-lg">
-                  <p className="text-muted-foreground mb-4">
-                    No dishes found. Add your first dish to get started.
-                  </p>
-                  <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
-                    <Link to="/add-meal">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Your First Dish
-                    </Link>
-                  </Button>
+                  <p className="text-muted-foreground">No dishes match your filters.</p>
                 </div>
-              )}
-            </>
-          )}
-        </div>
+              )
+            ) : (
+              <div className="col-span-full text-center p-8 border rounded-lg">
+                <p className="text-muted-foreground mb-4">
+                  No dishes found. Add your first dish to get started.
+                </p>
+                <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
+                  <Link to="/add-meal">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Your First Dish
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </>
+        )}
         
         {dishes && dishes.length > 0 && (
           <div className="mt-6 text-sm text-muted-foreground">
@@ -203,4 +231,3 @@ const AllDishes = () => {
 };
 
 export default AllDishes;
-
