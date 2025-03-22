@@ -12,6 +12,7 @@ import { formatDate } from "@/lib/utils";
 import TableColumnHeader from "./TableColumnHeader";
 import { Column, SortDirection } from "./types";
 import { useState, useEffect } from "react";
+import SourceInfo from "../dish-card/SourceInfo";
 
 interface DishTableProps {
   dishes: Dish[];
@@ -25,6 +26,8 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
   // Map between column identifiers and sort options
   const columnToSortMap: Record<Column, string> = {
     name: "name",
+    source: "source",
+    location: "location",
     cuisine: "cuisine",
     timesCooked: "timesCooked",
     lastMade: "lastCooked",
@@ -92,6 +95,24 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
             </TableColumnHeader>
             
             <TableColumnHeader 
+              column="source" 
+              currentSort={currentSortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Source
+            </TableColumnHeader>
+            
+            <TableColumnHeader 
+              column="location" 
+              currentSort={currentSortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Location
+            </TableColumnHeader>
+            
+            <TableColumnHeader 
               column="cuisine" 
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
@@ -139,6 +160,18 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
                 >
                   {dish.name}
                 </Link>
+              </TableCell>
+              <TableCell>
+                {dish.sourceId && (
+                  <SourceInfo sourceId={dish.sourceId} />
+                )}
+              </TableCell>
+              <TableCell>
+                {dish.location && (
+                  <span className="text-sm text-muted-foreground">
+                    {dish.location}
+                  </span>
+                )}
               </TableCell>
               <TableCell>{dish.cuisines.join(", ")}</TableCell>
               <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
