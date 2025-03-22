@@ -8,6 +8,7 @@ interface SearchAndFilterBarProps {
   setSearchQuery: (query: string) => void;
   sortOption: string;
   setSortOption: (option: string) => void;
+  viewMode?: "cards" | "table";
 }
 
 const SearchAndFilterBar = ({
@@ -15,6 +16,7 @@ const SearchAndFilterBar = ({
   setSearchQuery,
   sortOption,
   setSortOption,
+  viewMode = "cards",
 }: SearchAndFilterBarProps) => {
   return (
     <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -28,12 +30,14 @@ const SearchAndFilterBar = ({
         />
       </div>
       
-      <div className="sm:col-span-1">
-        <SortSelect 
-          sortOption={sortOption} 
-          setSortOption={setSortOption} 
-        />
-      </div>
+      {viewMode === "cards" && (
+        <div className="sm:col-span-1">
+          <SortSelect 
+            sortOption={sortOption} 
+            setSortOption={setSortOption} 
+          />
+        </div>
+      )}
     </div>
   );
 };

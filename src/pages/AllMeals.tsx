@@ -54,6 +54,7 @@ const AllDishes = () => {
           setSearchQuery={setSearchQuery}
           sortOption={sortOption}
           setSortOption={setSortOption}
+          viewMode={viewMode}
         />
         
         <ViewToggle 
