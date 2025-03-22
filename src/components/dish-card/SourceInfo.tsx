@@ -23,9 +23,9 @@ const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
   const isLocationUrl = location ? isUrl(location) : false;
   
   return (
-    <div className="flex items-center gap-1 break-words">
+    <div className="mt-2 flex items-center gap-1">
       {sourceId && <SourceLink sourceId={sourceId} location={location} />}
-      {sourceId && location && !isLocationUrl && <span className="text-terracotta-500 break-all">&nbsp;p.&nbsp;{location}</span>}
+      {sourceId && location && !isLocationUrl && <span className="text-terracotta-500">&nbsp;p.&nbsp;{location}</span>}
       {!sourceId && location && !isLocationUrl && <LocationDisplay location={location} inline={true} />}
     </div>
   );
