@@ -89,6 +89,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              className="w-1/4"
             >
               Name
             </TableColumnHeader>
@@ -98,6 +99,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              className="w-1/5"
             >
               Source
             </TableColumnHeader>
@@ -135,6 +137,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              className="w-1/4"
             >
               Latest Comment
             </TableColumnHeader>
@@ -151,7 +154,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
                   {dish.name}
                 </Link>
               </TableCell>
-              <TableCell>
+              <TableCell className="max-w-[200px] break-words">
                 <SourceInfo sourceId={dish.sourceId} location={dish.location} />
               </TableCell>
               <TableCell>{dish.cuisines.join(", ")}</TableCell>
