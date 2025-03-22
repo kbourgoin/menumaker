@@ -18,4 +18,5 @@ export type DishSummary = {
   user_id: string;
   times_cooked: number;
   last_made?: string;
+  last_comment?: string;
 };

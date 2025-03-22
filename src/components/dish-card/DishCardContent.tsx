@@ -11,6 +11,7 @@ interface DishCardContentProps {
   sourceId?: string;
   location?: string;
   compact?: boolean;
+  lastComment?: string;
 }
 
 const DishCardContent = ({ 
@@ -19,7 +20,8 @@ const DishCardContent = ({
   timesCooked, 
   sourceId, 
   location, 
-  compact = false 
+  compact = false,
+  lastComment
 }: DishCardContentProps) => {
   return (
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
@@ -31,6 +33,14 @@ const DishCardContent = ({
           timesCooked={timesCooked || 0} 
           compact={compact} 
         />
+        
+        {lastComment && (
+          <div className="mt-2">
+            <p className="text-sm text-muted-foreground italic truncate">
+              "{lastComment}"
+            </p>
+          </div>
+        )}
         
         <SourceInfo sourceId={sourceId} location={location} />
       </div>

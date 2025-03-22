@@ -8,18 +8,25 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: any[]): Dish => {
   // Default values for derived fields
   let timesCooked = 0;
   let lastMade: string | undefined = undefined;
+  let lastComment: string | undefined = undefined;
   
   // If meal history is provided, use it to calculate timesCooked and lastMade
   if (mealHistory && mealHistory.length > 0) {
     timesCooked = mealHistory.length;
     
     // Find the most recent meal date
-    const sortedDates = [...mealHistory].sort((a, b) => 
+    const sortedHistory = [...mealHistory].sort((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     
-    if (sortedDates.length > 0) {
-      lastMade = sortedDates[0].date;
+    if (sortedHistory.length > 0) {
+      lastMade = sortedHistory[0].date;
+      
+      // Find the most recent non-empty comment
+      const historyWithComments = sortedHistory.filter(entry => entry.notes && entry.notes.trim() !== '');
+      if (historyWithComments.length > 0) {
+        lastComment = historyWithComments[0].notes;
+      }
     }
   }
   
@@ -32,6 +39,7 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: any[]): Dish => {
     location: dish.location,
     lastMade,  // Derived value
     timesCooked, // Derived value
+    lastComment, // Derived value from most recent note
     user_id: dish.user_id
   };
 };
@@ -47,6 +55,7 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
     location: summary.location,
     lastMade: summary.last_made,
     timesCooked: summary.times_cooked || 0,
+    lastComment: summary.last_comment,
     user_id: summary.user_id
   };
 };

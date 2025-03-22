@@ -9,6 +9,7 @@ export interface Dish {
   timesCooked: number;
   user_id: string;
   location?: string;
+  lastComment?: string;
 }
 
 export interface MealHistory {
