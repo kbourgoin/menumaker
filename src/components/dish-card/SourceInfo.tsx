@@ -5,10 +5,19 @@ import { cn } from "@/lib/utils";
 
 interface SourceInfoProps {
   sourceId?: string;
+  sourceName?: string;  // New prop to receive source name directly
+  sourceType?: string;  // New prop to receive source type directly
+  sourceUrl?: string;   // New prop to receive source URL directly
   location?: string;
 }
 
-const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
+const SourceInfo = ({ 
+  sourceId, 
+  sourceName,
+  sourceType,
+  sourceUrl,
+  location 
+}: SourceInfoProps) => {
   // If there's no sourceId and no location, don't render anything
   if (!sourceId && !location) {
     return null;
@@ -24,7 +33,15 @@ const SourceInfo = ({ sourceId, location }: SourceInfoProps) => {
   
   return (
     <div className="mt-2 flex items-center gap-1">
-      {sourceId && <SourceLink sourceId={sourceId} location={location} />}
+      {sourceId && (
+        <SourceLink 
+          sourceId={sourceId} 
+          sourceName={sourceName}
+          sourceType={sourceType}
+          sourceUrl={sourceUrl}
+          location={location} 
+        />
+      )}
       {sourceId && location && !isLocationUrl && <span className="text-terracotta-500">&nbsp;p.&nbsp;{location}</span>}
       {!sourceId && location && !isLocationUrl && <LocationDisplay location={location} inline={true} />}
     </div>

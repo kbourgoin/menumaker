@@ -13,6 +13,7 @@ import TableColumnHeader from "./TableColumnHeader";
 import { Column, SortDirection } from "./types";
 import { useState, useEffect } from "react";
 import SourceInfo from "../dish-card/SourceInfo";
+import { useSources } from "@/hooks/sources";
 
 interface DishTableProps {
   dishes: Dish[];
@@ -22,6 +23,18 @@ interface DishTableProps {
 
 const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const { sources } = useSources();
+  
+  // Create a lookup map for source info to avoid individual requests
+  const sourceInfoMap = sources && Array.isArray(sources) ? 
+    sources.reduce((map, source) => {
+      map[source.id] = {
+        name: source.name,
+        type: source.type,
+        url: source.url
+      };
+      return map;
+    }, {} as Record<string, { name: string, type: string, url?: string }>) : {};
   
   // Map between column identifiers and sort options
   const columnToSortMap: Record<Column, string> = {
@@ -144,35 +157,47 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dishes.map((dish) => (
-            <TableRow key={dish.id}>
-              <TableCell>
-                <Link 
-                  to={`/meal/${dish.id}`} 
-                  className="text-primary hover:underline font-medium"
-                >
-                  {dish.name}
-                </Link>
-              </TableCell>
-              <TableCell className="max-w-[200px] break-words">
-                <SourceInfo sourceId={dish.sourceId} location={dish.location} />
-              </TableCell>
-              <TableCell>{dish.cuisines.join(", ")}</TableCell>
-              <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
-              <TableCell>
-                {dish.lastMade 
-                  ? formatDate(new Date(dish.lastMade)) 
-                  : "Never"}
-              </TableCell>
-              <TableCell className="max-w-md">
-                {dish.lastComment && (
-                  <p className="text-sm text-muted-foreground italic break-words">
-                    "{dish.lastComment}"
-                  </p>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
+          {dishes.map((dish) => {
+            // Get source info from our lookup map if available
+            const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
+            
+            return (
+              <TableRow key={dish.id}>
+                <TableCell>
+                  <Link 
+                    to={`/meal/${dish.id}`} 
+                    className="text-primary hover:underline font-medium"
+                  >
+                    {dish.name}
+                  </Link>
+                </TableCell>
+                <TableCell className="max-w-[200px] break-words">
+                  <SourceInfo 
+                    sourceId={dish.sourceId} 
+                    // Pass source info directly when available
+                    sourceName={sourceInfo?.name}
+                    sourceType={sourceInfo?.type}
+                    sourceUrl={sourceInfo?.url}
+                    location={dish.location} 
+                  />
+                </TableCell>
+                <TableCell>{dish.cuisines.join(", ")}</TableCell>
+                <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
+                <TableCell>
+                  {dish.lastMade 
+                    ? formatDate(new Date(dish.lastMade)) 
+                    : "Never"}
+                </TableCell>
+                <TableCell className="max-w-md">
+                  {dish.lastComment && (
+                    <p className="text-sm text-muted-foreground italic break-words">
+                      "{dish.lastComment}"
+                    </p>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

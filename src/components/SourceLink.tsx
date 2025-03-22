@@ -1,4 +1,3 @@
-
 import { Link, Globe, Book, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
@@ -6,16 +5,35 @@ import { useSources } from "@/hooks/sources";
 
 interface SourceLinkProps {
   sourceId?: string;
+  sourceName?: string;
+  sourceType?: string;
+  sourceUrl?: string;
   location?: string;
   className?: string;
 }
 
-const SourceLink = ({ sourceId, location, className = "" }: SourceLinkProps) => {
+const SourceLink = ({ 
+  sourceId, 
+  sourceName,
+  sourceType,
+  sourceUrl,
+  location, 
+  className = "" 
+}: SourceLinkProps) => {
   const [source, setSource] = useState<{name: string, type: string, url?: string} | null>(null);
   const { getSource } = useSources();
   
   useEffect(() => {
-    if (sourceId) {
+    if (sourceName && sourceType) {
+      setSource({
+        name: sourceName,
+        type: sourceType,
+        url: sourceUrl
+      });
+      return;
+    }
+
+    if (sourceId && !source) {
       const fetchSource = async () => {
         try {
           const sourceData = await getSource(sourceId);
@@ -33,7 +51,7 @@ const SourceLink = ({ sourceId, location, className = "" }: SourceLinkProps) => 
       
       fetchSource();
     }
-  }, [sourceId, getSource]);
+  }, [sourceId, getSource, sourceName, sourceType, sourceUrl, source]);
   
   if (!source) {
     return null;
