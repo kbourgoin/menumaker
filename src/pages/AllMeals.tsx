@@ -102,6 +102,8 @@ const AllDishes = () => {
             filteredDishes={filteredDishes}
             viewMode={viewMode}
             isLoading={isLoading}
+            sortOption={sortOption}
+            setSortOption={setSortOption}
           />
         )}
         

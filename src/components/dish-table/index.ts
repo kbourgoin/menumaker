@@ -1,2 +1,4 @@
 
-export { default } from "./DishTable";
+import DishTable from './DishTable';
+
+export default DishTable;

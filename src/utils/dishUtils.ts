@@ -27,22 +27,54 @@ export const getTimesCooked = (dish: Dish): number => {
 };
 
 export const sortDishes = (dishes: Dish[], sortBy: string): Dish[] => {
+  // Check if we need to sort in ascending order
+  const isAscending = sortBy.startsWith('asc_');
+  // Remove the asc_ prefix if present
+  const actualSortBy = isAscending ? sortBy.substring(4) : sortBy;
+  
   return [...dishes].sort((a, b) => {
-    switch (sortBy) {
+    let result = 0;
+    
+    switch (actualSortBy) {
       case 'name':
-        return a.name.localeCompare(b.name);
+        result = a.name.localeCompare(b.name);
+        break;
       case 'lastCooked':
         if (!a.lastMade && !b.lastMade) return 0;
         if (!a.lastMade) return 1;
         if (!b.lastMade) return -1;
-        return new Date(b.lastMade).getTime() - new Date(a.lastMade).getTime();
+        result = new Date(b.lastMade).getTime() - new Date(a.lastMade).getTime();
+        break;
       case 'timesCooked':
-        return (b.timesCooked || 0) - (a.timesCooked || 0);
+        result = (b.timesCooked || 0) - (a.timesCooked || 0);
+        break;
       case 'cuisine':
-        return a.cuisines[0]?.localeCompare(b.cuisines[0] || '') || 0;
+        result = a.cuisines[0]?.localeCompare(b.cuisines[0] || '') || 0;
+        break;
+      case 'lastComment':
+        // Sort by presence of comment, then by most recent comment
+        if (a.lastComment && !b.lastComment) result = -1;
+        else if (!a.lastComment && b.lastComment) result = 1;
+        else if (a.lastComment && b.lastComment) {
+          // If both have comments but no lastMade dates, sort alphabetically
+          if (!a.lastMade && !b.lastMade) {
+            result = a.lastComment.localeCompare(b.lastComment);
+          } 
+          // If both have comments and lastMade dates, sort by most recent
+          else if (a.lastMade && b.lastMade) {
+            result = new Date(b.lastMade).getTime() - new Date(a.lastMade).getTime();
+          }
+          // If only one has a lastMade date, prioritize that one
+          else if (a.lastMade && !b.lastMade) result = -1;
+          else if (!a.lastMade && b.lastMade) result = 1;
+        }
+        break;
       default:
         return 0;
     }
+    
+    // Invert the result if sorting in ascending order
+    return isAscending ? -result : result;
   });
 };
 

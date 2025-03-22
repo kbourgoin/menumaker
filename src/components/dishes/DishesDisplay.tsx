@@ -1,7 +1,7 @@
 
 import { Dish } from "@/types";
 import DishCard from "@/components/dish-card";
-import DishTable from "@/components/dish-table";
+import DishTable from "@/components/dish-table/DishTable";
 import DishesEmptyState from "./DishesEmptyState";
 
 interface DishesDisplayProps {
@@ -9,13 +9,17 @@ interface DishesDisplayProps {
   filteredDishes: Dish[];
   viewMode: "cards" | "table";
   isLoading: boolean;
+  sortOption: string;
+  setSortOption: (option: string) => void;
 }
 
 const DishesDisplay = ({ 
   dishes, 
   filteredDishes, 
   viewMode,
-  isLoading
+  isLoading,
+  sortOption,
+  setSortOption
 }: DishesDisplayProps) => {
   if (isLoading) {
     return null;
@@ -41,7 +45,11 @@ const DishesDisplay = ({
           ))}
         </div>
       ) : (
-        <DishTable dishes={filteredDishes} />
+        <DishTable 
+          dishes={filteredDishes} 
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+        />
       )}
     </>
   );
