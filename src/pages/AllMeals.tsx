@@ -3,23 +3,14 @@ import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
 import { useSources } from "@/hooks/sources";
-import DishCard from "@/components/dish-card";
-import DishTable from "@/components/dish-table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Plus, Search, SortAsc, LayoutGrid, Table as TableIcon } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
 import { sortDishes } from "@/utils/dishUtils";
-import { Source, Dish } from "@/types";
+import {
+  SearchAndFilterBar,
+  ViewToggle,
+  DishesLoading,
+  DishesHeader,
+  DishesDisplay
+} from "@/components/dishes";
 
 const AllDishes = () => {
   const { dishes, isLoading } = useMeals();
@@ -82,142 +73,36 @@ const AllDishes = () => {
     console.log("Dishes data available:", dishes ? dishes.length : 0);
   }, [isLoading, dishes]);
   
-  const LoadingSkeletons = () => (
-    <>
-      {Array(8).fill(0).map((_, index) => (
-        <div key={`skeleton-${index}`} className="rounded-lg border overflow-hidden">
-          <div className="p-6">
-            <Skeleton className="h-6 w-3/4 mb-4" />
-            <Skeleton className="h-4 w-1/4 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-2" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-          <div className="border-t p-4">
-            <div className="flex justify-between">
-              <Skeleton className="h-9 w-20" />
-              <Skeleton className="h-9 w-9 rounded-md" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-  
   return (
     <Layout>
       <div className="mb-8 animate-slide-down">
-        <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-          <h1 className="text-3xl font-serif font-medium">All Dishes</h1>
-          <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
-            <Link to="/add-meal">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Dish
-            </Link>
-          </Button>
-        </div>
+        <DishesHeader />
         
-        <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="relative col-span-full sm:col-span-1 lg:col-span-2">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by dish name or cuisine..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          
-          <div className="sm:col-span-1">
-            <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger>
-                <SortAsc className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by last cooked" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Name (A-Z)</SelectItem>
-                <SelectItem value="lastCooked">Last Cooked</SelectItem>
-                <SelectItem value="timesCooked">Times Cooked</SelectItem>
-                <SelectItem value="cuisine">Cuisine</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="sm:col-span-1">
-            <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Sources" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all-sources">All Sources</SelectItem>
-                <SelectItem value="none">No Source</SelectItem>
-                {!isLoadingSources && sources && sources.map((source: Source) => (
-                  <SelectItem key={source.id} value={source.id}>
-                    {source.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <SearchAndFilterBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+          sourceFilter={sourceFilter}
+          setSourceFilter={setSourceFilter}
+          sources={sources}
+          isLoadingSources={isLoadingSources}
+        />
         
-        <div className="flex justify-end mb-4">
-          <div className="bg-muted rounded-md p-1">
-            <Toggle
-              pressed={viewMode === "cards"}
-              onPressedChange={() => setViewMode("cards")}
-              aria-label="Switch to cards view"
-              className="data-[state=on]:bg-white data-[state=on]:text-foreground"
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Toggle>
-            <Toggle
-              pressed={viewMode === "table"}
-              onPressedChange={() => setViewMode("table")}
-              aria-label="Switch to table view"
-              className="data-[state=on]:bg-white data-[state=on]:text-foreground"
-            >
-              <TableIcon className="h-4 w-4" />
-            </Toggle>
-          </div>
-        </div>
+        <ViewToggle 
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
         
         {isLoading ? (
-          <LoadingSkeletons />
+          <DishesLoading />
         ) : (
-          <>
-            {dishes && Array.isArray(dishes) && dishes.length > 0 ? (
-              filteredDishes.length > 0 ? (
-                viewMode === "cards" ? (
-                  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredDishes.map((dish: Dish) => (
-                      <DishCard 
-                        key={dish.id} 
-                        dish={dish} 
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <DishTable dishes={filteredDishes} />
-                )
-              ) : (
-                <div className="col-span-full text-center p-8 border rounded-lg">
-                  <p className="text-muted-foreground">No dishes match your filters.</p>
-                </div>
-              )
-            ) : (
-              <div className="col-span-full text-center p-8 border rounded-lg">
-                <p className="text-muted-foreground mb-4">
-                  No dishes found. Add your first dish to get started.
-                </p>
-                <Button asChild className="bg-terracotta-500 hover:bg-terracotta-600">
-                  <Link to="/add-meal">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Your First Dish
-                  </Link>
-                </Button>
-              </div>
-            )}
-          </>
+          <DishesDisplay
+            dishes={dishes}
+            filteredDishes={filteredDishes}
+            viewMode={viewMode}
+            isLoading={isLoading}
+          />
         )}
         
         {dishes && dishes.length > 0 && (
