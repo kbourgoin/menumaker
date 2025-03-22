@@ -89,7 +89,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
-              className="w-1/4"
+              className="w-[25%]"
             >
               Name
             </TableColumnHeader>
@@ -99,7 +99,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
-              className="w-1/5"
+              className="w-[22%]"
             >
               Source
             </TableColumnHeader>
@@ -109,13 +109,14 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              className="w-[15%]"
             >
               Cuisine
             </TableColumnHeader>
             
             <TableColumnHeader 
               column="timesCooked" 
-              className="text-right"
+              className="text-right w-[10%]"
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
@@ -128,6 +129,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
+              className="w-[12%]"
             >
               Last Made
             </TableColumnHeader>
@@ -137,7 +139,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
               currentSort={currentSortColumn}
               sortDirection={sortDirection}
               onSort={handleSort}
-              className="w-1/4"
+              className="w-[16%]"
             >
               Latest Comment
             </TableColumnHeader>
@@ -146,27 +148,31 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
         <TableBody>
           {dishes.map((dish) => (
             <TableRow key={dish.id}>
-              <TableCell>
+              <TableCell className="max-w-[25%]">
                 <Link 
                   to={`/meal/${dish.id}`} 
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium truncate block"
                 >
                   {dish.name}
                 </Link>
               </TableCell>
-              <TableCell className="max-w-[200px] break-words">
-                <SourceInfo sourceId={dish.sourceId} location={dish.location} />
+              <TableCell className="max-w-[22%]">
+                <div className="break-words overflow-hidden">
+                  <SourceInfo sourceId={dish.sourceId} location={dish.location} />
+                </div>
               </TableCell>
-              <TableCell>{dish.cuisines.join(", ")}</TableCell>
-              <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
-              <TableCell>
+              <TableCell className="max-w-[15%] truncate">
+                {dish.cuisines.join(", ")}
+              </TableCell>
+              <TableCell className="text-right max-w-[10%]">{dish.timesCooked || 0}</TableCell>
+              <TableCell className="max-w-[12%]">
                 {dish.lastMade 
                   ? formatDate(new Date(dish.lastMade)) 
                   : "Never"}
               </TableCell>
-              <TableCell className="max-w-md">
+              <TableCell className="max-w-[16%]">
                 {dish.lastComment && (
-                  <p className="text-sm text-muted-foreground italic break-words">
+                  <p className="text-sm text-muted-foreground italic break-words line-clamp-2">
                     "{dish.lastComment}"
                   </p>
                 )}
