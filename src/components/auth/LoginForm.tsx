@@ -18,6 +18,7 @@ interface LoginFormProps {
     password: string;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onForgotPassword: () => void;
 }
 
 const LoginForm = ({ 
@@ -26,7 +27,8 @@ const LoginForm = ({
   showPassword, 
   setShowPassword, 
   formData, 
-  handleInputChange 
+  handleInputChange,
+  onForgotPassword
 }: LoginFormProps) => {
   
   const handleLogin = async (e: React.FormEvent) => {
@@ -72,7 +74,17 @@ const LoginForm = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Button 
+              type="button" 
+              variant="link" 
+              className="px-0 text-xs font-normal text-terracotta-600 hover:text-terracotta-700"
+              onClick={onForgotPassword}
+            >
+              Forgot password?
+            </Button>
+          </div>
           <div className="relative">
             <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input

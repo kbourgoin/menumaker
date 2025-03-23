@@ -1,16 +1,19 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthHeader, LoginForm, SignupForm } from "@/components/auth";
+import ForgotPassword from "@/components/auth/ForgotPassword";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -49,6 +52,15 @@ const Auth = () => {
     });
   };
 
+  // Check for password reset parameter in URL
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    if (query.get("reset") === "true") {
+      // User arrived from password reset email
+      toast.info("Please check your email to complete the password reset process.");
+    }
+  }, [location]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream-50 to-sage-50 p-4">
       <div className="w-full max-w-md">
@@ -56,41 +68,57 @@ const Auth = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
-              Sign in to your account or create a new one
-            </CardDescription>
+            {showForgotPassword ? (
+              <>
+                <CardTitle className="text-xl text-center">Reset Password</CardTitle>
+                <CardDescription className="text-center">
+                  We'll send you a link to reset your password
+                </CardDescription>
+              </>
+            ) : (
+              <>
+                <CardTitle className="text-xl text-center">Welcome Back</CardTitle>
+                <CardDescription className="text-center">
+                  Sign in to your account or create a new one
+                </CardDescription>
+              </>
+            )}
           </CardHeader>
           
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <LoginForm 
-                loading={loading}
-                setLoading={setLoading}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <SignupForm 
-                loading={loading}
-                setLoading={setLoading}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                formData={formData}
-                handleInputChange={handleInputChange}
-                setActiveTab={setActiveTab}
-              />
-            </TabsContent>
-          </Tabs>
+          {showForgotPassword ? (
+            <ForgotPassword onBack={() => setShowForgotPassword(false)} />
+          ) : (
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="login">
+                <LoginForm 
+                  loading={loading}
+                  setLoading={setLoading}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  onForgotPassword={() => setShowForgotPassword(true)}
+                />
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <SignupForm 
+                  loading={loading}
+                  setLoading={setLoading}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  setActiveTab={setActiveTab}
+                />
+              </TabsContent>
+            </Tabs>
+          )}
         </Card>
       </div>
     </div>
