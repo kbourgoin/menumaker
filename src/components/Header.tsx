@@ -35,7 +35,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Utensils className="w-8 h-8 text-terracotta-500" />
-            <h1 className="text-xl md:text-2xl font-serif tracking-tight">Family Meals</h1>
+            <h1 className="text-xl md:text-2xl font-serif tracking-tight">Menu Maker</h1>
           </Link>
           
           <nav className="flex items-center space-x-1 sm:space-x-2">
