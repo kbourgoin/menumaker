@@ -109,8 +109,8 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream-50 to-sage-50 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-serif font-medium text-terracotta-700">Family Meal Memories</h1>
-          <p className="text-muted-foreground mt-2">Track, plan and remember your family's favorite meals</p>
+          <h1 className="text-3xl font-serif font-medium text-terracotta-700">Menu Maker</h1>
+          <p className="text-muted-foreground mt-2">Track, plan and remember your favorite meals</p>
         </div>
         
         <Card>
