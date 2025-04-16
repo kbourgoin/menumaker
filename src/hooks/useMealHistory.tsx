@@ -21,6 +21,7 @@ export function useMealHistory() {
         
       if (error) throw error;
       
+      // Make sure to include id in the returned objects
       return data.map(history => ({
         id: history.id,
         date: history.date,
