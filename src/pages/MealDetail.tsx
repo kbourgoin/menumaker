@@ -56,24 +56,9 @@ const MealDetail = () => {
       setDish(dishData);
       
       try {
-        // Get meal history and ensure it has the correct shape
+        // Get meal history for this dish
         const historyData = await getMealHistoryForDish(id);
-        
-        if (Array.isArray(historyData)) {
-          // Explicitly verify we have all required fields
-          const validHistoryData = historyData.map(item => {
-            if (!item.id || !item.dishId || !item.user_id) {
-              console.error("Invalid history item:", item);
-              return null;
-            }
-            return item;
-          }).filter((item): item is MealHistory => item !== null);
-          
-          setHistory(validHistoryData);
-        } else {
-          console.error("History data is not an array:", historyData);
-          setHistory([]);
-        }
+        setHistory(historyData);
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
         setHistory([]);
