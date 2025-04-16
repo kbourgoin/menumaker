@@ -31,6 +31,18 @@ const MealDetail = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [historyLastUpdated, setHistoryLastUpdated] = useState(Date.now());
 
+  // Initial data fetch only
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+  // Only fetch history when needed
+  useEffect(() => {
+    if (activeTab === "history" || historyLastUpdated) {
+      fetchHistory();
+    }
+  }, [activeTab, historyLastUpdated]);
+
   const fetchData = async () => {
     if (!id) {
       setError("No dish ID provided");
@@ -55,17 +67,10 @@ const MealDetail = () => {
       
       console.log("Dish loaded successfully:", dishData);
       setDish(dishData);
-      
-      try {
-        // Get meal history for this dish with proper typing
-        const historyData = await getMealHistoryForDish(id);
-        console.log("History data loaded:", historyData);
-        setHistory(historyData);
-      } catch (historyError) {
-        console.error("Error fetching meal history:", historyError);
-        // Initialize with empty array that matches MealHistory type
-        setHistory([]);
-        // Don't fail the whole page for history errors
+
+      // Only fetch history if we're on the history tab
+      if (activeTab === "history") {
+        await fetchHistory();
       }
     } catch (fetchError) {
       console.error("Error fetching dish:", fetchError);
@@ -82,10 +87,18 @@ const MealDetail = () => {
     }
   };
 
-  // Refresh data when tab changes, after edits, or when historyLastUpdated changes
-  useEffect(() => {
-    fetchData();
-  }, [id, activeTab, historyLastUpdated]);
+  const fetchHistory = async () => {
+    if (!id) return;
+    
+    try {
+      const historyData = await getMealHistoryForDish(id);
+      console.log("History data loaded:", historyData);
+      setHistory(historyData);
+    } catch (historyError) {
+      console.error("Error fetching meal history:", historyError);
+      setHistory([]);
+    }
+  };
 
   const handleBack = () => {
     navigate(-1);
@@ -97,7 +110,6 @@ const MealDetail = () => {
   };
 
   const handleHistoryUpdated = () => {
-    // Update the timestamp to trigger a re-fetch
     setHistoryLastUpdated(Date.now());
   };
 
@@ -149,7 +161,6 @@ const MealDetail = () => {
                     title: "Dish updated",
                     description: "The dish has been updated successfully.",
                   });
-                  // Navigate directly rather than refreshing
                   navigate("/all-meals");
                 }} 
               />
