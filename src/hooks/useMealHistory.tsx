@@ -26,7 +26,7 @@ export function useMealHistory() {
       // Map database records to MealHistory objects with proper typing
       return data.map(history => {
         return {
-          id: String(history.id), // Explicitly convert to string to match the expected type
+          id: String(history.id), // Ensure id is a string
           dishId: history.dishid,
           date: history.date,
           notes: history.notes || undefined,

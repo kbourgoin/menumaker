@@ -56,8 +56,9 @@ const MealDetail = () => {
       setDish(dishData);
       
       try {
-        // Get meal history for this dish
+        // Get meal history for this dish with proper typing
         const historyData = await getMealHistoryForDish(id);
+        console.log("History data loaded:", historyData);
         setHistory(historyData);
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
