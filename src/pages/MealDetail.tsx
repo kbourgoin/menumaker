@@ -56,8 +56,14 @@ const MealDetail = () => {
       setDish(dishData);
       
       try {
+        // Ensure we're getting the correct history data with the id field
         const historyData = await getMealHistoryForDish(id);
-        setHistory(historyData);
+        if (Array.isArray(historyData) && historyData.every(entry => 'id' in entry)) {
+          setHistory(historyData);
+        } else {
+          console.error("Invalid history data format:", historyData);
+          setHistory([]);
+        }
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
         setHistory([]);
@@ -78,9 +84,10 @@ const MealDetail = () => {
     }
   };
 
+  // Refresh data when tab changes or after edits
   useEffect(() => {
     fetchData();
-  }, [id, activeTab]); // Reload data when tab changes to ensure we get fresh data after edits
+  }, [id, activeTab]);
 
   const handleBack = () => {
     navigate(-1);

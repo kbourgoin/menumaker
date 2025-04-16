@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import CookDishDialog from "@/components/CookDishDialog";
 import { useState } from "react";
-import { useDishes } from "@/hooks/useMeals";
+import { useMeals } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 
 interface CookingHistoryTabProps {
@@ -27,7 +27,7 @@ const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { deleteMealHistory } = useDishes();
+  const { deleteMealHistory } = useMeals();
 
   const formatDate = (dateString: string) => {
     try {

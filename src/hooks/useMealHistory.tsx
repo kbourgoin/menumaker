@@ -79,14 +79,22 @@ export function useMealHistory() {
   // Delete a meal history entry
   const deleteMealHistoryMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log("Deleting meal history entry with ID:", id);
       const { error } = await supabase
         .from('meal_history')
         .delete()
         .eq('id', id);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting meal history:", error);
+        throw error;
+      }
+      
+      console.log("Successfully deleted meal history entry");
+      return id;
     },
     onSuccess: () => {
+      console.log("Invalidating queries after delete");
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
       queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
       queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
@@ -110,6 +118,8 @@ export function useMealHistory() {
         .eq('id', id);
         
       if (error) throw error;
+      
+      return { id, ...updates };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
@@ -122,11 +132,11 @@ export function useMealHistory() {
 
   return {
     getMealHistoryForDish,
-    recordDishCooked: (dishId: string, date: string, notes?: string) => 
-      recordDishCookedMutation.mutateAsync({ dishId, date, notes }),
-    deleteMealHistory: (id: string) => 
-      deleteMealHistoryMutation.mutateAsync(id),
-    updateMealHistory: (id: string, updates: { date: string; notes?: string }) =>
-      updateMealHistoryMutation.mutateAsync({ id, updates })
+    recordDishCooked: async (dishId: string, date: string, notes?: string) => 
+      await recordDishCookedMutation.mutateAsync({ dishId, date, notes }),
+    deleteMealHistory: async (id: string) => 
+      await deleteMealHistoryMutation.mutateAsync(id),
+    updateMealHistory: async (id: string, updates: { date: string; notes?: string }) =>
+      await updateMealHistoryMutation.mutateAsync({ id, updates })
   };
 }
