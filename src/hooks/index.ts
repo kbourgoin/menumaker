@@ -9,3 +9,4 @@ export * from './useStats';
 export * from './useWeeklyMenu';
 export * from './useImportMealHistory';
 export * from './useClearData';
+export * from './useAuth'; // Add the useAuth export
