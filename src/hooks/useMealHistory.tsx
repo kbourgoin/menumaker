@@ -21,14 +21,19 @@ export function useMealHistory() {
         
       if (error) throw error;
       
+      if (!data) return [];
+      
       // Map database records to MealHistory objects with proper typing
-      return data.map(history => ({
-        id: history.id,
-        dishId: history.dishid,
-        date: history.date,
-        notes: history.notes || undefined,
-        user_id: history.user_id
-      }));
+      return data.map(history => {
+        // Ensure the id is a string to match the expected type
+        return {
+          id: String(history.id), // Explicitly convert to string to match the expected type
+          dishId: history.dishid,
+          date: history.date,
+          notes: history.notes || undefined,
+          user_id: history.user_id
+        };
+      });
     } catch (error) {
       console.error("Error getting meal history:", error);
       return [];

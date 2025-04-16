@@ -16,9 +16,10 @@ import CookDishDialog from "@/components/CookDishDialog";
 import { useState } from "react";
 import { useMeals } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
+import { MealHistory } from "@/types";
 
 interface CookingHistoryTabProps {
-  history: { id: string; date: string; notes?: string }[];
+  history: MealHistory[];
   dishId: string;
   dishName: string;
 }

@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { Dish } from "@/types";
+import { Dish, MealHistory } from "@/types";
 import { 
   LoadingState, 
   ErrorState, 
@@ -24,7 +24,7 @@ const MealDetail = () => {
   const { getDish, getMealHistoryForDish } = useDishes();
   const { toast } = useToast();
   const [dish, setDish] = useState<Dish | null>(null);
-  const [history, setHistory] = useState<{id: string; date: string; notes?: string}[]>([]);
+  const [history, setHistory] = useState<MealHistory[]>([]);
   const [activeTab, setActiveTab] = useState("details");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +58,12 @@ const MealDetail = () => {
       try {
         // Get meal history and ensure it has the correct shape
         const historyData = await getMealHistoryForDish(id);
-        setHistory(historyData);
+        if (Array.isArray(historyData)) {
+          setHistory(historyData);
+        } else {
+          console.error("History data is not an array:", historyData);
+          setHistory([]);
+        }
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
         setHistory([]);
