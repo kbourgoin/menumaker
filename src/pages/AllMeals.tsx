@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
@@ -17,7 +16,7 @@ const AllDishes = () => {
   const { sources: sourcesData } = useSources();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("lastCooked");
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("table");
   
   const processedDishes = () => {
     if (!dishes || !Array.isArray(dishes)) {
@@ -26,7 +25,6 @@ const AllDishes = () => {
     }
     
     let filtered = dishes.filter(dish => {
-      // Safety check for valid dish objects
       if (!dish || typeof dish !== 'object') {
         console.log("Invalid dish object:", dish);
         return false;
