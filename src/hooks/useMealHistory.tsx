@@ -1,4 +1,3 @@
-
 import { MealHistory } from "@/types";
 import { 
   supabase, 
@@ -21,11 +20,10 @@ export function useMealHistory() {
         
       if (error) throw error;
       
-      if (!data) return [];
+      if (!data || data.length === 0) return [];
       
       // Map database records to MealHistory objects with proper typing
       return data.map(history => {
-        // Ensure the id is a string to match the expected type
         return {
           id: String(history.id), // Explicitly convert to string to match the expected type
           dishId: history.dishid,
