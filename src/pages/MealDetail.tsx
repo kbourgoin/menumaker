@@ -56,14 +56,9 @@ const MealDetail = () => {
       setDish(dishData);
       
       try {
-        // Ensure we're getting the correct history data with the id field
+        // Get meal history and ensure it has the correct shape
         const historyData = await getMealHistoryForDish(id);
-        if (Array.isArray(historyData) && historyData.every(entry => 'id' in entry)) {
-          setHistory(historyData);
-        } else {
-          console.error("Invalid history data format:", historyData);
-          setHistory([]);
-        }
+        setHistory(historyData);
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
         setHistory([]);

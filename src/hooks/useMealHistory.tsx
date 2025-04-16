@@ -11,7 +11,7 @@ export function useMealHistory() {
   const queryClient = useQueryClient();
 
   // Get meal history for a dish
-  const getMealHistoryForDish = async (dishId: string) => {
+  const getMealHistoryForDish = async (dishId: string): Promise<MealHistory[]> => {
     try {
       const { data, error } = await supabase
         .from('meal_history')
@@ -21,11 +21,13 @@ export function useMealHistory() {
         
       if (error) throw error;
       
-      // Make sure to include id in the returned objects
+      // Map database records to MealHistory objects with proper typing
       return data.map(history => ({
         id: history.id,
+        dishId: history.dishid,
         date: history.date,
-        notes: history.notes
+        notes: history.notes || undefined,
+        user_id: history.user_id
       }));
     } catch (error) {
       console.error("Error getting meal history:", error);
