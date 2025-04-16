@@ -1,5 +1,5 @@
 
-import { Dish } from "@/types";
+import { Dish, MealHistory } from "@/types";
 import { supabase, mapDishFromDB, mapDishFromSummary } from "@/integrations/supabase/client";
 
 /**
@@ -118,7 +118,7 @@ export const fetchDishById = async (id: string): Promise<Dish | null> => {
 /**
  * Fetches meal history for a specific dish
  */
-export const fetchMealHistoryForDish = async (dishId: string) => {
+export const fetchMealHistoryForDish = async (dishId: string): Promise<MealHistory[]> => {
   try {
     const { data, error } = await supabase
       .from('meal_history')
@@ -128,9 +128,15 @@ export const fetchMealHistoryForDish = async (dishId: string) => {
       
     if (error) throw error;
     
+    if (!data) return [];
+    
+    // Map to proper MealHistory type with all required properties
     return data.map(history => ({
+      id: String(history.id),
+      dishId: history.dishid,
       date: history.date,
-      notes: history.notes
+      notes: history.notes || undefined,
+      user_id: history.user_id
     }));
   } catch (error) {
     console.error("Error getting meal history:", error);
