@@ -8,6 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Check, ChevronsUpDown, Book, Globe } from "lucide-react";
 import { Source } from "@/types";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SourceSelectorProps {
   form: UseFormReturn<FormValues>;
@@ -16,6 +17,7 @@ interface SourceSelectorProps {
 
 const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   
   const getSourceIcon = (type: string) => {
     switch (type) {
@@ -27,6 +29,11 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
         return null;
     }
   };
+
+  // Filter sources based on search value
+  const filteredSources = sources.filter(source => 
+    source.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   // Hide location field when no source is selected
   useEffect(() => {
@@ -50,7 +57,10 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                   <Button
                     variant="outline"
                     role="combobox"
-                    className="justify-between"
+                    className={cn(
+                      "justify-between",
+                      !field.value && "text-muted-foreground"
+                    )}
                   >
                     {field.value ? (
                       <div className="flex items-center">
@@ -64,11 +74,15 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="p-0">
-                <Command>
-                  <CommandInput placeholder="Search sources..." />
-                  <CommandEmpty>No source found.</CommandEmpty>
+              <PopoverContent className="p-0 w-[300px]" align="start">
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    placeholder="Search sources..." 
+                    value={searchValue}
+                    onValueChange={setSearchValue}
+                  />
                   <CommandList>
+                    <CommandEmpty>No source found.</CommandEmpty>
                     <CommandGroup>
                       <CommandItem
                         value="none"
@@ -76,6 +90,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                           form.setValue("sourceId", "");
                           form.setValue("location", "");
                           setOpen(false);
+                          setSearchValue("");
                         }}
                       >
                         <Check
@@ -85,13 +100,14 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                         />
                         No source
                       </CommandItem>
-                      {sources.map((source) => (
+                      {filteredSources.map((source) => (
                         <CommandItem
                           key={source.id}
                           value={source.id}
                           onSelect={() => {
                             form.setValue("sourceId", source.id);
                             setOpen(false);
+                            setSearchValue("");
                           }}
                         >
                           <Check
