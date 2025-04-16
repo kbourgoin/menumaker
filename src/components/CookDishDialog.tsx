@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Utensils } from "lucide-react";
 import { format } from "date-fns";
@@ -101,6 +100,17 @@ export default function CookDishDialog({
     </>
   );
 
+  const handleDateSelect = (newDate?: Date) => {
+    if (newDate) {
+      setDate(newDate);
+      // Close the popover after selecting a date
+      const popoverTrigger = document.querySelector('[data-state="open"] [data-radix-popper-content-wrapper]');
+      if (popoverTrigger) {
+        (popoverTrigger as HTMLElement).click();
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -142,12 +152,13 @@ export default function CookDishDialog({
                   {date ? format(date, "PPP") : "Select a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-50" align="start">
+              <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(newDate) => newDate && setDate(newDate)}
+                  onSelect={handleDateSelect}
                   initialFocus
+                  className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
             </Popover>
