@@ -62,6 +62,7 @@ const MealDetail = () => {
         setHistory(historyData);
       } catch (historyError) {
         console.error("Error fetching meal history:", historyError);
+        // Initialize with empty array that matches MealHistory type
         setHistory([]);
         // Don't fail the whole page for history errors
       }
