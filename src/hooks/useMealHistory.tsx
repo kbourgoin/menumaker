@@ -1,4 +1,3 @@
-
 import { MealHistory } from "@/types";
 import { 
   supabase, 
@@ -24,15 +23,13 @@ export function useMealHistory() {
       if (!data || data.length === 0) return [];
       
       // Map database records to MealHistory objects with proper typing
-      return data.map(history => {
-        return {
-          id: String(history.id), // Ensure id is a string
-          dishId: history.dishid,
-          date: history.date,
-          notes: history.notes || undefined,
-          user_id: history.user_id
-        };
-      });
+      return data.map(record => ({
+        id: String(record.id),
+        dishId: record.dishid,
+        date: record.date,
+        notes: record.notes || undefined,
+        user_id: record.user_id
+      }));
     } catch (error) {
       console.error("Error getting meal history:", error);
       return [];
