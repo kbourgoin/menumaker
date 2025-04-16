@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { Calendar as CalendarIcon, Utensils } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,7 @@ export default function CookDishDialog({
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>(initialDate || new Date());
   const [notes, setNotes] = useState(initialNotes);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const { recordDishCooked, updateMealHistory } = useDishes();
   const { toast } = useToast();
 
@@ -104,10 +106,7 @@ export default function CookDishDialog({
     if (newDate) {
       setDate(newDate);
       // Close the popover after selecting a date
-      const popoverTrigger = document.querySelector('[data-state="open"] [data-radix-popper-content-wrapper]');
-      if (popoverTrigger) {
-        (popoverTrigger as HTMLElement).click();
-      }
+      setPopoverOpen(false);
     }
   };
 
@@ -139,7 +138,7 @@ export default function CookDishDialog({
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Date Cooked</label>
-            <Popover>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -158,7 +157,6 @@ export default function CookDishDialog({
                   selected={date}
                   onSelect={handleDateSelect}
                   initialFocus
-                  className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
             </Popover>
