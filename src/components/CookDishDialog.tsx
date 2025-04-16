@@ -55,8 +55,8 @@ export default function CookDishDialog({
 
   useEffect(() => {
     if (initialDate) setDate(initialDate);
-    if (initialNotes) setNotes(initialNotes);
-  }, [initialDate, initialNotes]);
+    if (initialNotes !== undefined) setNotes(initialNotes || "");
+  }, [initialDate, initialNotes, open]);
 
   const handleSubmit = async () => {
     try {
@@ -77,8 +77,6 @@ export default function CookDishDialog({
         });
       }
       setOpen(false);
-      setNotes("");
-      if (!editMode) setDate(new Date());
     } catch (error) {
       console.error("Error saving entry:", error);
       toast({

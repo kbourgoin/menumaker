@@ -13,7 +13,12 @@ import { useDataImport } from "./import";
 export function useMeals() {
   const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
   const { addDish, updateDish, deleteDish } = useDishMutations();
-  const { recordDishCooked } = useMealHistory();
+  const { 
+    recordDishCooked, 
+    deleteMealHistory, 
+    updateMealHistory 
+  } = useMealHistory();
+  
   const weeklyMenuHook = useWeeklyMenu();
   const sourcesHook = useSources();
   const statsHook = useStats();
@@ -31,6 +36,8 @@ export function useMeals() {
     // Meal History
     recordDishCooked,
     getMealHistoryForDish,
+    deleteMealHistory,
+    updateMealHistory,
     
     // Weekly Menu
     getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,

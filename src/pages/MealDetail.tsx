@@ -24,7 +24,7 @@ const MealDetail = () => {
   const { getDish, getMealHistoryForDish } = useDishes();
   const { toast } = useToast();
   const [dish, setDish] = useState<Dish | null>(null);
-  const [history, setHistory] = useState<{date: string; notes?: string}[]>([]);
+  const [history, setHistory] = useState<{id: string; date: string; notes?: string}[]>([]);
   const [activeTab, setActiveTab] = useState("details");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +80,7 @@ const MealDetail = () => {
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [id, activeTab]); // Reload data when tab changes to ensure we get fresh data after edits
 
   const handleBack = () => {
     navigate(-1);

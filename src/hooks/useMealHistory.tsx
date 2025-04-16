@@ -1,3 +1,4 @@
+
 import { MealHistory } from "@/types";
 import { 
   supabase, 
@@ -21,6 +22,7 @@ export function useMealHistory() {
       if (error) throw error;
       
       return data.map(history => ({
+        id: history.id,
         date: history.date,
         notes: history.notes
       }));
