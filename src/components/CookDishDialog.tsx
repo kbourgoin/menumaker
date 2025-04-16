@@ -66,14 +66,14 @@ export default function CookDishDialog({
       if (editMode && historyEntryId) {
         await updateMealHistory(historyEntryId, {
           date: date.toISOString(),
-          notes: notes || undefined
+          notes: notes.trim() || null // Use null instead of undefined for empty strings
         });
         toast({
           title: "Entry updated",
           description: "The cooking history entry has been updated.",
         });
       } else {
-        await recordDishCooked(dish.id, date.toISOString(), notes || undefined);
+        await recordDishCooked(dish.id, date.toISOString(), notes.trim() || null);
         toast({
           title: "Dish cooked!",
           description: `${dish.name} has been recorded in your meal history.`,

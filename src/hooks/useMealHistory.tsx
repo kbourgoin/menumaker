@@ -1,3 +1,4 @@
+
 import { MealHistory } from "@/types";
 import { 
   supabase, 
@@ -45,7 +46,7 @@ export function useMealHistory() {
     }: { 
       dishId: string;
       date: string;
-      notes?: string;
+      notes?: string | null;
     }) => {
       const { data: userData } = await supabase.auth.getUser();
       const user_id = userData.user?.id;
@@ -113,7 +114,7 @@ export function useMealHistory() {
       updates 
     }: { 
       id: string; 
-      updates: { date: string; notes?: string }; 
+      updates: { date: string; notes?: string | null }; 
     }) => {
       const { error } = await supabase
         .from('meal_history')
@@ -135,11 +136,11 @@ export function useMealHistory() {
 
   return {
     getMealHistoryForDish,
-    recordDishCooked: async (dishId: string, date: string, notes?: string) => 
+    recordDishCooked: async (dishId: string, date: string, notes?: string | null) => 
       await recordDishCookedMutation.mutateAsync({ dishId, date, notes }),
     deleteMealHistory: async (id: string) => 
       await deleteMealHistoryMutation.mutateAsync(id),
-    updateMealHistory: async (id: string, updates: { date: string; notes?: string }) =>
+    updateMealHistory: async (id: string, updates: { date: string; notes?: string | null }) =>
       await updateMealHistoryMutation.mutateAsync({ id, updates })
   };
 }
