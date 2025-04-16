@@ -29,6 +29,7 @@ const MealDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [historyLastUpdated, setHistoryLastUpdated] = useState(Date.now());
 
   const fetchData = async () => {
     if (!id) {
@@ -81,10 +82,10 @@ const MealDetail = () => {
     }
   };
 
-  // Refresh data when tab changes or after edits
+  // Refresh data when tab changes, after edits, or when historyLastUpdated changes
   useEffect(() => {
     fetchData();
-  }, [id, activeTab]);
+  }, [id, activeTab, historyLastUpdated]);
 
   const handleBack = () => {
     navigate(-1);
@@ -93,6 +94,11 @@ const MealDetail = () => {
   const handleRefresh = () => {
     setIsRefreshing(true);
     fetchData();
+  };
+
+  const handleHistoryUpdated = () => {
+    // Update the timestamp to trigger a re-fetch
+    setHistoryLastUpdated(Date.now());
   };
 
   if (isLoading) {
@@ -155,6 +161,7 @@ const MealDetail = () => {
               history={history} 
               dishId={dish.id}
               dishName={dish.name}
+              onHistoryUpdated={handleHistoryUpdated}
             />
           </TabsContent>
         </Tabs>

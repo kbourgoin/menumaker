@@ -34,6 +34,7 @@ interface CookDishDialogProps {
   historyEntryId?: string;
   initialDate?: Date;
   initialNotes?: string;
+  onSuccess?: () => void;
 }
 
 export default function CookDishDialog({ 
@@ -45,7 +46,8 @@ export default function CookDishDialog({
   editMode = false,
   historyEntryId,
   initialDate,
-  initialNotes = ""
+  initialNotes = "",
+  onSuccess
 }: CookDishDialogProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>(initialDate || new Date());
@@ -77,6 +79,11 @@ export default function CookDishDialog({
         });
       }
       setOpen(false);
+      
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error("Error saving entry:", error);
       toast({

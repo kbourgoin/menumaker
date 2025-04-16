@@ -1,6 +1,6 @@
 
 import { format, parseISO } from "date-fns";
-import { Clock, MessageSquare, Pencil, Trash2, Plus } from "lucide-react";
+import { Clock, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -22,9 +22,15 @@ interface CookingHistoryTabProps {
   history: MealHistory[];
   dishId: string;
   dishName: string;
+  onHistoryUpdated?: () => void;
 }
 
-const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps) => {
+const CookingHistoryTab = ({ 
+  history, 
+  dishId, 
+  dishName,
+  onHistoryUpdated 
+}: CookingHistoryTabProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -48,6 +54,11 @@ const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps
         title: "Entry deleted",
         description: "The cooking history entry has been deleted.",
       });
+      
+      // Notify parent component that history was updated
+      if (onHistoryUpdated) {
+        onHistoryUpdated();
+      }
     } catch (error) {
       console.error("Error deleting entry:", error);
       toast({
@@ -70,6 +81,7 @@ const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps
             dish={{ id: dishId, name: dishName }}
             variant="outline"
             size="sm"
+            onSuccess={onHistoryUpdated}
           />
         </CardHeader>
         <CardContent>
@@ -91,6 +103,7 @@ const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps
                         initialNotes={entry.notes}
                         editMode
                         historyEntryId={entry.id}
+                        onSuccess={onHistoryUpdated}
                       >
                         <Pencil className="w-4 h-4" />
                       </CookDishDialog>
