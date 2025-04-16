@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Utensils } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -25,34 +25,76 @@ import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 
 interface CookDishDialogProps {
-  dish: Dish;
+  dish: Pick<Dish, 'id' | 'name'>;
   variant?: "default" | "outline" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   compact?: boolean;
+  children?: React.ReactNode;
+  editMode?: boolean;
+  historyEntryId?: string;
+  initialDate?: Date;
+  initialNotes?: string;
 }
 
 export default function CookDishDialog({ 
   dish,
   variant = "outline", 
   size = "default",
-  compact = false
+  compact = false,
+  children,
+  editMode = false,
+  historyEntryId,
+  initialDate,
+  initialNotes = ""
 }: CookDishDialogProps) {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date>(new Date());
-  const [notes, setNotes] = useState("");
-  const { recordDishCooked } = useDishes();
+  const [date, setDate] = useState<Date>(initialDate || new Date());
+  const [notes, setNotes] = useState(initialNotes);
+  const { recordDishCooked, updateMealHistory } = useDishes();
   const { toast } = useToast();
 
-  const handleCook = () => {
-    recordDishCooked(dish.id, date.toISOString(), notes || undefined);
-    toast({
-      title: "Dish cooked!",
-      description: `${dish.name} has been recorded in your meal history.`,
-    });
-    setOpen(false);
-    setNotes("");
-    setDate(new Date());
+  useEffect(() => {
+    if (initialDate) setDate(initialDate);
+    if (initialNotes) setNotes(initialNotes);
+  }, [initialDate, initialNotes]);
+
+  const handleSubmit = async () => {
+    try {
+      if (editMode && historyEntryId) {
+        await updateMealHistory(historyEntryId, {
+          date: date.toISOString(),
+          notes: notes || undefined
+        });
+        toast({
+          title: "Entry updated",
+          description: "The cooking history entry has been updated.",
+        });
+      } else {
+        await recordDishCooked(dish.id, date.toISOString(), notes || undefined);
+        toast({
+          title: "Dish cooked!",
+          description: `${dish.name} has been recorded in your meal history.`,
+        });
+      }
+      setOpen(false);
+      setNotes("");
+      if (!editMode) setDate(new Date());
+    } catch (error) {
+      console.error("Error saving entry:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save the entry. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  const triggerContent = children || (
+    <>
+      <Utensils className="mr-1 h-4 w-4" />
+      <span>{compact ? "Cook" : editMode ? "Edit Entry" : "Cook This"}</span>
+    </>
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -60,18 +102,23 @@ export default function CookDishDialog({
         <Button 
           variant={variant} 
           size={size}
-          className="text-terracotta-500 border-terracotta-200 hover:bg-terracotta-50 hover:text-terracotta-600"
+          className={cn(
+            "text-terracotta-500 border-terracotta-200 hover:bg-terracotta-50 hover:text-terracotta-600",
+            { "w-full": size === "icon" }
+          )}
           onClick={(e) => e.stopPropagation()}
         >
-          <Utensils className="mr-1 h-4 w-4" />
-          <span>{compact ? "Cook" : "Cook This"}</span>
+          {triggerContent}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Cook {dish.name}</DialogTitle>
+          <DialogTitle>{editMode ? "Edit Cooking Entry" : `Cook ${dish.name}`}</DialogTitle>
           <DialogDescription>
-            Record when you cooked this dish and add any notes about your experience.
+            {editMode 
+              ? "Update when you cooked this dish and any notes about your experience."
+              : "Record when you cooked this dish and add any notes about your experience."
+            }
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -117,10 +164,10 @@ export default function CookDishDialog({
             Cancel
           </Button>
           <Button 
-            onClick={handleCook}
+            onClick={handleSubmit}
             className="bg-terracotta-500 hover:bg-terracotta-600"
           >
-            Record Dish
+            {editMode ? "Save Changes" : "Record Dish"}
           </Button>
         </DialogFooter>
       </DialogContent>

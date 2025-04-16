@@ -1,13 +1,34 @@
 
 import { format, parseISO } from "date-fns";
-import { Clock, MessageSquare } from "lucide-react";
+import { Clock, MessageSquare, Pencil, Trash2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { 
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import CookDishDialog from "@/components/CookDishDialog";
+import { useState } from "react";
+import { useDishes } from "@/hooks/useMeals";
+import { useToast } from "@/hooks/use-toast";
 
 interface CookingHistoryTabProps {
-  history: { date: string; notes?: string }[];
+  history: { id: string; date: string; notes?: string }[];
+  dishId: string;
+  dishName: string;
 }
 
-const CookingHistoryTab = ({ history }: CookingHistoryTabProps) => {
+const CookingHistoryTab = ({ history, dishId, dishName }: CookingHistoryTabProps) => {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { deleteMealHistory } = useDishes();
+
   const formatDate = (dateString: string) => {
     try {
       return format(parseISO(dateString), "MMMM d, yyyy");
@@ -17,36 +38,107 @@ const CookingHistoryTab = ({ history }: CookingHistoryTabProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedEntryId) return;
+    
+    try {
+      await deleteMealHistory(selectedEntryId);
+      toast({
+        title: "Entry deleted",
+        description: "The cooking history entry has been deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the entry. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedEntryId(null);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Cooking History</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {history.length > 0 ? (
-          <div className="space-y-4">
-            {history.map((entry, index) => (
-              <div key={index} className="p-4 border rounded-md">
-                <div className="flex items-center text-sm text-muted-foreground mb-2">
-                  <Clock className="w-4 h-4 mr-2" />
-                  {formatDate(entry.date)}
-                </div>
-                {entry.notes && (
-                  <div className="mt-2 flex items-start">
-                    <MessageSquare className="w-4 h-4 mr-2 mt-0.5 text-muted-foreground" />
-                    <div className="text-sm">{entry.notes}</div>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl">Cooking History</CardTitle>
+          <CookDishDialog
+            dish={{ id: dishId, name: dishName }}
+            variant="outline"
+            size="sm"
+          />
+        </CardHeader>
+        <CardContent>
+          {history.length > 0 ? (
+            <div className="space-y-4">
+              {history.map((entry) => (
+                <div key={entry.id} className="p-4 border rounded-md">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {formatDate(entry.date)}
+                    </div>
+                    <div className="flex gap-2">
+                      <CookDishDialog
+                        dish={{ id: dishId, name: dishName }}
+                        variant="ghost"
+                        size="icon"
+                        initialDate={new Date(entry.date)}
+                        initialNotes={entry.notes}
+                        editMode
+                        historyEntryId={entry.id}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </CookDishDialog>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          setSelectedEntryId(entry.id);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            No cooking history recorded yet.
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  {entry.notes && (
+                    <div className="mt-2 flex items-start">
+                      <MessageSquare className="w-4 h-4 mr-2 mt-0.5 text-muted-foreground" />
+                      <div className="text-sm">{entry.notes}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No cooking history recorded yet.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete cooking history entry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this cooking history entry.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

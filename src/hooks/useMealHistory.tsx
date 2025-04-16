@@ -1,4 +1,3 @@
-
 import { MealHistory } from "@/types";
 import { 
   supabase, 
@@ -74,9 +73,57 @@ export function useMealHistory() {
     }
   });
 
+  // Delete a meal history entry
+  const deleteMealHistoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('meal_history')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    }
+  });
+
+  // Update a meal history entry
+  const updateMealHistoryMutation = useMutation({
+    mutationFn: async ({ 
+      id, 
+      updates 
+    }: { 
+      id: string; 
+      updates: { date: string; notes?: string }; 
+    }) => {
+      const { error } = await supabase
+        .from('meal_history')
+        .update(updates)
+        .eq('id', id);
+        
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      queryClient.invalidateQueries({ queryKey: ['mealHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['suggestedDishes'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    }
+  });
+
   return {
     getMealHistoryForDish,
     recordDishCooked: (dishId: string, date: string, notes?: string) => 
-      recordDishCookedMutation.mutateAsync({ dishId, date, notes })
+      recordDishCookedMutation.mutateAsync({ dishId, date, notes }),
+    deleteMealHistory: (id: string) => 
+      deleteMealHistoryMutation.mutateAsync(id),
+    updateMealHistory: (id: string, updates: { date: string; notes?: string }) =>
+      updateMealHistoryMutation.mutateAsync({ id, updates })
   };
 }

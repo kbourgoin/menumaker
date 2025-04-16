@@ -147,7 +147,11 @@ const MealDetail = () => {
           </TabsContent>
           
           <TabsContent value="history" className="mt-0">
-            <CookingHistoryTab history={history} />
+            <CookingHistoryTab 
+              history={history} 
+              dishId={dish.id}
+              dishName={dish.name}
+            />
           </TabsContent>
         </Tabs>
       </div>
