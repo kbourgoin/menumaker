@@ -3,6 +3,13 @@ import { Link } from "react-router-dom";
 import { Dish } from "@/types";
 import { TableCell, TableRow as UITableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
+import { formatDistanceToNow, parseISO, format } from "date-fns";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import SourceInfo from "../dish-card/SourceInfo";
 
 interface DishTableRowProps {
@@ -13,6 +20,47 @@ interface DishTableRowProps {
 const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   // Get source info from our lookup map if available
   const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
+  
+  const formatAbsoluteDate = (dateString: string | undefined) => {
+    if (!dateString) return "Never";
+    try {
+      return format(parseISO(dateString), "MMMM d, yyyy");
+    } catch (e) {
+      console.error("Error parsing date", e);
+      return "Invalid date";
+    }
+  };
+  
+  const formatTimeAgo = (dateString: string | undefined) => {
+    if (!dateString) return "";
+    try {
+      // Parse the date and truncate to just the date (no time)
+      const date = parseISO(dateString);
+      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      
+      // Calculate the difference in days and format accordingly
+      const now = new Date();
+      const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      const diffInMs = nowDateOnly.getTime() - dateOnly.getTime();
+      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+      
+      
+      if (diffInDays === 0) {
+        return "today";
+      } else if (diffInDays === 1) {
+        return "yesterday";
+      } else if (diffInDays === -1) {
+        return "tomorrow";
+      } else {
+        // For other cases, use the standard formatDistanceToNow but calculate from the truncated current date
+        return formatDistanceToNow(dateOnly, { addSuffix: true, referenceDate: nowDateOnly });
+      }
+    } catch (e) {
+      console.error("Error parsing date", e);
+      return "";
+    }
+  };
   
   return (
     <UITableRow>
@@ -39,9 +87,20 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
       <TableCell>{dish.cuisines.join(", ")}</TableCell>
       <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
       <TableCell>
-        {dish.lastMade 
-          ? formatDate(new Date(dish.lastMade)) 
-          : "Never"}
+        {dish.lastMade ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">{formatTimeAgo(dish.lastMade)}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{formatAbsoluteDate(dish.lastMade)}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          "Never"
+        )}
       </TableCell>
       <TableCell className="max-w-md">
         {dish.lastComment && (

@@ -28,7 +28,27 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
   const formatTimeAgo = (dateString: string | undefined) => {
     if (!dateString) return "";
     try {
-      return formatDistanceToNow(parseISO(dateString), { addSuffix: true });
+      // Parse the date and truncate to just the date (no time)
+      const date = parseISO(dateString);
+      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      
+      // Calculate the difference in days and format accordingly
+      const now = new Date();
+      const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      const diffInMs = nowDateOnly.getTime() - dateOnly.getTime();
+      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+      
+      if (diffInDays === 0) {
+        return "today";
+      } else if (diffInDays === 1) {
+        return "yesterday";
+      } else if (diffInDays === -1) {
+        return "tomorrow";
+      } else {
+        // For other cases, use the standard formatDistanceToNow but calculate from the truncated current date
+        return formatDistanceToNow(dateOnly, { addSuffix: true, referenceDate: nowDateOnly });
+      }
     } catch (e) {
       console.error("Error parsing date", e);
       return "";
