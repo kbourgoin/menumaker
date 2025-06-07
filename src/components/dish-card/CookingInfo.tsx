@@ -1,7 +1,7 @@
 
 import { Calendar, UtensilsCrossed } from "lucide-react";
-import { format, formatDistanceToNow, parseISO } from "date-fns";
-import { 
+import { format, formatDistance, parseISO } from "date-fns";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -24,21 +24,21 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
       return "Invalid date";
     }
   };
-  
+
   const formatTimeAgo = (dateString: string | undefined) => {
     if (!dateString) return "";
     try {
       // Parse the date and truncate to just the date (no time)
       const date = parseISO(dateString);
       const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      
+
       // Calculate the difference in days and format accordingly
       const now = new Date();
       const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       const diffInMs = nowDateOnly.getTime() - dateOnly.getTime();
       const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-      
+
       if (diffInDays === 0) {
         return "today";
       } else if (diffInDays === 1) {
@@ -46,8 +46,8 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
       } else if (diffInDays === -1) {
         return "tomorrow";
       } else {
-        // For other cases, use the standard formatDistanceToNow but calculate from the truncated current date
-        return formatDistanceToNow(dateOnly, { addSuffix: true, referenceDate: nowDateOnly });
+        // For other cases, use the standard formatDistance but calculate from the truncated current date
+        return formatDistance(dateOnly, nowDateOnly, { addSuffix: true });
       }
     } catch (e) {
       console.error("Error parsing date", e);
@@ -61,7 +61,7 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
         <UtensilsCrossed className="w-3.5 h-3.5 mr-1" />
         <span>Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}</span>
       </div>
-      
+
       <div className="flex items-center space-x-1 mt-1">
         <Calendar className="w-3.5 h-3.5 mr-1" />
         <span>Last made: </span>

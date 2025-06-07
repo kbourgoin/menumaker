@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Dish } from "@/types";
 import { TableCell, TableRow as UITableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
-import { formatDistanceToNow, parseISO, format } from "date-fns";
-import { 
+import { formatDistance, parseISO, format } from "date-fns";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -20,7 +20,7 @@ interface DishTableRowProps {
 const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   // Get source info from our lookup map if available
   const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
-  
+
   const formatAbsoluteDate = (dateString: string | undefined) => {
     if (!dateString) return "Never";
     try {
@@ -30,22 +30,22 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
       return "Invalid date";
     }
   };
-  
+
   const formatTimeAgo = (dateString: string | undefined) => {
     if (!dateString) return "";
     try {
       // Parse the date and truncate to just the date (no time)
       const date = parseISO(dateString);
       const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      
+
       // Calculate the difference in days and format accordingly
       const now = new Date();
       const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       const diffInMs = nowDateOnly.getTime() - dateOnly.getTime();
       const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-      
-      
+
+
       if (diffInDays === 0) {
         return "today";
       } else if (diffInDays === 1) {
@@ -53,20 +53,19 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
       } else if (diffInDays === -1) {
         return "tomorrow";
       } else {
-        // For other cases, use the standard formatDistanceToNow but calculate from the truncated current date
-        return formatDistanceToNow(dateOnly, { addSuffix: true, referenceDate: nowDateOnly });
+        return formatDistance(dateOnly, nowDateOnly, { addSuffix: true });
       }
     } catch (e) {
       console.error("Error parsing date", e);
       return "";
     }
   };
-  
+
   return (
     <UITableRow>
       <TableCell>
-        <Link 
-          to={`/meal/${dish.id}`} 
+        <Link
+          to={`/meal/${dish.id}`}
           className="text-primary hover:underline font-medium"
         >
           {dish.name}
@@ -74,13 +73,13 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
       </TableCell>
       <TableCell className="w-[200px] min-w-0">
         <div className="break-words">
-          <SourceInfo 
-            sourceId={dish.sourceId} 
+          <SourceInfo
+            sourceId={dish.sourceId}
             // Pass source info directly when available
             sourceName={sourceInfo?.name}
             sourceType={sourceInfo?.type}
             sourceUrl={sourceInfo?.url}
-            location={dish.location} 
+            location={dish.location}
           />
         </div>
       </TableCell>
