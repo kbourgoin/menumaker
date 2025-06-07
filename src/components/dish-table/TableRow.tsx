@@ -24,15 +24,17 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
           {dish.name}
         </Link>
       </TableCell>
-      <TableCell className="max-w-[200px] break-words">
-        <SourceInfo 
-          sourceId={dish.sourceId} 
-          // Pass source info directly when available
-          sourceName={sourceInfo?.name}
-          sourceType={sourceInfo?.type}
-          sourceUrl={sourceInfo?.url}
-          location={dish.location} 
-        />
+      <TableCell className="w-[200px] min-w-0">
+        <div className="break-words">
+          <SourceInfo 
+            sourceId={dish.sourceId} 
+            // Pass source info directly when available
+            sourceName={sourceInfo?.name}
+            sourceType={sourceInfo?.type}
+            sourceUrl={sourceInfo?.url}
+            location={dish.location} 
+          />
+        </div>
       </TableCell>
       <TableCell>{dish.cuisines.join(", ")}</TableCell>
       <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>

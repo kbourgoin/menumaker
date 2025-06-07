@@ -42,7 +42,6 @@ const SourceInfo = ({
           location={location} 
         />
       )}
-      {sourceId && location && !isLocationUrl && <span className="text-terracotta-500">&nbsp;p.&nbsp;{location}</span>}
       {!sourceId && location && !isLocationUrl && <LocationDisplay location={location} inline={true} />}
     </div>
   );

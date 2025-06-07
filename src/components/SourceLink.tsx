@@ -61,6 +61,9 @@ const SourceLink = ({
     if (!str) return false;
     return /^(https?:\/\/|www\.)[^\s]+\.[^\s]+/i.test(str);
   };
+
+  const isLocationUrl = location ? isUrl(location) : false;
+  const pageDisplay = location && !isLocationUrl ? ` p. ${location}` : '';
   
   if (source.type === 'website') {
     let linkUrl = '';
@@ -86,8 +89,8 @@ const SourceLink = ({
         onClick={(e) => e.stopPropagation()}
       >
         <Globe className="w-4 h-4 mr-1.5" />
-        <span className="truncate max-w-[200px]">
-          {source.name}
+        <span className="break-words">
+          {source.name}{pageDisplay}
         </span>
         <ExternalLink className="w-3.5 h-3.5 ml-1" />
       </a>
@@ -101,8 +104,8 @@ const SourceLink = ({
           <span className={`inline-flex items-center text-sm text-terracotta-500 ${className}`}>
             {source.type === 'book' && <Book className="w-4 h-4 mr-1.5" />}
             {source.type === 'website' && <Globe className="w-4 h-4 mr-1.5" />}
-            <span className="truncate max-w-[200px]">
-              {source.name}
+            <span className="break-words">
+              {source.name}{pageDisplay}
             </span>
           </span>
         </TooltipTrigger>
