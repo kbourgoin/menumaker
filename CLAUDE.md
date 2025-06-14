@@ -22,6 +22,7 @@ This is a React-based meal/dish management application using the following techn
 - **Routing**: React Router v6
 - **Authentication**: Supabase Auth
 - **Database**: Supabase PostgreSQL
+- **PWA**: Progressive Web App with service worker and offline capabilities
 
 ### Key Application Concepts
 - **Dishes**: Core entities representing meals/recipes with cuisines, sources, and cooking history
@@ -60,3 +61,19 @@ Use `@/` prefix for all internal imports (configured in tsconfig.json and vite.c
 
 ### Authentication Flow
 All routes except `/auth` require authentication. The `AuthProvider` handles session management and redirects unauthenticated users to the auth page.
+
+### Progressive Web App (PWA)
+The application is configured as a PWA with the following features:
+- **Installation**: Can be installed on mobile devices via browser install prompt
+- **Offline Support**: Service worker caches app shell and API responses for offline access
+- **App Manifest**: `public/manifest.json` defines app metadata, icons, and display settings
+- **Service Worker**: Automatic generation via Vite PWA plugin with Workbox
+- **Caching Strategy**: NetworkFirst for Supabase API calls, CacheFirst for static assets
+- **Install Button**: `PWAInstallButton` component shows when app is installable
+- **Icons**: Multiple sizes generated (192x192, 512x512, 180x180) for different devices
+
+**PWA Files**:
+- `public/manifest.json` - Web app manifest
+- `public/sw.js` - Manual service worker (superseded by Vite PWA generated one)
+- `src/hooks/usePWAInstall.ts` - Install prompt logic
+- `src/components/PWAInstallButton.tsx` - Install button component
