@@ -25,7 +25,15 @@ const AllDishes = () => {
       return [];
     }
     
-    let filtered = dishes.filter(dish => {
+    // Deduplicate dishes by ID to fix any duplicate key issues
+    const uniqueDishes = dishes.reduce((acc, dish) => {
+      if (!acc.some(existing => existing.id === dish.id)) {
+        acc.push(dish);
+      }
+      return acc;
+    }, [] as typeof dishes);
+    
+    let filtered = uniqueDishes.filter(dish => {
       if (!dish || typeof dish !== 'object') {
         console.log("Invalid dish object:", dish);
         return false;
