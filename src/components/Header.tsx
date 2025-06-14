@@ -9,6 +9,7 @@ import {
   Utensils 
 } from "lucide-react";
 import AddCookedDishDialog from "./AddCookedDishDialog";
+import { PWAInstallButton } from "./PWAInstallButton";
 
 const Header = () => {
   const location = useLocation();
@@ -85,6 +86,8 @@ const Header = () => {
             </Link>
             
             <AddCookedDishDialog />
+            
+            <PWAInstallButton />
             
             <Link to="/settings">
               <Button 
