@@ -4,6 +4,7 @@ import CuisinesList from "./CuisinesList";
 import CookingInfo from "./CookingInfo";
 import SourceInfo from "./SourceInfo";
 import { TagBadge } from "@/components/tags";
+import { useTagNavigation } from "@/hooks/useTagNavigation";
 
 interface DishCardContentProps {
   cuisines: string[];
@@ -26,6 +27,8 @@ const DishCardContent = ({
   lastComment,
   tags = []
 }: DishCardContentProps) => {
+  const { navigateToTag } = useTagNavigation();
+
   return (
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
       <div className="space-y-3">
@@ -34,7 +37,13 @@ const DishCardContent = ({
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {tags.map((tag) => (
-              <TagBadge key={tag} tag={tag} variant="outline" />
+              <TagBadge 
+                key={tag} 
+                tag={tag} 
+                variant="outline" 
+                clickable 
+                onClick={() => navigateToTag(tag)}
+              />
             ))}
           </div>
         )}

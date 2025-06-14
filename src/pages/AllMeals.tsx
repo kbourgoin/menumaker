@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
 import { useSources } from "@/hooks/sources";
@@ -14,10 +15,29 @@ import {
 const AllDishes = () => {
   const { dishes, isLoading } = useMeals();
   const { sources: sourcesData } = useSources();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("lastCooked");
   const [viewMode, setViewMode] = useState<"cards" | "table">("table");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Initialize selected tags from URL params
+  useEffect(() => {
+    const tagFromUrl = searchParams.get('tag');
+    if (tagFromUrl && !selectedTags.includes(tagFromUrl)) {
+      setSelectedTags([tagFromUrl]);
+    }
+  }, [searchParams]);
+
+  // Update URL when tags change (but only if navigated from tag click)
+  const handleTagsChange = (tags: string[]) => {
+    setSelectedTags(tags);
+    // Remove tag param from URL when no tags are selected
+    if (tags.length === 0) {
+      searchParams.delete('tag');
+      setSearchParams(searchParams);
+    }
+  };
   
   const getFilteredDishes = () => {
     if (!dishes || !Array.isArray(dishes)) {
@@ -72,7 +92,7 @@ const AllDishes = () => {
           sortOption={sortOption}
           setSortOption={setSortOption}
           selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
+          setSelectedTags={handleTagsChange}
           viewMode={viewMode}
         />
         

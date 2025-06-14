@@ -7,6 +7,8 @@ interface TagBadgeProps {
   variant?: "default" | "secondary" | "destructive" | "outline";
   removable?: boolean;
   onRemove?: () => void;
+  onClick?: () => void;
+  clickable?: boolean;
   className?: string;
 }
 
@@ -15,6 +17,8 @@ export const TagBadge = ({
   variant = "secondary",
   removable = false,
   onRemove,
+  onClick,
+  clickable = false,
   className,
 }: TagBadgeProps) => {
   return (
@@ -23,8 +27,14 @@ export const TagBadge = ({
       className={cn(
         "text-xs gap-1",
         removable && "pr-1",
+        clickable && "cursor-pointer hover:opacity-80 transition-opacity",
         className
       )}
+      onClick={clickable && onClick ? (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      } : undefined}
     >
       {tag}
       {removable && onRemove && (

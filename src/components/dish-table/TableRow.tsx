@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import SourceInfo from "../dish-card/SourceInfo";
 import { TagBadge } from "@/components/tags";
+import { useTagNavigation } from "@/hooks/useTagNavigation";
 
 interface DishTableRowProps {
   dish: Dish;
@@ -19,6 +20,7 @@ interface DishTableRowProps {
 }
 
 const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
+  const { navigateToTag } = useTagNavigation();
   // Get source info from our lookup map if available
   const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
 
@@ -75,7 +77,13 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
           {dish.tags && dish.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {dish.tags.map((tag) => (
-                <TagBadge key={tag} tag={tag} variant="outline" />
+                <TagBadge 
+                  key={tag} 
+                  tag={tag} 
+                  variant="outline" 
+                  clickable 
+                  onClick={() => navigateToTag(tag)}
+                />
               ))}
             </div>
           )}
