@@ -8,6 +8,7 @@ import DishTableHeader from "./TableHeader";
 import DishTableRow from "./TableRow";
 import { useTableSort } from "./useTableSort";
 import { useSourceInfo } from "./useSourceInfo";
+import { sortDishes } from "@/utils/dishUtils";
 
 interface DishTableProps {
   dishes: Dish[];
@@ -19,6 +20,9 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
   const { sortDirection, currentSortColumn, handleSort } = useTableSort(sortOption, setSortOption);
   const { sourceInfoMap } = useSourceInfo();
   
+  // Sort the dishes based on the current sort option
+  const sortedDishes = sortDishes(dishes, sortOption);
+  
   return (
     <div className="w-full overflow-auto">
       <Table>
@@ -28,7 +32,7 @@ const DishTable = ({ dishes, sortOption, setSortOption }: DishTableProps) => {
           onSort={handleSort}
         />
         <TableBody>
-          {dishes.map((dish) => (
+          {sortedDishes.map((dish) => (
             <DishTableRow 
               key={dish.id} 
               dish={dish} 

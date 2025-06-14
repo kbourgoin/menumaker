@@ -19,7 +19,7 @@ const AllDishes = () => {
   const [viewMode, setViewMode] = useState<"cards" | "table">("table");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const processedDishes = () => {
+  const getFilteredDishes = () => {
     if (!dishes || !Array.isArray(dishes)) {
       console.log("No dishes array available:", dishes);
       return [];
@@ -47,10 +47,11 @@ const AllDishes = () => {
       return matchesSearch && matchesTags;
     });
     
-    return sortDishes(filtered, sortOption);
+    // Only sort for cards view - table view handles its own sorting
+    return viewMode === "cards" ? sortDishes(filtered, sortOption) : filtered;
   };
   
-  const filteredDishes = processedDishes();
+  const filteredDishes = getFilteredDishes();
   
   return (
     <Layout>
