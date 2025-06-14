@@ -21,13 +21,6 @@ const WeeklyMenu = () => {
   
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   
-  useEffect(() => {
-    // Only generate menu when dishes are loaded and not already generating
-    if (!isLoading && allDishes && allDishes.length > 0 && !isGenerating && weeklyDishes.length === 0) {
-      generateWeeklyMenu();
-    }
-  }, [isLoading, allDishes, isGenerating, weeklyDishes.length, generateWeeklyMenu]);
-  
   const generateWeeklyMenu = useCallback(async () => {
     if (!allDishes || allDishes.length === 0) {
       toast({
@@ -58,6 +51,13 @@ const WeeklyMenu = () => {
       setIsGenerating(false);
     }
   }, [allDishes, getWeeklyDishSuggestions, toast]);
+  
+  useEffect(() => {
+    // Only generate menu when dishes are loaded and not already generating
+    if (!isLoading && allDishes && allDishes.length > 0 && !isGenerating && weeklyDishes.length === 0) {
+      generateWeeklyMenu();
+    }
+  }, [isLoading, allDishes, isGenerating, weeklyDishes.length, generateWeeklyMenu]);
 
   const refreshDayDish = async (dayIndex: number) => {
     if (!allDishes || allDishes.length === 0) return;

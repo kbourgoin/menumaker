@@ -31,6 +31,19 @@ const MealDetail = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [historyLastUpdated, setHistoryLastUpdated] = useState(Date.now());
 
+  const fetchHistory = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const historyData = await getMealHistoryForDish(id);
+      console.log("History data loaded:", historyData);
+      setHistory(historyData);
+    } catch (historyError) {
+      console.error("Error fetching meal history:", historyError);
+      setHistory([]);
+    }
+  }, [id, getMealHistoryForDish]);
+
   const fetchData = useCallback(async () => {
     if (!id) {
       setError("No dish ID provided");
@@ -74,19 +87,6 @@ const MealDetail = () => {
       setIsRefreshing(false);
     }
   }, [id, getDish, activeTab, fetchHistory, toast]);
-
-  const fetchHistory = useCallback(async () => {
-    if (!id) return;
-    
-    try {
-      const historyData = await getMealHistoryForDish(id);
-      console.log("History data loaded:", historyData);
-      setHistory(historyData);
-    } catch (historyError) {
-      console.error("Error fetching meal history:", historyError);
-      setHistory([]);
-    }
-  }, [id, getMealHistoryForDish]);
 
   // Initial data fetch only
   useEffect(() => {
