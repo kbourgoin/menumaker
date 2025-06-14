@@ -11,6 +11,7 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import SourceInfo from "../dish-card/SourceInfo";
+import { TagBadge } from "@/components/tags";
 
 interface DishTableRowProps {
   dish: Dish;
@@ -64,12 +65,21 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   return (
     <UITableRow>
       <TableCell>
-        <Link
-          to={`/meal/${dish.id}`}
-          className="text-primary hover:underline font-medium"
-        >
-          {dish.name}
-        </Link>
+        <div className="space-y-1">
+          <Link
+            to={`/meal/${dish.id}`}
+            className="text-primary hover:underline font-medium"
+          >
+            {dish.name}
+          </Link>
+          {dish.tags && dish.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {dish.tags.map((tag) => (
+                <TagBadge key={tag} tag={tag} variant="outline" />
+              ))}
+            </div>
+          )}
+        </div>
       </TableCell>
       <TableCell className="w-[200px] min-w-0">
         <div className="break-words">
