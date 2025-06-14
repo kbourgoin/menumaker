@@ -17,7 +17,7 @@ export const PWAInstallButton = () => {
       className="gap-2"
     >
       <Download className="h-4 w-4" />
-      Install App
+      <span className="hidden sm:inline">Install App</span>
     </Button>
   );
 };
