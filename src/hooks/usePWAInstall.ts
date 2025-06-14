@@ -24,12 +24,8 @@ export const usePWAInstall = () => {
     const isIOSStandalone = (window.navigator as NavigatorStandalone).standalone === true;
     const isAlreadyInstalled = isStandalone || isIOSStandalone;
     
+    
     setIsInstalled(isAlreadyInstalled);
-
-    // Don't show install button in development mode
-    if (import.meta.env.DEV) {
-      return;
-    }
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
