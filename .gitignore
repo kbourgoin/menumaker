@@ -13,6 +13,9 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
+# Development tools (not for public access)
+tools/
+
 node_modules
 dist
 dist-ssr
