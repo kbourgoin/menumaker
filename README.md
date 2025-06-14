@@ -1,22 +1,21 @@
-# Welcome to your Lovable project
+# MenuMaker
 
-## Project info
+A React-based meal and dish management application for tracking your favorite recipes, cooking history, and meal planning.
 
-**URL**: https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d
+## Features
 
-## How can I edit this code?
+- 🍽️ Track your favorite dishes with cuisines, sources, and cooking history
+- 📊 View cooking statistics and meal frequency analytics  
+- 📅 Generate intelligent weekly menu suggestions
+- 🔍 Search and filter dishes by name, cuisine, or source
+- 📱 Progressive Web App (PWA) with offline support
+- ♿ Accessibility-focused design (WCAG 2.1 compliant)
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+## Development
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clone this repo and start developing locally:
 
 The only requirement is having Bun installed - [install Bun](https://bun.sh/docs/installation)
 
@@ -60,10 +59,21 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d) and click on Share -> Publish.
+This project is deployed at [menu.bourgoin.casa](https://menu.bourgoin.casa) using Cloudflare Pages.
 
-## I want to use a custom domain - is that possible?
+To deploy your own instance:
+1. Connect your repository to your preferred hosting platform (Vercel, Netlify, Cloudflare Pages)
+2. Set build command: `bun run build`
+3. Set publish directory: `dist`
+4. Deploy!
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Architecture
+
+Built with modern web technologies:
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI**: shadcn/ui components with Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **State Management**: TanStack React Query
+- **Testing**: Vitest + React Testing Library
