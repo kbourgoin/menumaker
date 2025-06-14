@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MenuMaker Icon Creator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #B85C43;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 30px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .icon-item {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .icon {
+            margin: 0 auto 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #F9F0EE 0%, #F3E1DD 100%);
+            border: 3px solid #B85C43;
+            box-shadow: 
+                0 8px 25px rgba(184, 92, 67, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+            transition: transform 0.2s ease;
+        }
+        
+        .icon:hover {
+            transform: scale(1.05);
+        }
+        
+        .icon-192 { 
+            width: 192px; 
+            height: 192px; 
+            border-radius: 42px; 
+        }
+        .icon-512 { 
+            width: 256px; 
+            height: 256px; 
+            border-radius: 56px; 
+        }
+        .icon-180 { 
+            width: 180px; 
+            height: 180px; 
+            border-radius: 40px; 
+        }
+        .icon-64 { 
+            width: 64px; 
+            height: 64px; 
+            border-radius: 14px; 
+        }
+        
+        /* Custom utensils icon using CSS */
+        .utensils-icon {
+            color: #B85C43;
+            position: relative;
+        }
+        
+        .utensils-icon::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background: currentColor;
+            border-radius: 2px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .utensils-icon::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            left: 50%;
+            top: 20%;
+            transform: translateX(-50%);
+        }
+        
+        .utensils-192 .utensils-icon {
+            width: 80px;
+            height: 80px;
+        }
+        .utensils-192 .utensils-icon::before {
+            width: 6px;
+            height: 50px;
+        }
+        .utensils-192 .utensils-icon::after {
+            width: 16px;
+            height: 24px;
+            border-width: 3px;
+        }
+        
+        .utensils-512 .utensils-icon {
+            width: 120px;
+            height: 120px;
+        }
+        .utensils-512 .utensils-icon::before {
+            width: 8px;
+            height: 70px;
+        }
+        .utensils-512 .utensils-icon::after {
+            width: 24px;
+            height: 36px;
+            border-width: 4px;
+        }
+        
+        .utensils-180 .utensils-icon {
+            width: 70px;
+            height: 70px;
+        }
+        .utensils-180 .utensils-icon::before {
+            width: 5px;
+            height: 45px;
+        }
+        .utensils-180 .utensils-icon::after {
+            width: 14px;
+            height: 22px;
+            border-width: 2px;
+        }
+        
+        .utensils-64 .utensils-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .utensils-64 .utensils-icon::before {
+            width: 2px;
+            height: 16px;
+        }
+        .utensils-64 .utensils-icon::after {
+            width: 6px;
+            height: 8px;
+            border-width: 1px;
+        }
+        
+        .label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+        
+        .download-btn {
+            background: #B85C43;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        
+        .download-btn:hover {
+            background: #9a4a35;
+        }
+        
+        .instructions {
+            background: #F9F0EE;
+            border: 1px solid #E7C3BB;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #B85C43;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MenuMaker PWA Icon Generator</h1>
+        
+        <div class="icon-grid">
+            <div class="icon-item">
+                <div class="icon icon-192" id="icon-192">
+                    <div class="utensils-192">
+                        <div class="utensils-icon"></div>
+                    </div>
+                </div>
+                <div class="label">192×192 PWA Icon</div>
+                <button class="download-btn" onclick="downloadIcon('icon-192', 192)">Download PNG</button>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon icon-512" id="icon-512">
+                    <div class="utensils-512">
+                        <div class="utensils-icon"></div>
+                    </div>
+                </div>
+                <div class="label">512×512 PWA Icon</div>
+                <button class="download-btn" onclick="downloadIcon('icon-512', 512)">Download PNG</button>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon icon-180" id="icon-180">
+                    <div class="utensils-180">
+                        <div class="utensils-icon"></div>
+                    </div>
+                </div>
+                <div class="label">180×180 Apple Touch</div>
+                <button class="download-btn" onclick="downloadIcon('icon-180', 180)">Download PNG</button>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon icon-64" id="icon-64">
+                    <div class="utensils-64">
+                        <div class="utensils-icon"></div>
+                    </div>
+                </div>
+                <div class="label">64×64 Favicon</div>
+                <button class="download-btn" onclick="downloadIcon('icon-64', 64)">Download PNG</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click the "Download PNG" button under each icon to save it</li>
+                <li>Replace the files in the <code>public/</code> folder:
+                    <ul>
+                        <li><code>icon-192.png</code></li>
+                        <li><code>icon-512.png</code></li>
+                        <li><code>icon-apple-touch.png</code></li>
+                        <li><code>favicon.ico</code> (convert the 64×64 PNG to ICO format)</li>
+                    </ul>
+                </li>
+                <li>The icons use your app's terracotta color scheme (#B85C43) with a subtle gradient background</li>
+                <li>They're designed to look crisp at all sizes and match your app's branding</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function downloadIcon(elementId, targetSize) {
+            const element = document.getElementById(elementId);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = targetSize;
+            canvas.height = targetSize;
+            
+            // High DPI support
+            const ratio = window.devicePixelRatio || 1;
+            canvas.width = targetSize * ratio;
+            canvas.height = targetSize * ratio;
+            canvas.style.width = targetSize + 'px';
+            canvas.style.height = targetSize + 'px';
+            ctx.scale(ratio, ratio);
+            
+            // Calculate dimensions
+            const radius = targetSize * 0.22;
+            const borderWidth = Math.max(2, targetSize * 0.015);
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, targetSize, targetSize);
+            gradient.addColorStop(0, '#F9F0EE');
+            gradient.addColorStop(1, '#F3E1DD');
+            
+            // Draw background with rounded corners
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(borderWidth/2, borderWidth/2, targetSize - borderWidth, targetSize - borderWidth, radius);
+            ctx.fill();
+            
+            // Draw border
+            ctx.strokeStyle = '#B85C43';
+            ctx.lineWidth = borderWidth;
+            ctx.stroke();
+            
+            // Draw utensils icon
+            const iconSize = targetSize * 0.4;
+            const centerX = targetSize / 2;
+            const centerY = targetSize / 2;
+            
+            ctx.fillStyle = '#B85C43';
+            
+            // Draw fork handle
+            const handleWidth = iconSize * 0.08;
+            const handleHeight = iconSize * 0.6;
+            ctx.fillRect(centerX - handleWidth/2, centerY - handleHeight/2, handleWidth, handleHeight);
+            
+            // Draw fork head
+            const headWidth = iconSize * 0.2;
+            const headHeight = iconSize * 0.3;
+            ctx.strokeStyle = '#B85C43';
+            ctx.lineWidth = handleWidth * 0.7;
+            ctx.strokeRect(centerX - headWidth/2, centerY - iconSize/2, headWidth, headHeight);
+            
+            // Download the canvas as PNG
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `icon-${targetSize}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+    </script>
+</body>
+</html>

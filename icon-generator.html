@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MenuMaker Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .icon-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #F9F0EE 0%, #F3E1DD 100%);
+            border-radius: 50px;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(184, 92, 67, 0.2);
+        }
+        .icon-192 { width: 192px; height: 192px; border-radius: 38px; }
+        .icon-512 { width: 512px; height: 512px; border-radius: 100px; }
+        .icon-180 { width: 180px; height: 180px; border-radius: 36px; }
+        .icon-64 { width: 64px; height: 64px; border-radius: 12px; }
+        
+        .utensils {
+            color: #B85C43;
+            font-weight: bold;
+        }
+        .utensils-192 { font-size: 80px; }
+        .utensils-512 { font-size: 220px; }
+        .utensils-180 { font-size: 75px; }
+        .utensils-64 { font-size: 26px; }
+        
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #B85C43;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #9a4a35;
+        }
+    </style>
+</head>
+<body>
+    <h1>MenuMaker PWA Icons</h1>
+    <p>Right-click on each icon and "Save image as..." to download</p>
+    
+    <div class="icon-container">
+        <div class="icon icon-192" id="icon-192">
+            <div class="utensils utensils-192">🍽️</div>
+        </div>
+        <div>192x192 (PWA)</div>
+        <button onclick="downloadIcon('icon-192', 192, 'icon-192.png')">Download</button>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-512" id="icon-512">
+            <div class="utensils utensils-512">🍽️</div>
+        </div>
+        <div>512x512 (PWA)</div>
+        <button onclick="downloadIcon('icon-512', 512, 'icon-512.png')">Download</button>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-180" id="icon-180">
+            <div class="utensils utensils-180">🍽️</div>
+        </div>
+        <div>180x180 (Apple Touch)</div>
+        <button onclick="downloadIcon('icon-180', 180, 'icon-apple-touch.png')">Download</button>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon icon-64" id="icon-64">
+            <div class="utensils utensils-64">🍽️</div>
+        </div>
+        <div>64x64 (Favicon)</div>
+        <button onclick="downloadIcon('icon-64', 64, 'favicon.png')">Download</button>
+    </div>
+
+    <script>
+        function downloadIcon(elementId, size, filename) {
+            const element = document.getElementById(elementId);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#F9F0EE');
+            gradient.addColorStop(1, '#F3E1DD');
+            
+            // Fill background with rounded rectangle
+            const radius = size * 0.2;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+            
+            // Add shadow effect
+            ctx.shadowColor = 'rgba(184, 92, 67, 0.3)';
+            ctx.shadowBlur = size * 0.02;
+            ctx.shadowOffsetY = size * 0.01;
+            
+            // Draw utensils emoji
+            ctx.fillStyle = '#B85C43';
+            ctx.font = `${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🍽️', size/2, size/2);
+            
+            // Download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+    </script>
+</body>
+</html>
