@@ -75,91 +75,29 @@
             border-radius: 14px; 
         }
         
-        /* Custom utensils icon using CSS */
+        /* Clean emoji-based design */
         .utensils-icon {
             color: #B85C43;
-            position: relative;
-        }
-        
-        .utensils-icon::before {
-            content: '';
-            position: absolute;
-            width: 4px;
-            height: 40px;
-            background: currentColor;
-            border-radius: 2px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .utensils-icon::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 20px;
-            border: 2px solid currentColor;
-            border-bottom: none;
-            border-radius: 6px 6px 0 0;
-            left: 50%;
-            top: 20%;
-            transform: translateX(-50%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .utensils-192 .utensils-icon {
-            width: 80px;
-            height: 80px;
-        }
-        .utensils-192 .utensils-icon::before {
-            width: 6px;
-            height: 50px;
-        }
-        .utensils-192 .utensils-icon::after {
-            width: 16px;
-            height: 24px;
-            border-width: 3px;
+            font-size: 80px;
         }
         
         .utensils-512 .utensils-icon {
-            width: 120px;
-            height: 120px;
-        }
-        .utensils-512 .utensils-icon::before {
-            width: 8px;
-            height: 70px;
-        }
-        .utensils-512 .utensils-icon::after {
-            width: 24px;
-            height: 36px;
-            border-width: 4px;
+            font-size: 160px;
         }
         
         .utensils-180 .utensils-icon {
-            width: 70px;
-            height: 70px;
-        }
-        .utensils-180 .utensils-icon::before {
-            width: 5px;
-            height: 45px;
-        }
-        .utensils-180 .utensils-icon::after {
-            width: 14px;
-            height: 22px;
-            border-width: 2px;
+            font-size: 72px;
         }
         
         .utensils-64 .utensils-icon {
-            width: 24px;
-            height: 24px;
-        }
-        .utensils-64 .utensils-icon::before {
-            width: 2px;
-            height: 16px;
-        }
-        .utensils-64 .utensils-icon::after {
-            width: 6px;
-            height: 8px;
-            border-width: 1px;
+            font-size: 32px;
         }
         
         .label {
@@ -205,7 +143,7 @@
             <div class="icon-item">
                 <div class="icon icon-192" id="icon-192">
                     <div class="utensils-192">
-                        <div class="utensils-icon"></div>
+                        <div class="utensils-icon">🍴</div>
                     </div>
                 </div>
                 <div class="label">192×192 PWA Icon</div>
@@ -215,7 +153,7 @@
             <div class="icon-item">
                 <div class="icon icon-512" id="icon-512">
                     <div class="utensils-512">
-                        <div class="utensils-icon"></div>
+                        <div class="utensils-icon">🍴</div>
                     </div>
                 </div>
                 <div class="label">512×512 PWA Icon</div>
@@ -225,7 +163,7 @@
             <div class="icon-item">
                 <div class="icon icon-180" id="icon-180">
                     <div class="utensils-180">
-                        <div class="utensils-icon"></div>
+                        <div class="utensils-icon">🍴</div>
                     </div>
                 </div>
                 <div class="label">180×180 Apple Touch</div>
@@ -235,7 +173,7 @@
             <div class="icon-item">
                 <div class="icon icon-64" id="icon-64">
                     <div class="utensils-64">
-                        <div class="utensils-icon"></div>
+                        <div class="utensils-icon">🍴</div>
                     </div>
                 </div>
                 <div class="label">64×64 Favicon</div>
@@ -298,24 +236,15 @@
             ctx.lineWidth = borderWidth;
             ctx.stroke();
             
-            // Draw utensils icon
-            const iconSize = targetSize * 0.4;
+            // Draw utensils emoji
             const centerX = targetSize / 2;
             const centerY = targetSize / 2;
+            const fontSize = targetSize * 0.3;
             
-            ctx.fillStyle = '#B85C43';
-            
-            // Draw fork handle
-            const handleWidth = iconSize * 0.08;
-            const handleHeight = iconSize * 0.6;
-            ctx.fillRect(centerX - handleWidth/2, centerY - handleHeight/2, handleWidth, handleHeight);
-            
-            // Draw fork head
-            const headWidth = iconSize * 0.2;
-            const headHeight = iconSize * 0.3;
-            ctx.strokeStyle = '#B85C43';
-            ctx.lineWidth = handleWidth * 0.7;
-            ctx.strokeRect(centerX - headWidth/2, centerY - iconSize/2, headWidth, headHeight);
+            ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🍴', centerX, centerY);
             
             // Download the canvas as PNG
             canvas.toBlob(function(blob) {
