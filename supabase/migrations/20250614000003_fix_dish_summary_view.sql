@@ -2,7 +2,7 @@
 DROP VIEW IF EXISTS public.dish_summary;
 
 -- Recreate dish_summary view with tags and fixed meal history aggregation
-CREATE VIEW public.dish_summary AS
+CREATE MATERIALIZED VIEW public.dish_summary AS
 SELECT 
     d.id,
     d.name,
