@@ -20,6 +20,13 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-sage-50">
+      {/* Skip navigation link for accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+      >
+        Skip to main content
+      </a>
       <Header />
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">
@@ -27,11 +34,14 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       )}
       <motion.main 
+        id="main-content"
         className="flex-1 container mx-auto px-4 py-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
+        role="main"
+        aria-label="Main content"
       >
         {isLoading ? (
           <div className="flex flex-col justify-center items-center h-[50vh]">

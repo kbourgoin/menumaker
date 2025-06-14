@@ -12,7 +12,7 @@ interface RecentlyCookedProps {
   isLoading: boolean;
 }
 
-const RecentlyCooked = ({ recentlyCooked, isLoading }: RecentlyCookedProps) => {
+const RecentlyCooked = React.memo<RecentlyCookedProps>(({ recentlyCooked, isLoading }) => {
   return (
     <Card className="animate-slide-down delay-200">
       <CardHeader>
@@ -68,6 +68,8 @@ const RecentlyCooked = ({ recentlyCooked, isLoading }: RecentlyCookedProps) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+RecentlyCooked.displayName = 'RecentlyCooked';
 
 export default RecentlyCooked;
