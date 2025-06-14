@@ -45,9 +45,10 @@ const LoginForm = ({
       if (error) throw error;
       
       // Navigate happens automatically via the auth state change listener
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      toast.error(error.message || "Failed to log in");
+      const errorMessage = error instanceof Error ? error.message : "Failed to log in";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

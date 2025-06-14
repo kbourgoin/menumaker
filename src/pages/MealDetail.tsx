@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useDishes } from "@/hooks/useMeals";
@@ -31,19 +31,7 @@ const MealDetail = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [historyLastUpdated, setHistoryLastUpdated] = useState(Date.now());
 
-  // Initial data fetch only
-  useEffect(() => {
-    fetchData();
-  }, [id]);
-
-  // Only fetch history when needed
-  useEffect(() => {
-    if (activeTab === "history" || historyLastUpdated) {
-      fetchHistory();
-    }
-  }, [activeTab, historyLastUpdated]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!id) {
       setError("No dish ID provided");
       setIsLoading(false);
@@ -85,9 +73,9 @@ const MealDetail = () => {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, [id, getDish, activeTab, fetchHistory, toast]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     if (!id) return;
     
     try {
@@ -98,7 +86,19 @@ const MealDetail = () => {
       console.error("Error fetching meal history:", historyError);
       setHistory([]);
     }
-  };
+  }, [id, getMealHistoryForDish]);
+
+  // Initial data fetch only
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Only fetch history when needed
+  useEffect(() => {
+    if (activeTab === "history" || historyLastUpdated) {
+      fetchHistory();
+    }
+  }, [activeTab, historyLastUpdated, fetchHistory]);
 
   const handleBack = () => {
     navigate(-1);

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dish, MealHistory, Source } from "@/types";
+import { Tables } from "@/integrations/supabase/types";
 import { 
   mapDishFromDB, 
   mapMealHistoryFromDB, 
@@ -29,7 +30,7 @@ export function useDataExport() {
       if (!userId) throw new Error("User not authenticated");
       
       // Fetch all dishes with pagination to overcome any limits
-      let allDishes: any[] = [];
+      let allDishes: Tables<'dishes'>[] = [];
       let hasMoreDishes = true;
       let lastDishId: string | null = null;
       
@@ -64,7 +65,7 @@ export function useDataExport() {
       console.log(`Exported ${allDishes.length} dishes`);
       
       // Fetch all meal history with pagination
-      let allMealHistory: any[] = [];
+      let allMealHistory: Tables<'meal_history'>[] = [];
       let hasMoreHistory = true;
       let lastHistoryId: string | null = null;
       
@@ -99,7 +100,7 @@ export function useDataExport() {
       console.log(`Exported ${allMealHistory.length} meal history entries`);
       
       // Fetch all sources with pagination
-      let allSources: any[] = [];
+      let allSources: Tables<'sources'>[] = [];
       let hasMoreSources = true;
       let lastSourceId: string | null = null;
       

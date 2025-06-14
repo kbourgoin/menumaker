@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,9 +26,9 @@ const WeeklyMenu = () => {
     if (!isLoading && allDishes && allDishes.length > 0 && !isGenerating && weeklyDishes.length === 0) {
       generateWeeklyMenu();
     }
-  }, [isLoading, allDishes]);
+  }, [isLoading, allDishes, isGenerating, weeklyDishes.length, generateWeeklyMenu]);
   
-  const generateWeeklyMenu = async () => {
+  const generateWeeklyMenu = useCallback(async () => {
     if (!allDishes || allDishes.length === 0) {
       toast({
         title: "No dishes available",
@@ -57,7 +57,7 @@ const WeeklyMenu = () => {
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [allDishes, getWeeklyDishSuggestions, toast]);
 
   const refreshDayDish = async (dayIndex: number) => {
     if (!allDishes || allDishes.length === 0) return;

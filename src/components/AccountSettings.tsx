@@ -50,9 +50,10 @@ const AccountSettings = () => {
       if (error) throw error;
       
       toast.success("Verification email sent. Please check your inbox.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating email:", error);
-      toast.error(error.message || "Failed to update email");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update email";
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -82,9 +83,10 @@ const AccountSettings = () => {
       });
       
       toast.success("Password updated successfully");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating password:", error);
-      toast.error(error.message || "Failed to update password");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update password";
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }

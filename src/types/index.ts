@@ -52,3 +52,22 @@ export type CuisineType =
   | 'British'
   | 'Fusion'
   | 'Other';
+
+export interface MealHistoryWithDish {
+  id: string;
+  dishId: string;
+  date: string;
+  notes?: string;
+  user_id: string;
+  dish?: Dish;
+}
+
+export interface StatsData {
+  totalDishes: number;
+  totalTimesCooked: number;
+  mostCooked?: {
+    name: string;
+    timesCooked: number;
+  };
+  cuisineBreakdown: Record<string, number>;
+}

@@ -1,5 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
+import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
 
 export function useStats() {
@@ -16,7 +17,7 @@ export function useStats() {
         if (dishesError) throw dishesError;
         
         // Fetch ALL meal history data with pagination to handle the 1000 row limit
-        let allHistoryData: any[] = [];
+        let allHistoryData: Tables<'meal_history'>[] = [];
         let hasMoreEntries = true;
         let lastDate: string | null = null;
         
@@ -55,7 +56,7 @@ export function useStats() {
         }
         
         // Group meal history by dish ID
-        const historyByDishId: Record<string, any[]> = {};
+        const historyByDishId: Record<string, Tables<'meal_history'>[]> = {};
         allHistoryData.forEach(entry => {
           if (!historyByDishId[entry.dishid]) {
             historyByDishId[entry.dishid] = [];

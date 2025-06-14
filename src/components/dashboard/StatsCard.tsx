@@ -7,8 +7,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 // Define colors for the pie chart
 const COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#F9F871', '#6A0572', '#AB83A1', '#15616D'];
 
+import type { StatsData } from "@/types";
+
 interface StatsCardProps {
-  stats: any;
+  stats: StatsData | null;
   isLoading: boolean;
 }
 

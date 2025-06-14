@@ -60,7 +60,7 @@ export const processDishImport = async (
     return await createMealHistoryEntries(dishId, dishEntries, existingEntries, userId);
   } catch (err) {
     // Log the specific error for debugging
-    const error = err as any;
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error(`Error processing dish '${dishEntries[0].dish}':`, error);
     return { success: 0, skipped: dishEntries.length };
   }

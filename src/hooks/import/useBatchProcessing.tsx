@@ -18,7 +18,7 @@ export function useBatchProcessing<T, R>(
         setIsProcessing(false);
       }
     },
-    [processFn, batchSize]
+    [processFn]
   );
 
   return {

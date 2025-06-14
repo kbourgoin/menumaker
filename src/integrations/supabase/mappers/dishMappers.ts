@@ -1,10 +1,10 @@
 
-import { Database, Json } from '../types';
+import { Database, Json, Tables } from '../types';
 import { DBDish, DishSummary } from './types';
 import { Dish } from '@/types';
 
 // Mapping functions to convert between database and client formats
-export const mapDishFromDB = (dish: DBDish, mealHistory?: any[]): Dish => {
+export const mapDishFromDB = (dish: DBDish, mealHistory?: Tables<'meal_history'>[]): Dish => {
   // Default values for derived fields
   let timesCooked = 0;
   let lastMade: string | undefined = undefined;

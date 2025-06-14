@@ -36,9 +36,10 @@ const ForgotPassword = ({ onBack }: ForgotPasswordProps) => {
       
       setSubmitted(true);
       toast.success("Password reset link sent");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password reset error:", error);
-      toast.error(error.message || "Failed to send reset link");
+      const errorMessage = error instanceof Error ? error.message : "Failed to send reset link";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

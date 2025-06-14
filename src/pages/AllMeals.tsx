@@ -27,7 +27,7 @@ const AllDishes = () => {
     if (tagFromUrl && !selectedTags.includes(tagFromUrl)) {
       setSelectedTags([tagFromUrl]);
     }
-  }, [searchParams]);
+  }, [searchParams, selectedTags]);
 
   // Update URL when tags change (but only if navigated from tag click)
   const handleTagsChange = (tags: string[]) => {
@@ -53,7 +53,7 @@ const AllDishes = () => {
       return acc;
     }, [] as typeof dishes);
     
-    let filtered = uniqueDishes.filter(dish => {
+    const filtered = uniqueDishes.filter(dish => {
       if (!dish || typeof dish !== 'object') {
         console.log("Invalid dish object:", dish);
         return false;

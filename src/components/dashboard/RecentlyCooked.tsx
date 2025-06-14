@@ -5,8 +5,10 @@ import { Check, ChevronRight, Clock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import type { MealHistoryWithDish } from "@/types";
+
 interface RecentlyCookedProps {
-  recentlyCooked: any[];
+  recentlyCooked: MealHistoryWithDish[];
   isLoading: boolean;
 }
 
@@ -32,7 +34,7 @@ const RecentlyCooked = ({ recentlyCooked, isLoading }: RecentlyCookedProps) => {
           </div>
         ) : recentlyCooked && recentlyCooked.length > 0 ? (
           <div className="space-y-3">
-            {recentlyCooked.map((item: any, index: number) => (
+            {recentlyCooked.map((item: MealHistoryWithDish, index: number) => (
               <div key={index} className="flex items-center border rounded-lg p-3 hover:bg-slate-50 transition-colors">
                 <div className="w-8 h-8 rounded-full bg-terracotta-100 flex items-center justify-center mr-3 text-terracotta-500">
                   <Check className="h-4 w-4" />

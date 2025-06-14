@@ -22,7 +22,7 @@ export const fetchDishesOriginalMethod = async (user_id: string): Promise<Dish[]
     // Process each dish one by one to avoid hitting the 1000 row limit for all meal history at once
     for (const dish of dishesData) {
       // For each dish, get its meal history with pagination to handle the 1000 row limit
-      let historyForDish: any[] = [];
+      let historyForDish: MealHistory[] = [];
       let hasMoreEntries = true;
       let lastDate = null;
       

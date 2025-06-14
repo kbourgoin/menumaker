@@ -1,5 +1,6 @@
 
-import { Source, Dish } from "@/types";
+import { Source, Dish, MealHistory } from "@/types";
+import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapSourceFromDB, mapDishFromDB } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -84,7 +85,7 @@ export function useSourceQueries() {
       
       // Get meal history for these dishes
       const dishIds = dishesData.map(dish => dish.id);
-      let mealHistoryByDish: Record<string, any[]> = {};
+      let mealHistoryByDish: Record<string, Tables<'meal_history'>[]> = {};
       
       if (dishIds.length > 0) {
         const { data: historyData, error: historyError } = await supabase
@@ -102,7 +103,7 @@ export function useSourceQueries() {
             }
             acc[history.dishid].push(history);
             return acc;
-          }, {} as Record<string, any[]>);
+          }, {} as Record<string, Tables<'meal_history'>[]>);
         }
       }
       

@@ -41,7 +41,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
     if (!sourceId) {
       form.setValue("location", "");
     }
-  }, [form.watch("sourceId")]);
+  }, [form]);
 
   return (
     <div className="space-y-4">
