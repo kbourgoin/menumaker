@@ -40,7 +40,8 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: any[]): Dish => {
     lastMade,  // Derived value
     timesCooked, // Derived value
     lastComment, // Derived value from most recent note
-    user_id: dish.user_id
+    user_id: dish.user_id,
+    tags: [] // Default empty array for dishes fetched without tags
   };
 };
 
@@ -56,7 +57,8 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
     lastMade: summary.last_made,
     timesCooked: summary.times_cooked || 0,
     lastComment: summary.last_comment,
-    user_id: summary.user_id
+    user_id: summary.user_id,
+    tags: summary.tags || []
   };
 };
 

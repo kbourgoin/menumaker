@@ -9,6 +9,46 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      dish_tags: {
+        Row: {
+          created_at: string
+          dish_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          dish_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          dish_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dish_tags_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dish_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dish_tags_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dish_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dishes: {
         Row: {
           createdat: string
@@ -137,6 +177,30 @@ export type Database = {
         }
         Relationships: []
       }
+      tags: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       dish_summary: {
@@ -149,6 +213,7 @@ export type Database = {
           location: string | null
           name: string | null
           source_id: string | null
+          tags: string[] | null
           times_cooked: number | null
           user_id: string | null
         }

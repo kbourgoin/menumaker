@@ -10,6 +10,7 @@ export interface Dish {
   user_id: string;
   location?: string;
   lastComment?: string;
+  tags: string[];
 }
 
 export interface MealHistory {
