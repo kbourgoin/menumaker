@@ -6,24 +6,24 @@ import type { Tables } from "@/integrations/supabase/types";
 export type Tag = Tables<"tags">;
 
 export const useTagQueries = () => {
-  const { user } = useAuth();
+  const { session } = useAuth();
 
   const useAllTags = () => {
     return useQuery({
-      queryKey: ["tags", user?.id],
+      queryKey: ["tags", session?.user?.id],
       queryFn: async (): Promise<Tag[]> => {
-        if (!user?.id) throw new Error("User not authenticated");
+        if (!session?.user?.id) throw new Error("User not authenticated");
 
         const { data, error } = await supabase
           .from("tags")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", session.user.id)
           .order("name");
 
         if (error) throw error;
         return data || [];
       },
-      enabled: !!user?.id,
+      enabled: !!session?.user?.id,
     });
   };
 
@@ -31,19 +31,19 @@ export const useTagQueries = () => {
     return useQuery({
       queryKey: ["tag", tagId],
       queryFn: async (): Promise<Tag | null> => {
-        if (!tagId || !user?.id) return null;
+        if (!tagId || !session?.user?.id) return null;
 
         const { data, error } = await supabase
           .from("tags")
           .select("*")
           .eq("id", tagId)
-          .eq("user_id", user.id)
+          .eq("user_id", session.user.id)
           .single();
 
         if (error) throw error;
         return data;
       },
-      enabled: !!tagId && !!user?.id,
+      enabled: !!tagId && !!session?.user?.id,
     });
   };
 
@@ -51,7 +51,7 @@ export const useTagQueries = () => {
     return useQuery({
       queryKey: ["dish-tags", dishId],
       queryFn: async (): Promise<Tag[]> => {
-        if (!dishId || !user?.id) return [];
+        if (!dishId || !session?.user?.id) return [];
 
         const { data, error } = await supabase
           .from("dish_tags")
@@ -64,7 +64,7 @@ export const useTagQueries = () => {
         
         return data?.map(item => item.tags).filter(Boolean) as Tag[] || [];
       },
-      enabled: !!dishId && !!user?.id,
+      enabled: !!dishId && !!session?.user?.id,
     });
   };
 
@@ -72,7 +72,7 @@ export const useTagQueries = () => {
     return useQuery({
       queryKey: ["tag-usage", tagId],
       queryFn: async (): Promise<number> => {
-        if (!tagId || !user?.id) return 0;
+        if (!tagId || !session?.user?.id) return 0;
 
         const { count, error } = await supabase
           .from("dish_tags")
@@ -82,7 +82,7 @@ export const useTagQueries = () => {
         if (error) throw error;
         return count || 0;
       },
-      enabled: !!tagId && !!user?.id,
+      enabled: !!tagId && !!session?.user?.id,
     });
   };
 

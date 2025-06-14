@@ -17,6 +17,7 @@ const AllDishes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("lastCooked");
   const [viewMode, setViewMode] = useState<"cards" | "table">("table");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const processedDishes = () => {
     if (!dishes || !Array.isArray(dishes)) {
@@ -30,11 +31,20 @@ const AllDishes = () => {
         return false;
       }
       
-      return !searchQuery || 
+      // Text search filter
+      const matchesSearch = !searchQuery || 
         (dish.name && dish.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (dish.cuisines && Array.isArray(dish.cuisines) && dish.cuisines.some(cuisine => 
           cuisine && cuisine.toLowerCase().includes(searchQuery.toLowerCase())
         ));
+      
+      // Tag filter
+      const matchesTags = selectedTags.length === 0 || 
+        (dish.tags && selectedTags.every(selectedTag => 
+          dish.tags.includes(selectedTag)
+        ));
+      
+      return matchesSearch && matchesTags;
     });
     
     return sortDishes(filtered, sortOption);
@@ -52,6 +62,8 @@ const AllDishes = () => {
           setSearchQuery={setSearchQuery}
           sortOption={sortOption}
           setSortOption={setSortOption}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
           viewMode={viewMode}
         />
         

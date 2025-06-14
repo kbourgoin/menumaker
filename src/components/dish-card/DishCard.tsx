@@ -35,6 +35,7 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
         location={dish.location}
         compact={compact}
         lastComment={dish.lastComment}
+        tags={dish.tags || []}
       />
       
       {showActions && (

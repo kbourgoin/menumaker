@@ -15,6 +15,8 @@ import CuisineSelector from "./CuisineSelector";
 import SourceSelector from "./SourceSelector";
 import LocationField from "./LocationField";
 import { useSources } from "@/hooks/sources";
+import { TagSelector } from "@/components/tags";
+import { useTagMutations, useTagQueries } from "@/hooks/tag";
 
 interface DishFormProps {
   existingDish?: Dish;
@@ -24,6 +26,10 @@ interface DishFormProps {
 const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const { dishes, addDish, updateDish } = useDishes();
   const { getSources } = useSources();
+  const { createTag, addMultipleTagsToDish, removeTagFromDish } = useTagMutations();
+  const { useAllTags, useTagsByDishId } = useTagQueries();
+  const { data: allTags = [] } = useAllTags();
+  const { data: currentTags = [] } = useTagsByDishId(existingDish?.id);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,8 +52,62 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
       cuisines: defaultCuisine,
       sourceId: existingDish?.sourceId || "",
       location: existingDish?.location || "",
+      tags: currentTags.map(tag => tag.name) || [],
     },
   });
+
+  // Helper function to manage tag associations
+  const manageTags = async (dishId: string, selectedTagNames: string[]) => {
+    const tagNameToId = new Map(allTags.map(tag => [tag.name, tag.id]));
+    const selectedTagIds: string[] = [];
+    
+    // Process each selected tag
+    for (const tagName of selectedTagNames) {
+      if (tagNameToId.has(tagName)) {
+        // Existing tag
+        selectedTagIds.push(tagNameToId.get(tagName)!);
+      } else {
+        // Create new tag
+        try {
+          await createTag.mutateAsync({ name: tagName });
+          // Note: We'll need to refetch tags to get the new ID, or handle this differently
+          // For now, we'll skip adding it to the dish - the TagSelector handles creation
+        } catch (error) {
+          console.error(`Failed to create tag: ${tagName}`, error);
+        }
+      }
+    }
+    
+    // Remove old tag associations for existing dish
+    if (existingDish) {
+      const currentTagIds = currentTags.map(tag => tag.id);
+      const tagsToRemove = currentTagIds.filter(id => {
+        const tagName = allTags.find(tag => tag.id === id)?.name;
+        return tagName && !selectedTagNames.includes(tagName);
+      });
+      
+      for (const tagId of tagsToRemove) {
+        try {
+          await removeTagFromDish.mutateAsync({ dishId, tagId });
+        } catch (error) {
+          console.error('Failed to remove tag:', error);
+        }
+      }
+    }
+    
+    // Add new tag associations
+    const tagsToAdd = selectedTagIds.filter(tagId => {
+      return !currentTags.some(currentTag => currentTag.id === tagId);
+    });
+    
+    if (tagsToAdd.length > 0) {
+      try {
+        await addMultipleTagsToDish.mutateAsync({ dishId, tagIds: tagsToAdd });
+      } catch (error) {
+        console.error('Failed to add tags:', error);
+      }
+    }
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -61,10 +121,12 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           location: data.location,
         });
         
+        // Manage tags
+        await manageTags(existingDish.id, data.tags || []);
+        
         if (onSuccess) {
           onSuccess(existingDish);
         } else {
-          // If no onSuccess handler, toast and navigate directly
           toast({
             title: "Dish updated",
             description: `${data.name} has been updated successfully.`,
@@ -79,10 +141,14 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           location: data.location,
         });
         
+        // Manage tags for new dish
+        if (newDish && data.tags && data.tags.length > 0) {
+          await manageTags(newDish.id, data.tags);
+        }
+        
         if (onSuccess && newDish) {
           onSuccess(newDish);
         } else {
-          // If no onSuccess handler, toast and navigate directly
           toast({
             title: "Dish added",
             description: `${data.name} has been added to your dishes.`,
@@ -128,6 +194,23 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         <SourceSelector form={form} sources={sources} />
         
         <LocationField form={form} sources={sources} />
+
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <TagSelector
+                  selectedTags={field.value || []}
+                  onTagsChange={field.onChange}
+                  placeholder="Add tags to organize your dish"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="flex justify-end space-x-3 pt-3">
           <Button

@@ -3,6 +3,7 @@ import { CardContent } from "@/components/ui/card";
 import CuisinesList from "./CuisinesList";
 import CookingInfo from "./CookingInfo";
 import SourceInfo from "./SourceInfo";
+import { TagBadge } from "@/components/tags";
 
 interface DishCardContentProps {
   cuisines: string[];
@@ -12,6 +13,7 @@ interface DishCardContentProps {
   location?: string;
   compact?: boolean;
   lastComment?: string;
+  tags?: string[];
 }
 
 const DishCardContent = ({ 
@@ -21,12 +23,21 @@ const DishCardContent = ({
   sourceId, 
   location, 
   compact = false,
-  lastComment
+  lastComment,
+  tags = []
 }: DishCardContentProps) => {
   return (
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
       <div className="space-y-3">
         <CuisinesList cuisines={cuisines || []} compact={compact} />
+        
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {tags.map((tag) => (
+              <TagBadge key={tag} tag={tag} variant="outline" />
+            ))}
+          </div>
+        )}
         
         <CookingInfo 
           lastMade={lastMade} 

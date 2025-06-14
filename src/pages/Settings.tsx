@@ -7,8 +7,9 @@ import { DataManagement } from "@/components/data/DataManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed } from "lucide-react";
+import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed, Tag } from "lucide-react";
 import CuisineSettings from "@/components/settings/CuisineSettings";
+import { TagManager } from "@/components/tags";
 
 const Settings = () => {
   return (
@@ -77,6 +78,19 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                      <Tag className="h-5 w-5 text-terracotta-500" />
+                      Tag Management
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Create and manage tags to organize your recipes
+                    </p>
+                    <TagManager />
+                  </div>
+                  
+                  <Separator />
+                  
                   <div>
                     <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
                       <UtensilsCrossed className="h-5 w-5 text-terracotta-500" />
