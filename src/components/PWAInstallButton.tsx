@@ -5,7 +5,19 @@ import { usePWAInstall } from "@/hooks/usePWAInstall";
 export const PWAInstallButton = () => {
   const { isInstallable, isInstalled, installApp } = usePWAInstall();
 
-  if (isInstalled || !isInstallable) {
+  // Debug logging in development
+  if (import.meta.env.DEV) {
+    console.log('PWA Install Button Debug:', {
+      isInstallable,
+      isInstalled,
+      shouldShow: !isInstalled && isInstallable
+    });
+  }
+
+  // In development, show the button even if not installable (for testing)
+  const shouldShow = import.meta.env.DEV ? true : (!isInstalled && isInstallable);
+  
+  if (!shouldShow) {
     return null;
   }
 
