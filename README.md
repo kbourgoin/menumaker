@@ -13,51 +13,72 @@ A React-based meal and dish management application for tracking your favorite re
 
 ## Development
 
-**Use your preferred IDE**
-
-Clone this repo and start developing locally:
+### Setup
 
 The only requirement is having Bun installed - [install Bun](https://bun.sh/docs/installation)
 
-Follow these steps:
-
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/kbourgoin/menumaker.git
+cd menumaker
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 bun install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 bun run dev
 ```
 
-**Edit a file directly in GitHub**
+### Development Process
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+**⚠️ Important: All changes must go through pull requests. Direct pushes to main are not allowed.**
 
-**Use GitHub Codespaces**
+1. **Create a feature branch** from main:
+   ```sh
+   git checkout main
+   git pull origin main
+   git checkout -b feature/your-feature-name
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. **Make your changes** and test locally:
+   ```sh
+   bun run dev     # Start development server
+   bun run test    # Run tests
+   bun run lint    # Check code quality
+   bun run build   # Test production build
+   ```
 
-## What technologies are used for this project?
+3. **Commit and push your branch**:
+   ```sh
+   git add .
+   git commit -m "feat: describe your changes"
+   git push -u origin feature/your-feature-name
+   ```
 
-This project is built with .
+4. **Create a pull request** on GitHub:
+   - Provide a clear title and description
+   - Link any related issues
+   - Request review from maintainers
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+5. **After review and approval**, the PR will be merged to main
+
+### Branch Naming Convention
+- `feature/` - New features or enhancements
+- `fix/` - Bug fixes
+- `refactor/` - Code refactoring
+- `docs/` - Documentation updates
+- `test/` - Test additions or updates
+
+## Technologies
+
+This project is built with:
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI**: shadcn/ui components with Tailwind CSS  
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **State Management**: TanStack React Query
+- **Testing**: Vitest + React Testing Library
+- **Package Manager**: Bun
 
 ## Deployment
 
