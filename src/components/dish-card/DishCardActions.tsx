@@ -45,7 +45,7 @@ const DishCardActions = ({ dish, compact = false, onDeleted }: DishCardActionsPr
 
   return (
     <CardFooter className={`border-t mt-auto ${compact ? "pt-2 pb-3 px-4" : "pt-3"}`}>
-      <div className="flex justify-between w-full">
+      <div className="flex justify-between w-full" role="group" aria-label={`Actions for ${dish.name}`}>
         <CookDishDialog 
           dish={dish}
           variant="outline"
@@ -53,15 +53,17 @@ const DishCardActions = ({ dish, compact = false, onDeleted }: DishCardActionsPr
           compact={compact}
         />
         
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="group" aria-label="Edit and delete actions">
           <Button
             variant="ghost"
             size={compact ? "sm" : "default"}
             className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+            aria-label={`Edit ${dish.name}`}
             asChild
           >
             <Link to={`/meal/${dish.id}`}>
-              <Pencil className="h-4 w-4" />
+              <Pencil className="h-4 w-4" aria-hidden="true" />
+              <span className="sr-only">Edit dish</span>
             </Link>
           </Button>
           
@@ -71,8 +73,10 @@ const DishCardActions = ({ dish, compact = false, onDeleted }: DishCardActionsPr
                 variant="ghost" 
                 size={compact ? "sm" : "default"} 
                 className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                aria-label={`Delete ${dish.name}`}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only">Delete dish</span>
               </Button>
             </DialogTrigger>
             <DialogContent onClick={(e) => e.stopPropagation()}>

@@ -4,11 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `npm run dev` - Start development server on port 8080
-- `npm run build` - Build for production
-- `npm run build:dev` - Build in development mode
-- `npm run lint` - Run ESLint to check code quality
-- `npm run preview` - Preview production build locally
+- `bun run dev` - Start development server on port 8080
+- `bun run build` - Build for production
+- `bun run build:dev` - Build in development mode
+- `bun run lint` - Run ESLint to check code quality
+- `bun run preview` - Preview production build locally
+- `bun run test` - Run tests in watch mode
+- `bun run test:run` - Run tests once
+
+**Package Management**: This project uses Bun as the package manager. Use `bun install` to install dependencies and `bun add <package>` to add new packages.
 
 ## Architecture Overview
 

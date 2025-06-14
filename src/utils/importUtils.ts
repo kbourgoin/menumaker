@@ -4,7 +4,7 @@ import { generateId } from "./storageUtils";
 
 // Function to import meal history data
 export const importMealHistory = (
-  mealHistoryData: Record<string, any>[],
+  mealHistoryData: Record<string, unknown>[],
   userId: string
 ): MealHistory[] => {
   return mealHistoryData.map((historyData) => importMealHistoryEntry(historyData, userId));
@@ -12,7 +12,7 @@ export const importMealHistory = (
 
 // Function to import a single meal history entry
 export const importMealHistoryEntry = (
-  historyData: Record<string, any>,
+  historyData: Record<string, unknown>,
   userId: string
 ): MealHistory => {
   // Set default values for required fields if they aren't present
@@ -37,7 +37,7 @@ export const importMealHistoryEntry = (
 
 // Function to import dish data
 export const importDishes = (
-  dishesData: Record<string, any>[],
+  dishesData: Record<string, unknown>[],
   userId: string
 ): Dish[] => {
   return dishesData.map((dishData) => importDish(dishData, userId));
@@ -45,7 +45,7 @@ export const importDishes = (
 
 // Function to import a single dish
 export const importDish = (
-  dishData: Record<string, any>,
+  dishData: Record<string, unknown>,
   userId: string
 ): Dish => {
   // Set default values for required fields if they aren't present

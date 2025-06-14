@@ -7,19 +7,23 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 // Define colors for the pie chart
 const COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#F9F871', '#6A0572', '#AB83A1', '#15616D'];
 
+import type { StatsData } from "@/types";
+
 interface StatsCardProps {
-  stats: any;
+  stats: StatsData | null;
   isLoading: boolean;
 }
 
-const StatsCard = ({ stats, isLoading }: StatsCardProps) => {
+const StatsCard = React.memo<StatsCardProps>(({ stats, isLoading }) => {
   // Prepare data for pie chart
-  const pieData = stats && stats.cuisineBreakdown
-    ? Object.entries(stats.cuisineBreakdown)
-        .map(([name, value]) => ({ name, value }))
-        .filter(item => (item.value as number) > 0)
-        .sort((a, b) => (b.value as number) - (a.value as number))
-    : [];
+  const pieData = React.useMemo(() => {
+    return stats && stats.cuisineBreakdown
+      ? Object.entries(stats.cuisineBreakdown)
+          .map(([name, value]) => ({ name, value }))
+          .filter(item => (item.value as number) > 0)
+          .sort((a, b) => (b.value as number) - (a.value as number))
+      : [];
+  }, [stats]);
 
   return (
     <Card className="animate-slide-down delay-100">
@@ -92,6 +96,8 @@ const StatsCard = ({ stats, isLoading }: StatsCardProps) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+StatsCard.displayName = 'StatsCard';
 
 export default StatsCard;

@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -9,6 +10,30 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Force cache invalidation in development
+    ...(mode === 'development' && {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    }),
+  },
+  // Prevent aggressive caching in development
+  ...(mode === 'development' && {
+    build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: '[name]-[hash].js',
+          chunkFileNames: '[name]-[hash].js',
+          assetFileNames: '[name]-[hash].[ext]'
+        }
+      }
+    }
+  }),
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
   },
   plugins: [
     react(),

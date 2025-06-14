@@ -64,9 +64,10 @@ export const useUserCuisines = () => {
       setCuisines(newCuisines);
       toast.success("Cuisines updated successfully");
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating cuisines:', error);
-      toast.error(error.message || "Failed to update cuisines");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update cuisines";
+      toast.error(errorMessage);
       return false;
     }
   };

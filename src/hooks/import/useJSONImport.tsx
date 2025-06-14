@@ -27,7 +27,7 @@ export function useJSONImport() {
       if (!userId) throw new Error("User not authenticated");
       
       // Ensure all imported data has the current user ID
-      const updateUserIds = (obj: any) => ({...obj, user_id: userId});
+      const updateUserIds = <T extends Record<string, unknown>>(obj: T): T & { user_id: string } => ({...obj, user_id: userId});
       
       // Update the progress
       const totalItems = jsonData.sources.length + jsonData.dishes.length + jsonData.mealHistory.length;

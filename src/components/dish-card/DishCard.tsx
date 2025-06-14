@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Dish } from "@/types";
 import { Card } from "@/components/ui/card";
 import DishCardHeader from "./DishCardHeader";
@@ -12,7 +13,7 @@ interface DishCardProps {
   onDeleted?: () => void;
 }
 
-const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: DishCardProps) => {
+const DishCard = React.memo<DishCardProps>(({ dish, showActions = true, compact = false, onDeleted }) => {
   // Safety check for valid dish object
   if (!dish || typeof dish !== 'object' || !dish.id) {
     console.error("Invalid dish passed to DishCard:", dish);
@@ -47,6 +48,8 @@ const DishCard = ({ dish, showActions = true, compact = false, onDeleted }: Dish
       )}
     </Card>
   );
-};
+});
+
+DishCard.displayName = 'DishCard';
 
 export default DishCard;

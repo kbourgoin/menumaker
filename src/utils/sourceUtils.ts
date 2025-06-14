@@ -1,5 +1,5 @@
 
-import { Source } from "@/types";
+import { Source, Dish } from "@/types";
 import { getStorageItem, saveStorageItem, generateId } from "./storageUtils";
 
 // Get sources from localStorage or initialize with empty array
@@ -56,7 +56,7 @@ export const deleteSource = (id: string): Source[] => {
 };
 
 // Get dishes by source ID
-export const getDishesBySourceId = (sourceId: string): any[] => {
+export const getDishesBySourceId = (sourceId: string): Dish[] => {
   // This function would normally get dishes from localStorage
   // But we're now using Supabase for this, so this is just a placeholder
   return [];

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useMeals } from "@/hooks/useMeals";
 import { useSources } from "@/hooks/sources";
 import { sortDishes } from "@/utils/dishUtils";
+import SEOHead, { getPageSEO } from "@/components/SEOHead";
 import {
   SearchAndFilterBar,
   ViewToggle,
@@ -27,33 +28,37 @@ const AllDishes = () => {
     if (tagFromUrl && !selectedTags.includes(tagFromUrl)) {
       setSelectedTags([tagFromUrl]);
     }
-  }, [searchParams]);
+  }, [searchParams, selectedTags]);
 
   // Update URL when tags change (but only if navigated from tag click)
-  const handleTagsChange = (tags: string[]) => {
+  const handleTagsChange = useCallback((tags: string[]) => {
     setSelectedTags(tags);
     // Remove tag param from URL when no tags are selected
     if (tags.length === 0) {
       searchParams.delete('tag');
       setSearchParams(searchParams);
     }
-  };
+  }, [searchParams, setSearchParams]);
   
-  const getFilteredDishes = () => {
+  // Memoized unique dishes to avoid recalculating on every render
+  const uniqueDishes = useMemo(() => {
     if (!dishes || !Array.isArray(dishes)) {
       console.log("No dishes array available:", dishes);
       return [];
     }
     
     // Deduplicate dishes by ID to fix any duplicate key issues
-    const uniqueDishes = dishes.reduce((acc, dish) => {
+    return dishes.reduce((acc, dish) => {
       if (!acc.some(existing => existing.id === dish.id)) {
         acc.push(dish);
       }
       return acc;
     }, [] as typeof dishes);
-    
-    let filtered = uniqueDishes.filter(dish => {
+  }, [dishes]);
+
+  // Memoized filtered and sorted dishes
+  const filteredDishes = useMemo(() => {
+    const filtered = uniqueDishes.filter(dish => {
       if (!dish || typeof dish !== 'object') {
         console.log("Invalid dish object:", dish);
         return false;
@@ -77,12 +82,11 @@ const AllDishes = () => {
     
     // Only sort for cards view - table view handles its own sorting
     return viewMode === "cards" ? sortDishes(filtered, sortOption) : filtered;
-  };
-  
-  const filteredDishes = getFilteredDishes();
+  }, [uniqueDishes, searchQuery, selectedTags, viewMode, sortOption]);
   
   return (
     <Layout>
+      <SEOHead {...getPageSEO('all-meals')} />
       <div className="mb-8 animate-slide-down">
         <DishesHeader />
         

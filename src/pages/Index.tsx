@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
 import Layout from "@/components/Layout";
+import SEOHead, { getPageSEO } from "@/components/SEOHead";
 
 // Import our new component files
 import QuickActions from "@/components/dashboard/QuickActions";
@@ -75,6 +76,7 @@ const Home = () => {
 
   return (
     <Layout>
+      <SEOHead {...getPageSEO('home')} />
       <div className="max-w-6xl mx-auto">
         {/* Quick actions and Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

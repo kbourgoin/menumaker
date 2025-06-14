@@ -92,7 +92,7 @@ const CSVImportLegacy = ({ onImportComplete }: CSVImportLegacyProps) => {
       
       // Check for database permission errors with improved detection
       if (typeof error === 'object' && error !== null) {
-        const supabaseError = error as any;
+        const supabaseError = error as { code?: string; message?: string };
         if (supabaseError.code === '42501' || 
             (supabaseError.message && typeof supabaseError.message === 'string' && 
              (supabaseError.message.includes('permission denied') || 
