@@ -1,69 +1,100 @@
-# Welcome to your Lovable project
+# MenuMaker
 
-## Project info
+A React-based meal and dish management application for tracking your favorite recipes, cooking history, and meal planning.
 
-**URL**: https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d
+## Features
 
-## How can I edit this code?
+- 🍽️ Track your favorite dishes with cuisines, sources, and cooking history
+- 📊 View cooking statistics and meal frequency analytics  
+- 📅 Generate intelligent weekly menu suggestions
+- 🔍 Search and filter dishes by name, cuisine, or source
+- 📱 Progressive Web App (PWA) with offline support
+- ♿ Accessibility-focused design (WCAG 2.1 compliant)
 
-There are several ways of editing your application.
+## Development
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Setup
 
 The only requirement is having Bun installed - [install Bun](https://bun.sh/docs/installation)
 
-Follow these steps:
-
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/kbourgoin/menumaker.git
+cd menumaker
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 bun install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 bun run dev
 ```
 
-**Edit a file directly in GitHub**
+### Development Process
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+**⚠️ Important: All changes must go through pull requests. Direct pushes to main are not allowed.**
 
-**Use GitHub Codespaces**
+1. **Create a feature branch** from main:
+   ```sh
+   git checkout main
+   git pull origin main
+   git checkout -b feature/your-feature-name
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. **Make your changes** and test locally:
+   ```sh
+   bun run dev     # Start development server
+   bun run test    # Run tests
+   bun run lint    # Check code quality
+   bun run build   # Test production build
+   ```
 
-## What technologies are used for this project?
+3. **Commit and push your branch**:
+   ```sh
+   git add .
+   git commit -m "feat: describe your changes"
+   git push -u origin feature/your-feature-name
+   ```
 
-This project is built with .
+4. **Create a pull request** on GitHub:
+   - Provide a clear title and description
+   - Link any related issues
+   - Request review from maintainers
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+5. **After review and approval**, the PR will be merged to main
 
-## How can I deploy this project?
+### Branch Naming Convention
+- `feature/` - New features or enhancements
+- `fix/` - Bug fixes
+- `refactor/` - Code refactoring
+- `docs/` - Documentation updates
+- `test/` - Test additions or updates
 
-Simply open [Lovable](https://lovable.dev/projects/eff7b041-f65c-4f6a-a6a6-a746d91f068d) and click on Share -> Publish.
+## Technologies
 
-## I want to use a custom domain - is that possible?
+This project is built with:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI**: shadcn/ui components with Tailwind CSS  
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **State Management**: TanStack React Query
+- **Testing**: Vitest + React Testing Library
+- **Package Manager**: Bun
+
+## Deployment
+
+This project is deployed at [menu.bourgoin.casa](https://menu.bourgoin.casa) using Cloudflare Pages.
+
+To deploy your own instance:
+1. Connect your repository to your preferred hosting platform (Vercel, Netlify, Cloudflare Pages)
+2. Set build command: `bun run build`
+3. Set publish directory: `dist`
+4. Deploy!
+
+## Architecture
+
+Built with modern web technologies:
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI**: shadcn/ui components with Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **State Management**: TanStack React Query
+- **Testing**: Vitest + React Testing Library
