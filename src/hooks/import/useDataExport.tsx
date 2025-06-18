@@ -3,8 +3,9 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dish, MealHistory, Source } from "@/types";
 import { Tables } from "@/integrations/supabase/types";
+import { DishSummary } from "@/integrations/supabase/mappers/types";
 import { 
-  mapDishFromDB, 
+  mapDishFromSummary, 
   mapMealHistoryFromDB, 
   mapSourceFromDB
 } from "@/integrations/supabase/client";
@@ -13,6 +14,7 @@ export interface ExportData {
   dishes: Dish[];
   mealHistory: MealHistory[];
   sources: Source[];
+  profile?: Tables<'profiles'>;
   version: string;
   exportDate: string;
 }
@@ -29,14 +31,14 @@ export function useDataExport() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      // Fetch all dishes with pagination to overcome any limits
-      let allDishes: Tables<'dishes'>[] = [];
+      // Fetch all dishes with tags from dish_summary view with pagination
+      let allDishes: Tables<'dish_summary'>[] = [];
       let hasMoreDishes = true;
       let lastDishId: string | null = null;
       
       while (hasMoreDishes) {
         let query = supabase
-          .from('dishes')
+          .from('dish_summary')
           .select('*')
           .eq('user_id', userId)
           .order('id', { ascending: true })
@@ -134,8 +136,27 @@ export function useDataExport() {
       
       console.log(`Exported ${allSources.length} sources`);
       
-      // Map data to our app types
-      const dishes = allDishes.map(dish => mapDishFromDB(dish));
+      // Fetch user profile to include all user data with dates
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      // Map data to our app types  
+      const dishes = allDishes.map(dish => mapDishFromSummary({
+        id: dish.id!,
+        name: dish.name!,
+        createdat: dish.createdat!,
+        cuisines: dish.cuisines || [],
+        source_id: dish.source_id || undefined,
+        location: dish.location || undefined,
+        user_id: dish.user_id!,
+        times_cooked: dish.times_cooked || 0,
+        last_made: dish.last_made || undefined,
+        last_comment: dish.last_comment || undefined,
+        tags: dish.tags || []
+      }));
       const mealHistory = allMealHistory.map(history => mapMealHistoryFromDB(history));
       const sources = allSources.map(source => mapSourceFromDB(source));
       
@@ -144,6 +165,7 @@ export function useDataExport() {
         dishes,
         mealHistory,
         sources,
+        profile: profile || undefined,
         version: "1.0",
         exportDate: new Date().toISOString()
       };
