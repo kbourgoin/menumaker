@@ -1,6 +1,6 @@
 
 import { useState, useRef } from "react";
-import { useDataImport } from "@/hooks/import";
+import { useJSONImport } from "@/hooks/import";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExportData } from "@/hooks/import/useDataExport";
 
 export function JSONImport() {
-  const { importFromJSON, validateJSONData, isImporting, importProgress } = useDataImport();
+  const { importFromJSON, validateJSONData, isImporting, progress: importProgress } = useJSONImport();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -137,7 +137,7 @@ export function JSONImport() {
           <AlertDescription>
             Import complete: {importStats.success} items imported successfully
             {importStats.errors > 0 ? `, ${importStats.errors} errors occurred` : ''} 
-            out of {importStats.total} total items.
+            {' '}out of {importStats.total} total items.
           </AlertDescription>
         </Alert>
       )}

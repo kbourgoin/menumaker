@@ -26,8 +26,39 @@ export function useJSONImport() {
       
       if (!userId) throw new Error("User not authenticated");
       
+      console.log(`Import starting for user: ${userId}`);
+      
+      // Check if this is a same-account import by looking at user_ids in the data
+      const exportedUserIds = new Set([
+        ...jsonData.sources.map(s => s.user_id).filter(Boolean),
+        ...jsonData.dishes.map(d => d.user_id).filter(Boolean),
+        ...jsonData.mealHistory.map(m => m.user_id).filter(Boolean)
+      ]);
+      
+      const isSameAccountImport = exportedUserIds.size === 1 && exportedUserIds.has(userId);
+      console.log(`Same account import: ${isSameAccountImport}`);
+      if (isSameAccountImport) {
+        console.log("Detected same-account import - will preserve existing IDs and use upsert behavior");
+      } else {
+        console.log("Detected cross-account import - will generate new IDs to prevent conflicts");
+      }
+      
+      // Create ID mapping tables to handle cross-account imports
+      const sourceIdMap = new Map<string, string>();
+      const dishIdMap = new Map<string, string>();
+      const mealHistoryIdMap = new Map<string, string>();
+      
+      // Generate new UUIDs for all entities to prevent conflicts (only for cross-account)
+      const generateNewId = () => crypto.randomUUID();
+      
       // Ensure all imported data has the current user ID
-      const updateUserIds = <T extends Record<string, unknown>>(obj: T): T & { user_id: string } => ({...obj, user_id: userId});
+      const updateUserIds = <T extends Record<string, unknown>>(obj: T): T & { user_id: string } => {
+        const updated = {...obj, user_id: userId};
+        if (obj.user_id && obj.user_id !== userId) {
+          console.log(`Updated user_id from ${obj.user_id} to ${userId}`);
+        }
+        return updated;
+      };
       
       // Update the progress
       const totalItems = jsonData.sources.length + jsonData.dishes.length + jsonData.mealHistory.length;
@@ -37,16 +68,32 @@ export function useJSONImport() {
       console.log(`Importing ${jsonData.sources.length} sources...`);
       let successCount = 0;
       let errorCount = 0;
+      let sourceImportSuccess = 0;
+      let dishImportSuccess = 0;
       
       // Process sources in batches
       for (let i = 0; i < jsonData.sources.length; i += BATCH_SIZE) {
         const batch = jsonData.sources.slice(i, i + BATCH_SIZE);
-        // Create properly typed source objects
+        // Create properly typed source objects (with or without new IDs based on import type)
         const sourcesToDB = batch.map(source => {
           const sourceToDB = mapSourceToDB(updateUserIds(source));
+          
+          let finalId: string;
+          if (isSameAccountImport) {
+            // Same account: preserve original ID for upsert behavior
+            finalId = sourceToDB.id || generateNewId();
+            sourceIdMap.set(sourceToDB.id || 'unknown', finalId);
+          } else {
+            // Cross account: generate new ID to prevent conflicts
+            finalId = generateNewId();
+            if (sourceToDB.id) {
+              sourceIdMap.set(sourceToDB.id, finalId);
+            }
+          }
+          
           // Ensure all required fields are present
           return {
-            id: sourceToDB.id,
+            id: finalId,
             name: sourceToDB.name || 'Unknown Source', // Default name if missing
             type: sourceToDB.type || 'other', // Default type if missing
             description: sourceToDB.description,
@@ -65,9 +112,11 @@ export function useJSONImport() {
               });
               
             if (error) throw error;
+            sourceImportSuccess += count || 0;
             successCount += count || 0;
           } catch (error) {
             console.error("Error importing sources batch:", error);
+            console.error("Source batch data:", sourcesToDB);
             errorCount += batch.length;
           }
         } else {
@@ -83,16 +132,33 @@ export function useJSONImport() {
       console.log(`Importing ${jsonData.dishes.length} dishes...`);
       for (let i = 0; i < jsonData.dishes.length; i += BATCH_SIZE) {
         const batch = jsonData.dishes.slice(i, i + BATCH_SIZE);
-        // Create properly typed dish objects
+        // Create properly typed dish objects (with or without new IDs based on import type)
         const dishesToDB = batch.map(dish => {
           const dishToDB = mapDishToDB(updateUserIds(dish));
+          
+          let finalId: string;
+          if (isSameAccountImport) {
+            // Same account: preserve original ID for upsert behavior
+            finalId = dishToDB.id || generateNewId();
+            dishIdMap.set(dishToDB.id || 'unknown', finalId);
+          } else {
+            // Cross account: generate new ID to prevent conflicts
+            finalId = generateNewId();
+            if (dishToDB.id) {
+              dishIdMap.set(dishToDB.id, finalId);
+            }
+          }
+          
+          // Map source_id to new source ID if it exists in our mapping
+          const mappedSourceId = dishToDB.source_id ? sourceIdMap.get(dishToDB.source_id) : undefined;
+          
           // Ensure all required fields are present
           return {
-            id: dishToDB.id,
+            id: finalId,
             name: dishToDB.name || 'Unknown Dish', // Default name if missing
             createdat: dishToDB.createdat || new Date().toISOString(),
             cuisines: dishToDB.cuisines || ['Other'],
-            source_id: dishToDB.source_id,
+            source_id: mappedSourceId || dishToDB.source_id, // Use mapped ID if available
             location: dishToDB.location,
             user_id: dishToDB.user_id
           };
@@ -108,9 +174,11 @@ export function useJSONImport() {
               });
               
             if (error) throw error;
+            dishImportSuccess += count || 0;
             successCount += count || 0;
           } catch (error) {
             console.error("Error importing dishes batch:", error);
+            console.error("Dish batch data:", dishesToDB);
             errorCount += batch.length;
           }
         } else {
@@ -122,22 +190,51 @@ export function useJSONImport() {
         setProgress(Math.floor((processedItems / totalItems) * 100));
       }
       
-      // Import meal history in batches
+      // Import meal history in batches (only if dishes were imported successfully)
       console.log(`Importing ${jsonData.mealHistory.length} meal history entries...`);
+      console.log(`Dishes imported successfully: ${dishImportSuccess}`);
       for (let i = 0; i < jsonData.mealHistory.length; i += BATCH_SIZE) {
         const batch = jsonData.mealHistory.slice(i, i + BATCH_SIZE);
-        // Create properly typed history objects
+        // Create properly typed history objects (with or without new IDs based on import type)
         const historyToDB = batch.map(history => {
           const historyEntry = mapMealHistoryToDB(updateUserIds(history));
+          
+          let finalId: string;
+          if (isSameAccountImport) {
+            // Same account: preserve original ID for upsert behavior
+            finalId = historyEntry.id || generateNewId();
+            mealHistoryIdMap.set(historyEntry.id || 'unknown', finalId);
+          } else {
+            // Cross account: generate new ID to prevent conflicts
+            finalId = generateNewId();
+            if (historyEntry.id) {
+              mealHistoryIdMap.set(historyEntry.id, finalId);
+            }
+          }
+          
+          // Map dishid to dish ID - for same account, use original; for cross account, use mapped
+          let finalDishId: string | undefined;
+          if (isSameAccountImport) {
+            finalDishId = historyEntry.dishid; // Keep original dish reference
+          } else {
+            finalDishId = historyEntry.dishid ? dishIdMap.get(historyEntry.dishid) : undefined;
+          }
+          
           // Ensure all required fields are present
           return {
-            id: historyEntry.id,
-            dishid: historyEntry.dishid, // This is required
+            id: finalId,
+            dishid: finalDishId,
             date: historyEntry.date || new Date().toISOString(),
             notes: historyEntry.notes,
             user_id: historyEntry.user_id
           };
-        }).filter(h => h.dishid); // Filter out invalid entries without dishid
+        }).filter(h => {
+          if (!h.dishid) {
+            console.warn(`Meal history entry missing ${isSameAccountImport ? 'original' : 'mapped'} dishid:`, h);
+            return false;
+          }
+          return true;
+        }); // Filter out entries where dish reference is invalid
         
         if (historyToDB.length > 0) {
           try {
@@ -152,6 +249,7 @@ export function useJSONImport() {
             successCount += count || 0;
           } catch (error) {
             console.error("Error importing meal history batch:", error);
+            console.error("Meal history batch data:", historyToDB);
             errorCount += batch.length;
           }
         } else {
@@ -163,28 +261,17 @@ export function useJSONImport() {
         setProgress(Math.floor((processedItems / totalItems) * 100));
       }
       
-      // Manually trigger a materialized view refresh using an SQL query
-      // This will ensure that the dashboard works correctly after import
-      try {
-        // Instead of calling a specific function that doesn't exist in the types,
-        // execute a direct SQL query to refresh the materialized view
-        const { error } = await supabase
-          .rpc('increment_times_cooked', { dish_id: 'dummy-refresh' })
-          .select('count');
-          
-        // If there's an error (which is expected since we passed a dummy ID), 
-        // we don't need to throw since the query itself will still cause 
-        // the triggers to execute and refresh the view
-        console.log("Materialized view refresh triggered");
-      } catch (error) {
-        console.warn("Could not trigger materialized view refresh:", error);
-        // This is non-fatal, the triggers should handle it automatically
-      }
+      // The materialized view should be refreshed automatically by database triggers
+      // after the import completes, so no manual refresh is needed
       
       // Refresh all queries to update data
       queryClient.invalidateQueries();
       
       console.log(`Import complete. Success: ${successCount}, Errors: ${errorCount}`);
+      console.log(`ID mappings created:`);
+      console.log(`- Sources: ${sourceIdMap.size} mappings`);
+      console.log(`- Dishes: ${dishIdMap.size} mappings`);
+      console.log(`- Meal History: ${mealHistoryIdMap.size} mappings`);
       
       // Ensure 100% progress is shown
       setProgress(100);
