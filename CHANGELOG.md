@@ -5,6 +5,91 @@ All notable changes to MenuMaker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-06-19
+
+### Added
+- **Hybrid Cuisine-Tag System**: Unified architecture treating cuisines as a special category of tags
+  - Added category and color fields to tags table for cuisine categorization
+  - Created smart migration system to convert existing cuisines to cuisine tags
+  - Implemented CuisineTagSelector component for single-select cuisine behavior
+  - Preserved visual distinction and UX while unifying backend architecture
+- **Unified Omni Search**: Revolutionary search experience combining text search and tag filtering
+  - Inline suggestions for both cuisines and tags as you type (e.g., "fre" → "freezable")
+  - Smart sorting with exact matches prioritized
+  - Visual distinction between cuisines (colored dots) and tags (hash icons)
+  - Enhanced filtering logic supporting both cuisines and general tags
+  - Real-time suggestions with up to 6 relevant matches
+- **Enhanced Table View**: Improved dish table with unified cuisine and tag display
+  - Moved tags to cuisine column for better space utilization
+  - Consistent rounded styling for both cuisines and tags
+  - Updated column header to "Cuisine & Tags"
+  - Proper color coding maintained for cuisine tags
+- **Migration Utilities**: Comprehensive data migration system
+  - Smart duplicate detection during cuisine-to-tag conversion
+  - User-friendly migration interface with progress tracking
+  - Preservation of color mappings during migration
+  - Rollback-safe migration process
+- **CSV Import Removal**: Cleaned up legacy import functionality
+  - Removed outdated CSV import components and utilities
+  - Simplified import workflows for better maintainability
+  - Eliminated technical debt from unused features
+
+### Changed
+- **Tag System Architecture**: Complete overhaul to support categorized tags
+  - Extended Tag interface with category ('cuisine' | 'general') and color fields
+  - Updated all tag-related hooks to support category filtering
+  - Enhanced TagSelector with maxSelection and category parameters
+  - Modified analytics to work with new cuisine tag system
+- **Search Interface**: Replaced separate search and tag filter with unified omni search
+  - Streamlined UI with single search input supporting multiple functions
+  - Improved discovery through inline suggestions
+  - Better mobile experience with consolidated controls
+- **Display Logic**: Enhanced filtering to prevent cuisine tag duplication
+  - Cuisine tags now excluded from general tag displays
+  - Smart filtering in both card and table views
+  - Proper separation of concerns between cuisine and tag categories
+
+### Fixed
+- **Tag Filter Issues**: Resolved cuisines appearing in general tag filters
+  - Updated TagFilter component to use useGeneralTags instead of useAllTags
+  - Proper category-based filtering throughout the application
+- **Display Duplication**: Eliminated cuisines appearing in both cuisine and tag sections
+  - Fixed duplication in dish card view
+  - Fixed duplication in table view
+  - Consistent filtering logic across all components
+- **TypeScript Issues**: Improved type safety in tag-related components
+  - Replaced 'any' types with proper Record<string, unknown> typing
+  - Enhanced type definitions for new tag category system
+
+### Removed
+- **Legacy CSV Import**: Completely removed outdated CSV import functionality
+  - Eliminated CSVImport component and related utilities
+  - Removed CSV parsing dependencies and file handling code
+  - Cleaned up unused import workflows from early development
+  - Simplified codebase by removing unmaintained features
+
+### Developer Experience
+- **Database Schema**: Added new fields to support hybrid system
+  - category field with CHECK constraint for data integrity
+  - color field for cuisine tag styling
+  - Proper indexing for performance
+- **Component Architecture**: Clean separation between cuisine and general tag handling
+  - CuisineTagSelector for cuisine-specific single-select behavior
+  - Enhanced TagSelector with category support
+  - Unified OmniSearch combining multiple search functions
+- **Code Quality**: Maintained high standards throughout major refactoring
+  - Comprehensive testing of new components
+  - Proper error handling in migration utilities
+  - Clean TypeScript interfaces and type safety
+
+### Migration Notes
+- **Backward Compatibility**: Existing data safely migrated to new system
+- **Zero Downtime**: Migration designed to work alongside existing functionality
+- **Data Integrity**: Comprehensive validation and duplicate detection
+- **User Experience**: Migration happens transparently with user-friendly interface
+
+---
+
 ## [0.1.0] - 2025-06-14
 
 ### Added
@@ -68,5 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security** in case of vulnerabilities
 
 ## Release Notes
+
+**Version 0.2.0** introduces a revolutionary hybrid cuisine-tag system and unified omni search that fundamentally improves how users organize and discover dishes. This release represents a major UX leap forward while maintaining backward compatibility through smart data migration.
 
 **Version 0.1.0** represents a major foundation release that transforms MenuMaker from a basic application into a production-ready, performant, and professionally tested PWA with comprehensive developer tooling and workflows.
