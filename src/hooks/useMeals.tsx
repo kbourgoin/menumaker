@@ -4,7 +4,6 @@ import { useMealHistory } from "./useMealHistory";
 import { useWeeklyMenu } from "./useWeeklyMenu";
 import { useSources } from "./sources";
 import { useStats } from "./useStats";
-import { useDataImport } from "./import";
 
 /**
  * This is a composite hook that combines all meal-related functionality.
@@ -22,7 +21,6 @@ export function useMeals() {
   const weeklyMenuHook = useWeeklyMenu();
   const sourcesHook = useSources();
   const statsHook = useStats();
-  const dataImportHook = useDataImport();
 
   return {
     // Dishes
@@ -49,11 +47,7 @@ export function useMeals() {
     getDishesBySource: sourcesHook.getDishesBySource,
     
     // Stats
-    getStats: statsHook.getStats,
-    
-    // Data Import
-    importMealHistory: dataImportHook.importMealHistory,
-    clearData: dataImportHook.clearData
+    getStats: statsHook.getStats
   };
 }
 

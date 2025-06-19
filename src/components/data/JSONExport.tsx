@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { useDataImport } from "@/hooks/import";
+import { useDataExport } from "@/hooks/import";
 import { Button } from "@/components/ui/button";
 import { Loader2, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function JSONExport() {
-  const { exportAllData, downloadExportFile, isExporting } = useDataImport();
+  const { exportAllData, downloadExportFile, isExporting } = useDataExport();
   const { toast } = useToast();
   const [exportCount, setExportCount] = useState<Record<string, number>>({});
 
