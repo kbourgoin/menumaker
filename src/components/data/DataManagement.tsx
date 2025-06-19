@@ -2,7 +2,6 @@
 import { Separator } from "@/components/ui/separator";
 import { JSONExport } from "./JSONExport";
 import { JSONImport } from "./JSONImport";
-import CSVImportLegacy from "./CSVImportLegacy";
 import { ClearDataDialog } from "@/components/ClearDataDialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -31,14 +30,6 @@ export function DataManagement() {
               Restore data from a previously exported JSON file
             </p>
             <JSONImport />
-          </div>
-          
-          <div className="space-y-4 border rounded-lg p-4 bg-slate-50 dark:bg-slate-950">
-            <h3 className="text-lg font-medium">Legacy Import</h3>
-            <p className="text-sm text-muted-foreground">
-              Import meal history from a CSV file (older format)
-            </p>
-            <CSVImportLegacy />
           </div>
         </CardContent>
       </Card>
