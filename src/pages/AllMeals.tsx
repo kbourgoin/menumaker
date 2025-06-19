@@ -71,11 +71,15 @@ const AllDishes = () => {
           cuisine && cuisine.toLowerCase().includes(searchQuery.toLowerCase())
         ));
       
-      // Tag filter
+      // Tag filter (includes both general tags and cuisines)
       const matchesTags = selectedTags.length === 0 || 
-        (dish.tags && selectedTags.every(selectedTag => 
-          dish.tags.includes(selectedTag)
-        ));
+        selectedTags.every(selectedTag => {
+          // Check if tag exists in dish tags
+          const matchesTag = dish.tags && dish.tags.includes(selectedTag);
+          // Check if tag exists in dish cuisines
+          const matchesCuisine = dish.cuisines && dish.cuisines.includes(selectedTag);
+          return matchesTag || matchesCuisine;
+        });
       
       return matchesSearch && matchesTags;
     });

@@ -5,6 +5,7 @@ import CookingInfo from "./CookingInfo";
 import SourceInfo from "./SourceInfo";
 import { TagBadge } from "@/components/tags";
 import { useTagNavigation } from "@/hooks/useTagNavigation";
+import { CUISINES } from "@/components/dish-form/constants";
 
 interface DishCardContentProps {
   cuisines: string[];
@@ -29,14 +30,19 @@ const DishCardContent = ({
 }: DishCardContentProps) => {
   const { navigateToTag } = useTagNavigation();
 
+  // Filter out cuisine tags from the general tags display
+  // Cuisine tags are handled separately in CuisinesList
+  const knownCuisines = new Set(CUISINES);
+  const generalTags = tags?.filter(tag => !knownCuisines.has(tag)) || [];
+
   return (
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
       <div className="space-y-3">
         <CuisinesList cuisines={cuisines || []} compact={compact} />
         
-        {tags && tags.length > 0 && (
+        {generalTags && generalTags.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {tags.map((tag) => (
+            {generalTags.map((tag) => (
               <TagBadge 
                 key={tag} 
                 tag={tag} 

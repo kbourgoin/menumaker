@@ -81,9 +81,33 @@ export function useStats() {
         // Find dish with highest timesCooked
         const mostCooked = [...dishes].sort((a, b) => b.timesCooked - a.timesCooked)[0];
         
-        // Get cuisine breakdown
+        // Get cuisine breakdown - works with both old cuisines array and new cuisine tags
         const cuisineBreakdown = dishes.reduce((acc: Record<string, number>, dish) => {
-          dish.cuisines.forEach(cuisine => {
+          // Check both old cuisine array and new cuisine tags
+          const cuisines = new Set<string>();
+          
+          // Add cuisines from old system (for backward compatibility)
+          dish.cuisines?.forEach(cuisine => cuisines.add(cuisine));
+          
+          // Add cuisines from new tag system (cuisine tags)
+          dish.tags?.forEach(tag => {
+            // For now, we'll check if any tags match known cuisine names
+            // This will be updated once the migration sets cuisine tags with category
+            const knownCuisines = ['Italian', 'Mexican', 'American', 'Asian', 'Mediterranean', 
+                                  'Indian', 'French', 'Greek', 'Thai', 'Japanese', 'Chinese', 
+                                  'Korean', 'Middle Eastern', 'Vietnamese', 'Spanish', 
+                                  'Caribbean', 'German', 'British', 'Fusion', 'Other'];
+            if (knownCuisines.includes(tag)) {
+              cuisines.add(tag);
+            }
+          });
+          
+          // If no cuisines found, default to "Other"
+          if (cuisines.size === 0) {
+            cuisines.add('Other');
+          }
+          
+          cuisines.forEach(cuisine => {
             acc[cuisine] = (acc[cuisine] || 0) + 1;
           });
           return acc;

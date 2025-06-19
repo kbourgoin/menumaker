@@ -13,6 +13,8 @@ import {
 import SourceInfo from "../dish-card/SourceInfo";
 import { TagBadge } from "@/components/tags";
 import { useTagNavigation } from "@/hooks/useTagNavigation";
+import { CUISINES } from "@/components/dish-form/constants";
+import CuisineTag from "../CuisineTag";
 
 interface DishTableRowProps {
   dish: Dish;
@@ -23,6 +25,11 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   const { navigateToTag } = useTagNavigation();
   // Get source info from our lookup map if available
   const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
+  
+  // Filter out cuisine tags from the general tags display
+  // Cuisine tags are handled separately in the Cuisine column
+  const knownCuisines = new Set(CUISINES);
+  const generalTags = dish.tags?.filter(tag => !knownCuisines.has(tag)) || [];
 
   const formatAbsoluteDate = (dateString: string | undefined) => {
     if (!dateString) return "Never";
@@ -67,27 +74,12 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   return (
     <UITableRow>
       <TableCell>
-        <div className="space-y-1">
-          <Link
-            to={`/meal/${dish.id}`}
-            className="text-primary hover:underline font-medium"
-          >
-            {dish.name}
-          </Link>
-          {dish.tags && dish.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {dish.tags.map((tag) => (
-                <TagBadge 
-                  key={tag} 
-                  tag={tag} 
-                  variant="outline" 
-                  clickable 
-                  onClick={() => navigateToTag(tag)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <Link
+          to={`/meal/${dish.id}`}
+          className="text-primary hover:underline font-medium"
+        >
+          {dish.name}
+        </Link>
       </TableCell>
       <TableCell className="w-[200px] min-w-0">
         <div className="break-words">
@@ -101,7 +93,26 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
           />
         </div>
       </TableCell>
-      <TableCell>{dish.cuisines.join(", ")}</TableCell>
+      <TableCell>
+        <div className="flex flex-wrap gap-1.5 items-start">
+          {dish.cuisines.map((cuisine) => (
+            <CuisineTag 
+              key={cuisine}
+              cuisine={cuisine}
+              size="sm"
+            />
+          ))}
+          {generalTags.map((tag) => (
+            <span 
+              key={tag}
+              onClick={() => navigateToTag(tag)}
+              className="inline-flex items-center rounded-full border font-medium text-xs px-2 py-0.5 bg-gray-50 text-gray-700 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </TableCell>
       <TableCell className="text-right">{dish.timesCooked || 0}</TableCell>
       <TableCell>
         {dish.lastMade ? (

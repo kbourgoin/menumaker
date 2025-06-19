@@ -43,7 +43,7 @@ const DishTableHeader = ({
           sortDirection={sortDirection}
           onSort={onSort}
         >
-          Cuisine
+          Cuisine & Tags
         </TableColumnHeader>
         
         <TableColumnHeader 

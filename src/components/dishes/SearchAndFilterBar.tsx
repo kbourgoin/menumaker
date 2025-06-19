@@ -1,7 +1,6 @@
 
-import SearchInput from "./SearchInput";
 import SortSelect from "./SortSelect";
-import { TagFilter } from "./TagFilter";
+import { OmniSearch } from "./OmniSearch";
 
 interface SearchAndFilterBarProps {
   searchQuery: string;
@@ -26,9 +25,11 @@ const SearchAndFilterBar = ({
     <div className="space-y-4 mb-6">
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <div className="col-span-full sm:col-span-1 lg:col-span-2">
-          <SearchInput
+          <OmniSearch
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
           />
         </div>
         
@@ -41,11 +42,6 @@ const SearchAndFilterBar = ({
           </div>
         )}
       </div>
-      
-      <TagFilter
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
-      />
     </div>
   );
 };
