@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed, Tag } from "lucide-react";
 import CuisineSettings from "@/components/settings/CuisineSettings";
 import { TagManager } from "@/components/tags";
+import { MigrationTrigger } from "@/components/MigrationTrigger";
 
 const Settings = () => {
   return (
@@ -36,6 +37,8 @@ const Settings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <MigrationTrigger />
+                
                 <div>
                   <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-terracotta-500" />

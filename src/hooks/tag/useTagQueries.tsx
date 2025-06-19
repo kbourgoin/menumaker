@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Tables } from "@/integrations/supabase/types";
+import type { TagCategory } from "@/types";
 
 export type Tag = Tables<"tags">;
 
@@ -86,10 +87,36 @@ export const useTagQueries = () => {
     });
   };
 
+  const useTagsByCategory = (category: TagCategory) => {
+    return useQuery({
+      queryKey: ["tags-by-category", category, session?.user?.id],
+      queryFn: async (): Promise<Tag[]> => {
+        if (!session?.user?.id) throw new Error("User not authenticated");
+
+        const { data, error } = await supabase
+          .from("tags")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .eq("category", category)
+          .order("name");
+
+        if (error) throw error;
+        return data || [];
+      },
+      enabled: !!session?.user?.id,
+    });
+  };
+
+  const useCuisineTags = () => useTagsByCategory('cuisine');
+  const useGeneralTags = () => useTagsByCategory('general');
+
   return {
     useAllTags,
     useTagById,
     useTagsByDishId,
     useTagUsageCount,
+    useTagsByCategory,
+    useCuisineTags,
+    useGeneralTags,
   };
 };

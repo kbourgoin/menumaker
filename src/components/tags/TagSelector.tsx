@@ -9,12 +9,15 @@ import { Check, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries, useTagMutations } from "@/hooks/tag";
 import { TagBadge } from "./TagBadge";
+import type { TagCategory } from "@/types";
 
 interface TagSelectorProps {
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
   placeholder?: string;
   className?: string;
+  category?: TagCategory;
+  maxSelection?: number; // For single-select behavior (e.g., cuisines)
 }
 
 export const TagSelector = ({
@@ -22,21 +25,29 @@ export const TagSelector = ({
   onTagsChange,
   placeholder = "Select tags...",
   className,
+  category = 'general',
+  maxSelection,
 }: TagSelectorProps) => {
   const [open, setOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { useAllTags } = useTagQueries();
+  const { useTagsByCategory } = useTagQueries();
   const { createTag } = useTagMutations();
   
-  const { data: availableTags = [], isLoading } = useAllTags();
+  const { data: availableTags = [], isLoading } = useTagsByCategory(category);
 
   const handleTagSelect = (tagName: string) => {
     if (selectedTags.includes(tagName)) {
       onTagsChange(selectedTags.filter(t => t !== tagName));
     } else {
-      onTagsChange([...selectedTags, tagName]);
+      if (maxSelection === 1) {
+        // Single select behavior (e.g., for cuisines)
+        onTagsChange([tagName]);
+      } else if (!maxSelection || selectedTags.length < maxSelection) {
+        // Multi-select behavior with optional limit
+        onTagsChange([...selectedTags, tagName]);
+      }
     }
   };
 
@@ -50,10 +61,15 @@ export const TagSelector = ({
     try {
       await createTag.mutateAsync({
         name: newTagName.trim(),
+        category: category,
       });
       
       // Add the new tag to selected tags
-      onTagsChange([...selectedTags, newTagName.trim()]);
+      if (maxSelection === 1) {
+        onTagsChange([newTagName.trim()]);
+      } else if (!maxSelection || selectedTags.length < maxSelection) {
+        onTagsChange([...selectedTags, newTagName.trim()]);
+      }
       setNewTagName("");
       setIsCreating(false);
     } catch (error) {

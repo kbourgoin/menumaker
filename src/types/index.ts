@@ -53,6 +53,18 @@ export type CuisineType =
   | 'Fusion'
   | 'Other';
 
+export type TagCategory = 'cuisine' | 'general';
+
+export interface Tag {
+  id: string;
+  name: string;
+  category: TagCategory;
+  color?: string;
+  description?: string;
+  user_id: string;
+  created_at: string;
+}
+
 export interface MealHistoryWithDish {
   id: string;
   dishId: string;

@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
 import { formSchema, FormValues } from "./FormSchema";
-import CuisineSelector from "./CuisineSelector";
 import SourceSelector from "./SourceSelector";
 import LocationField from "./LocationField";
 import { useSources } from "@/hooks/sources";
 import { TagSelector } from "@/components/tags";
+import CuisineTagSelector from "@/components/tags/CuisineTagSelector";
 import { useTagMutations, useTagQueries } from "@/hooks/tag";
 
 interface DishFormProps {
@@ -189,7 +189,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           )}
         />
 
-        <CuisineSelector form={form} />
+        <CuisineTagSelector form={form} />
         
         <SourceSelector form={form} sources={sources} />
         
@@ -205,6 +205,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
                   selectedTags={field.value || []}
                   onTagsChange={field.onChange}
                   placeholder="Add tags to organize your dish"
+                  category="general"
                 />
               </FormControl>
               <FormMessage />

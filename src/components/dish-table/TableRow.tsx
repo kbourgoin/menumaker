@@ -13,6 +13,7 @@ import {
 import SourceInfo from "../dish-card/SourceInfo";
 import { TagBadge } from "@/components/tags";
 import { useTagNavigation } from "@/hooks/useTagNavigation";
+import { CUISINES } from "@/components/dish-form/constants";
 
 interface DishTableRowProps {
   dish: Dish;
@@ -23,6 +24,11 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
   const { navigateToTag } = useTagNavigation();
   // Get source info from our lookup map if available
   const sourceInfo = dish.sourceId ? sourceInfoMap[dish.sourceId] : null;
+  
+  // Filter out cuisine tags from the general tags display
+  // Cuisine tags are handled separately in the Cuisine column
+  const knownCuisines = new Set(CUISINES);
+  const generalTags = dish.tags?.filter(tag => !knownCuisines.has(tag)) || [];
 
   const formatAbsoluteDate = (dateString: string | undefined) => {
     if (!dateString) return "Never";
@@ -74,9 +80,9 @@ const DishTableRow = ({ dish, sourceInfoMap }: DishTableRowProps) => {
           >
             {dish.name}
           </Link>
-          {dish.tags && dish.tags.length > 0 && (
+          {generalTags && generalTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {dish.tags.map((tag) => (
+              {generalTags.map((tag) => (
                 <TagBadge 
                   key={tag} 
                   tag={tag} 
