@@ -14,7 +14,7 @@ import CuisineTag from "@/components/CuisineTag";
 import { CUISINES } from "@/components/dish-form/constants";
 
 interface CuisineTagSelectorProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<Record<string, unknown>>;
   fieldName?: string;
 }
 

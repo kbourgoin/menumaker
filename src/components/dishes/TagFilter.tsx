@@ -20,8 +20,8 @@ export const TagFilter = ({
 }: TagFilterProps) => {
   const [open, setOpen] = useState(false);
 
-  const { useAllTags } = useTagQueries();
-  const { data: availableTags = [], isLoading } = useAllTags();
+  const { useGeneralTags } = useTagQueries();
+  const { data: availableTags = [], isLoading } = useGeneralTags();
 
   const handleTagToggle = (tagName: string) => {
     if (selectedTags.includes(tagName)) {
