@@ -5,6 +5,37 @@ All notable changes to MenuMaker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-06-21
+
+### Security
+- **Row Level Security (RLS)**: Enabled comprehensive database-level security policies
+  - Added RLS policies to `dishes`, `sources`, `meal_history`, and `profiles` tables
+  - Enforces user-level data isolation at the PostgreSQL level
+  - Provides defense-in-depth security beyond application-level filtering
+  - Prevents unauthorized access even if application bugs occur
+- **Database Function Security**: Fixed search_path vulnerabilities in 5 database functions
+  - `handle_new_user`: Added `SET search_path = 'public'` to prevent injection attacks
+  - `increment_times_cooked`: Added search_path security + user access validation
+  - `increment_by`: Added search_path security + user access validation  
+  - `refresh_dish_summary_secure`: Added search_path security for materialized view refresh
+  - `clear_user_data`: Added search_path security + user access control
+- **Materialized View Protection**: Secured `dish_summary` materialized view API access
+  - Revoked public API access to prevent unauthorized data exposure
+  - Applications now use RLS-protected base tables instead
+
+### Fixed
+- **Security Vulnerabilities**: Resolved 6 of 8 Supabase dashboard security warnings
+  - Eliminated search path injection attack vectors in database functions
+  - Closed potential data access loopholes in materialized views
+  - Strengthened overall database security posture
+
+### Developer Experience
+- **Migration Safety**: All security migrations include existence checks to prevent conflicts
+- **Backward Compatibility**: Existing application queries continue to work unchanged
+- **Database Integrity**: User access validation added to increment and clear functions
+
+---
+
 ## [0.2.0] - 2025-06-19
 
 ### Added
