@@ -25,15 +25,14 @@ export function useDishQueries() {
         }
         
         try {
-          // Get dishes from the materialized view (READ ONLY)
+          // Get dishes from the secure materialized view (READ ONLY)
           const { data: summaryData, error: summaryError } = await supabase
-            .from('dish_summary')
+            .from('dish_summary_secure')
             .select('*')
-            .eq('user_id', user_id)
             .order('name');
           
           if (summaryError) {
-            console.error("Error fetching from dish_summary:", summaryError);
+            console.error("Error fetching from dish_summary_secure:", summaryError);
             // Fallback to the original method if materialized view fails
             return await fetchDishesOriginalMethod(user_id);
           }
@@ -47,7 +46,7 @@ export function useDishQueries() {
           
           return mappedDishes;
         } catch (viewError) {
-          console.error("Error with dish_summary view:", viewError);
+          console.error("Error with dish_summary_secure view:", viewError);
           // Fallback if there's any issue with the view
           return await fetchDishesOriginalMethod(user_id);
         }

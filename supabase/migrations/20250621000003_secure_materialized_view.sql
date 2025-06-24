@@ -9,16 +9,5 @@ CREATE OR REPLACE VIEW public.dish_summary_secure AS
 SELECT * FROM public.dish_summary
 WHERE user_id = auth.uid();
 
--- Enable RLS on the secure view
-ALTER VIEW public.dish_summary_secure ENABLE ROW LEVEL SECURITY;
-
--- Grant access to the secure view
+-- Grant access to the secure view (views cannot have RLS, filtering is done in the view definition)
 GRANT SELECT ON public.dish_summary_secure TO anon, authenticated;
-
--- Create RLS policy for the secure view
-DO $$ BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'dish_summary_secure' AND policyname = 'Users can view their own dish summary') THEN
-        CREATE POLICY "Users can view their own dish summary" ON public.dish_summary_secure
-            FOR SELECT USING (auth.uid() = user_id);
-    END IF;
-END $$;

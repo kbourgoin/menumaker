@@ -86,18 +86,17 @@ export const fetchDishesOptimized = async (user_id: string): Promise<Dish[]> => 
 };
 
 /**
- * Optimized dish fetching using the materialized view (preferred method)
+ * Optimized dish fetching using the secure materialized view (preferred method)
  */
 export const fetchDishesFromView = async (user_id: string): Promise<Dish[]> => {
   try {
     const { data, error } = await supabase
-      .from('dish_summary')
+      .from('dish_summary_secure')
       .select('*')
-      .eq('user_id', user_id)
       .order('name');
       
     if (error) {
-      console.error("Error fetching from dish_summary view:", error);
+      console.error("Error fetching from dish_summary_secure view:", error);
       // Fallback to optimized fetch instead of the N+1 query method
       return fetchDishesOptimized(user_id);
     }
