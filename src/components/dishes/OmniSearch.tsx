@@ -34,7 +34,6 @@ export const OmniSearch = ({
 }: OmniSearchProps) => {
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
-  const [showInlineSuggestions, setShowInlineSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { useGeneralTags } = useTagQueries();
@@ -99,7 +98,6 @@ export const OmniSearch = ({
     }
     setSearchQuery(""); // Clear search when selecting a tag
     setShowTagSuggestions(false);
-    setShowInlineSuggestions(false);
     
     // On mobile, blur the input to close the keyboard
     // On desktop, keep focus for better UX
@@ -130,7 +128,6 @@ export const OmniSearch = ({
       inputRef.current?.blur();
     }
     // Hide any open suggestions since user is "submitting" search
-    setShowInlineSuggestions(false);
     setShowTagSuggestions(false);
   };
 
@@ -152,16 +149,13 @@ export const OmniSearch = ({
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            setShowInlineSuggestions(true);
           }}
           onFocus={() => {
             setInputFocused(true);
-            if (matchingSuggestions.length > 0) setShowInlineSuggestions(true);
           }}
           onBlur={() => {
             setTimeout(() => {
               setInputFocused(false);
-              setShowInlineSuggestions(false);
             }, 200);
           }}
           onKeyDown={(e) => {
@@ -235,7 +229,7 @@ export const OmniSearch = ({
         </div>
         
         {/* Inline suggestions */}
-        {showInlineSuggestions && matchingSuggestions.length > 0 && (
+        {matchingSuggestions.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50">
             <div className="p-2">
               <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
