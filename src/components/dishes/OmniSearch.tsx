@@ -123,6 +123,17 @@ export const OmniSearch = ({
     }
   };
 
+  const handleSearchSubmit = () => {
+    // On mobile, blur input to close keyboard when submitting search
+    // This makes pressing the magnifying glass Enter key close the keyboard
+    if (isMobile()) {
+      inputRef.current?.blur();
+    }
+    // Hide any open suggestions since user is "submitting" search
+    setShowInlineSuggestions(false);
+    setShowTagSuggestions(false);
+  };
+
   const hasFilters = searchQuery.length > 0 || selectedTags.length > 0;
 
   return (
@@ -152,6 +163,12 @@ export const OmniSearch = ({
               setInputFocused(false);
               setShowInlineSuggestions(false);
             }, 200);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSearchSubmit();
+            }
           }}
           className="pl-9 pr-20"
           aria-describedby="omni-search-help"
