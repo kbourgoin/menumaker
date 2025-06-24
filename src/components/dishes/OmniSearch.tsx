@@ -86,6 +86,13 @@ export const OmniSearch = ({
 
   const matchingSuggestions = getMatchingSuggestions();
 
+  // Utility to detect if we're on a mobile device
+  const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (window.innerWidth <= 768);
+  };
+
   const handleTagSelect = (tagName: string) => {
     if (!selectedTags.includes(tagName)) {
       setSelectedTags([...selectedTags, tagName]);
@@ -93,7 +100,14 @@ export const OmniSearch = ({
     setSearchQuery(""); // Clear search when selecting a tag
     setShowTagSuggestions(false);
     setShowInlineSuggestions(false);
-    inputRef.current?.focus();
+    
+    // On mobile, blur the input to close the keyboard
+    // On desktop, keep focus for better UX
+    if (isMobile()) {
+      inputRef.current?.blur();
+    } else {
+      inputRef.current?.focus();
+    }
   };
 
   const handleTagRemove = (tagName: string) => {
@@ -103,6 +117,10 @@ export const OmniSearch = ({
   const handleClearAll = () => {
     setSearchQuery("");
     setSelectedTags([]);
+    // On mobile, blur input to close keyboard when clearing all
+    if (isMobile()) {
+      inputRef.current?.blur();
+    }
   };
 
   const hasFilters = searchQuery.length > 0 || selectedTags.length > 0;
