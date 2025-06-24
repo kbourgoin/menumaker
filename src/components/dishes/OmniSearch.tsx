@@ -148,7 +148,7 @@ export const OmniSearch = ({
           ref={inputRef}
           id="omni-search"
           type="search"
-          placeholder="Search dishes... (type # for tags)"
+          placeholder="Search dishes..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -231,7 +231,7 @@ export const OmniSearch = ({
         </div>
         
         <div id="omni-search-help" className="sr-only">
-          Type to search through your dishes by name or cuisine. Use the # button or type # to add tags for filtering.
+          Type to search through your dishes by name or cuisine. Use the # button to add tags for filtering.
         </div>
         
         {/* Inline suggestions */}
