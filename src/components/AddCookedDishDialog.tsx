@@ -31,6 +31,7 @@ export default function AddCookedDishDialog() {
   const [notes, setNotes] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const { dishes, recordDishCooked } = useDishes();
   const { toast } = useToast();
 
@@ -45,6 +46,14 @@ export default function AddCookedDishDialog() {
   const handleSelectDish = (dish: Dish) => {
     setSelectedDish(dish);
     setSearchQuery(dish.name);
+  };
+
+  const handleDateSelect = (newDate?: Date) => {
+    if (newDate) {
+      setDate(newDate);
+      // Close the popover after selecting a date
+      setPopoverOpen(false);
+    }
   };
 
   const handleCook = async () => {
@@ -141,7 +150,7 @@ export default function AddCookedDishDialog() {
             <>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Date Cooked</label>
-                <Popover>
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -158,7 +167,7 @@ export default function AddCookedDishDialog() {
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={(date) => date && setDate(date)}
+                      onSelect={handleDateSelect}
                       initialFocus
                     />
                   </PopoverContent>
