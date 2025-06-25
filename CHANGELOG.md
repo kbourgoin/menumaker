@@ -5,6 +5,30 @@ All notable changes to MenuMaker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-06-25
+
+### Performance
+- **Database Query Optimization**: Significantly improved application performance through comprehensive database optimizations
+  - **RLS Performance**: Optimized Row Level Security policies to prevent `auth.uid()` re-evaluation per row across all tables
+  - **Missing Indexes**: Added critical foreign key indexes for `dishes.source_id`, `dishes.user_id`, `meal_history.dishid`, and `meal_history.user_id`
+  - **Composite Indexes**: Added optimized indexes for common query patterns including user-dish lookups and date-based meal history queries
+  - **Policy Cleanup**: Removed duplicate permissive policies on sources table that caused multiple policy evaluations
+
+### Security
+- **Security Definer View**: Resolved security definer view warnings while maintaining secure access to materialized views
+  - Updated `dish_summary_secure` view to provide secure, performant access to aggregated dish data
+  - Documented accepted security patterns in `SECURITY.md` for future reference
+  - Maintained user data isolation while optimizing query performance
+
+### Documentation
+- **Security Documentation**: Added comprehensive `SECURITY.md` documenting security patterns and accepted exceptions
+- **Database Index Documentation**: Added detailed comments explaining purpose of database indexes to prevent unnecessary removal
+
+### Fixed
+- **Direct Materialized View Access**: Updated all application code to use secure view wrappers instead of direct materialized view access
+- **React Query Cache**: Fixed cache invalidation keys to match actual query patterns
+- **Supabase Performance Warnings**: Resolved all performance warnings from Supabase database linter
+
 ## [0.2.1] - 2025-06-21
 
 ### Security
