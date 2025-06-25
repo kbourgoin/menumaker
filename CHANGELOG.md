@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Composite Indexes**: Added optimized indexes for common query patterns including user-dish lookups and date-based meal history queries
   - **Policy Cleanup**: Removed duplicate permissive policies on sources table that caused multiple policy evaluations
 
+### User Experience
+- **Mobile Keyboard Handling**: Fixed omnisearch keyboard not closing properly on mobile devices for better touch interaction
+- **Date Picker Modal**: Fixed date picker modal not closing when date is clicked, improving form workflow
+- **Tag Interface Cleanup**: Removed unused "(type # for tags)" functionality that was confusing users
+- **Automatic Data Refresh**: Restored automatic refresh of dish summary data after database security migration
+
 ### Security
 - **Security Definer View**: Resolved security definer view warnings while maintaining secure access to materialized views
   - Updated `dish_summary_secure` view to provide secure, performant access to aggregated dish data
