@@ -78,7 +78,7 @@ export const useTagMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags", session?.user?.id] });
-      queryClient.invalidateQueries({ queryKey: ["dish_summary"] });
+      queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag deleted successfully");
     },
     onError: (error) => {
@@ -108,7 +108,7 @@ export const useTagMutations = () => {
     },
     onSuccess: (_, { dishId }) => {
       queryClient.invalidateQueries({ queryKey: ["dish-tags", dishId] });
-      queryClient.invalidateQueries({ queryKey: ["dish_summary"] });
+      queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag added to dish");
     },
     onError: (error) => {
@@ -137,7 +137,7 @@ export const useTagMutations = () => {
     },
     onSuccess: (_, { dishId }) => {
       queryClient.invalidateQueries({ queryKey: ["dish-tags", dishId] });
-      queryClient.invalidateQueries({ queryKey: ["dish_summary"] });
+      queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag removed from dish");
     },
     onError: (error) => {
@@ -169,7 +169,7 @@ export const useTagMutations = () => {
     },
     onSuccess: (_, { dishId }) => {
       queryClient.invalidateQueries({ queryKey: ["dish-tags", dishId] });
-      queryClient.invalidateQueries({ queryKey: ["dish_summary"] });
+      queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tags added to dish");
     },
     onError: (error) => {

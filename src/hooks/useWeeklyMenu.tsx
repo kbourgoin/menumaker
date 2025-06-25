@@ -16,14 +16,13 @@ export function useWeeklyMenu() {
       }
       
       try {
-        // Use the materialized view for much faster performance (READ ONLY)
+        // Use the secure materialized view for much faster performance (READ ONLY)
         const { data: summaryData, error: summaryError } = await supabase
-          .from('dish_summary')
-          .select('*')
-          .eq('user_id', user_id);
+          .from('dish_summary_secure')
+          .select('*');
         
         if (summaryError) {
-          console.error("Error fetching from dish_summary:", summaryError);
+          console.error("Error fetching from dish_summary_secure:", summaryError);
           
           // Use the fallback method imported from useDishQueries
           return await fetchDishesOriginalMethod(user_id);

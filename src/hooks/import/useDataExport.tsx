@@ -31,16 +31,15 @@ export function useDataExport() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      // Fetch all dishes with tags from dish_summary view with pagination
+      // Fetch all dishes with tags from dish_summary_secure view with pagination
       let allDishes: Tables<'dish_summary'>[] = [];
       let hasMoreDishes = true;
       let lastDishId: string | null = null;
       
       while (hasMoreDishes) {
         let query = supabase
-          .from('dish_summary')
+          .from('dish_summary_secure')
           .select('*')
-          .eq('user_id', userId)
           .order('id', { ascending: true })
           .limit(1000);
         
