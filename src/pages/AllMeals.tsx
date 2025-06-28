@@ -30,6 +30,14 @@ const AllDishes = () => {
     }
   }, [searchParams, selectedTags]);
 
+  // Scroll to top when navigating to filtered page
+  useEffect(() => {
+    const tagFromUrl = searchParams.get('tag');
+    if (tagFromUrl) {
+      window.scrollTo(0, 0);
+    }
+  }, [searchParams]);
+
   // Update URL when tags change (but only if navigated from tag click)
   const handleTagsChange = useCallback((tags: string[]) => {
     setSelectedTags(tags);
