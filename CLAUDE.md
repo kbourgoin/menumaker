@@ -14,6 +14,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Package Management**: This project uses Bun as the package manager. Use `bun install` to install dependencies and `bun add <package>` to add new packages.
 
+## Environment Setup
+
+**IMPORTANT**: This project requires environment variables for Supabase configuration.
+
+### First-time Setup:
+1. **Copy environment template**: `cp .env.example .env.local`
+2. **Update credentials**: Edit `.env.local` with your Supabase project credentials
+3. **Never commit**: The `.env.local` file is automatically gitignored and should never be committed
+
+### Required Environment Variables:
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Your Supabase anonymous/public key
+
+### Getting Credentials:
+1. Go to your Supabase dashboard
+2. Navigate to Settings > API
+3. Copy the "Project URL" and "anon public" key
+4. Paste them into your `.env.local` file
+
+**Note**: The anon key is safe for client-side use and is designed to be exposed in frontend applications.
+
 ## Git Workflow
 
 **IMPORTANT**: Always create a feature branch before making any changes. Never develop directly on the main branch.
