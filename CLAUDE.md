@@ -14,6 +14,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Package Management**: This project uses Bun as the package manager. Use `bun install` to install dependencies and `bun add <package>` to add new packages.
 
+## Git Workflow
+
+**IMPORTANT**: Always create a feature branch before making any changes. Never develop directly on the main branch.
+
+### Proper Development Workflow:
+1. **Start with a feature branch**: `git checkout -b feature/descriptive-name`
+2. **Make your changes** on the feature branch
+3. **Test thoroughly** using the development commands above
+4. **Commit your changes** with descriptive messages
+5. **Push the feature branch**: `git push -u origin feature/descriptive-name`
+6. **Create a Pull Request** from the feature branch to main
+
+### Example:
+```bash
+# ✅ CORRECT - Create feature branch first
+git checkout -b feature/fix-dashboard-loading
+# Make changes, test, commit
+git push -u origin feature/fix-dashboard-loading
+# Create PR
+
+# ❌ WRONG - Never do this
+git checkout main
+# Make changes directly on main - DON'T DO THIS!
+```
+
+This workflow prevents conflicts and makes it easier to review changes before they're merged to main.
+
 ## Architecture Overview
 
 This is a React-based meal/dish management application using the following technology stack:
