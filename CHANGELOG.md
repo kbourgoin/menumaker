@@ -5,6 +5,24 @@ All notable changes to MenuMaker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-06-28
+
+### Security
+- **Environment Variables**: Fixed critical security vulnerability by replacing hardcoded Supabase credentials with environment variables (#45)
+  - Moved production credentials from source code to `.env.local` configuration
+  - Added `.env.example` template for easy developer setup
+  - Updated deployment documentation for environment variable configuration
+  - Enhanced security without breaking existing functionality
+
+### Technical Debt Analysis
+- **Comprehensive Audit**: Conducted thorough technical debt analysis identifying 23 issues across 4 severity levels
+- **GitHub Issue Tracking**: Created systematic tracking with parent issue #33 and child issues #34-#44 organized by implementation phases
+- **Priority Framework**: Established Critical/High/Medium/Low priority system for systematic debt reduction
+
+### Developer Experience
+- **Project Documentation**: Enhanced `CLAUDE.md` with environment setup instructions and Git workflow guidelines
+- **Issue Templates**: Created detailed GitHub issues with implementation guidance for future technical debt resolution
+
 ## [0.2.2] - 2025-06-25
 
 ### Performance
