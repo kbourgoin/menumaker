@@ -81,5 +81,11 @@ export interface StatsData {
     name: string;
     timesCooked: number;
   };
+  topDishes: Dish[];
   cuisineBreakdown: Record<string, number>;
+  recentlyCooked: Array<{
+    date: string;
+    dish: Dish | null;
+    notes?: string;
+  }>;
 }

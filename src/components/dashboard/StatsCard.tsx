@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useDishQueries } from "@/hooks/dish";
 
 // Define colors for the charts
 const COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#F9F871', '#6A0572', '#AB83A1', '#15616D'];
@@ -17,7 +16,6 @@ interface StatsCardProps {
 
 const StatsCard = React.memo<StatsCardProps>(({ stats, isLoading }) => {
   const navigate = useNavigate();
-  const { dishes } = useDishQueries();
   const [showAllCuisines, setShowAllCuisines] = useState(false);
 
   // Prepare cuisine data
@@ -30,13 +28,10 @@ const StatsCard = React.memo<StatsCardProps>(({ stats, isLoading }) => {
       : [];
   }, [stats]);
 
-  // Prepare top 5 most cooked dishes
+  // Get top dishes from stats data
   const topDishes = React.useMemo(() => {
-    return dishes
-      .filter(dish => dish.timesCooked > 0)
-      .sort((a, b) => b.timesCooked - a.timesCooked)
-      .slice(0, 5);
-  }, [dishes]);
+    return stats?.topDishes || [];
+  }, [stats]);
 
   const handleCuisineClick = (cuisine: string) => {
     navigate(`/all-meals?tag=${encodeURIComponent(cuisine)}`);

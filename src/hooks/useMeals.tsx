@@ -47,7 +47,9 @@ export function useMeals() {
     getDishesBySource: sourcesHook.getDishesBySource,
     
     // Stats
-    getStats: statsHook.getStats
+    getStats: statsHook.getStats,
+    stats: statsHook.stats,
+    statsLoading: statsHook.isLoading
   };
 }
 
