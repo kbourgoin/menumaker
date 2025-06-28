@@ -81,6 +81,12 @@ export function useStats() {
         // Find dish with highest timesCooked
         const mostCooked = [...dishes].sort((a, b) => b.timesCooked - a.timesCooked)[0];
         
+        // Get top 5 most cooked dishes
+        const topDishes = [...dishes]
+          .filter(dish => dish.timesCooked > 0)
+          .sort((a, b) => b.timesCooked - a.timesCooked)
+          .slice(0, 5);
+        
         // Get cuisine breakdown - works with both old cuisines array and new cuisine tags
         const cuisineBreakdown = dishes.reduce((acc: Record<string, number>, dish) => {
           // Check both old cuisine array and new cuisine tags
@@ -124,6 +130,7 @@ export function useStats() {
           totalDishes: dishes.length,
           totalTimesCooked: allHistoryData.length, // Total count of ALL meal history entries
           mostCooked,
+          topDishes,
           cuisineBreakdown,
           recentlyCooked
         };
@@ -139,9 +146,11 @@ export function useStats() {
       totalDishes: 0,
       totalTimesCooked: 0,
       mostCooked: null,
+      topDishes: [],
       cuisineBreakdown: {},
       recentlyCooked: []
     },
+    stats, // Expose stats directly for synchronous access
     isLoading
   };
 }

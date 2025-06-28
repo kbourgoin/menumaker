@@ -8,7 +8,15 @@ export function useMealHistoryByDate() {
     queryKey: ['mealHistoryByDate'],
     queryFn: async () => {
       try {
-        // Fetch meal history with dishes joined
+        // Fetch ALL meal history to properly calculate dish statistics
+        const { data: allHistoryData, error: allHistoryError } = await supabase
+          .from('meal_history')
+          .select('*')
+          .order('date', { ascending: false });
+          
+        if (allHistoryError) throw allHistoryError;
+        
+        // Fetch meal history with dishes joined for display (limit to recent entries)
         const { data: historyData, error } = await supabase
           .from('meal_history')
           .select('*, dishes(*)')
@@ -19,14 +27,23 @@ export function useMealHistoryByDate() {
         
         if (!historyData || historyData.length === 0) return [];
         
-        // Map to include dish data
+        // Group all meal history by dish ID for proper statistics calculation
+        const historyByDishId: Record<string, any[]> = {};
+        (allHistoryData || []).forEach(entry => {
+          if (!historyByDishId[entry.dishid]) {
+            historyByDishId[entry.dishid] = [];
+          }
+          historyByDishId[entry.dishid].push(entry);
+        });
+        
+        // Map to include dish data with proper statistics
         return historyData
           .filter(entry => entry.dishes) // Only include entries with valid dish data
           .map(entry => ({
             id: entry.id,
             date: entry.date,
             notes: entry.notes,
-            dish: mapDishFromDB(entry.dishes, []) // Convert dish data to proper format
+            dish: mapDishFromDB(entry.dishes, historyByDishId[entry.dishes.id] || []) // Convert dish data with full meal history
           }));
       } catch (error) {
         console.error("Error fetching meal history by date:", error);
