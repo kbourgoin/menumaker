@@ -42,7 +42,12 @@ const TodaysMenu = ({ todaysDishes, isLoading }: TodaysMenuProps) => {
         ) : todaysDishes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {todaysDishes.map(dish => (
-              <DishCard key={dish.id} dish={dish} />
+              <DishCard 
+                key={dish.id} 
+                dish={dish} 
+                showActions={false} 
+                compact={true} 
+              />
             ))}
           </div>
         ) : (
