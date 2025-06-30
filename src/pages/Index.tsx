@@ -6,6 +6,8 @@ import { useMealHistoryByDate } from "@/hooks/useMealHistoryByDate";
 import Layout from "@/components/Layout";
 import SEOHead, { getPageSEO } from "@/components/SEOHead";
 import { Dish } from "@/types";
+import { ErrorMessage, ErrorFallback } from "@/components/ErrorMessage";
+import { isNetworkError } from "@/utils/errorHandling";
 
 // Import our new component files
 import TodaysMenu from "@/components/dashboard/TodaysMenu";
@@ -13,20 +15,58 @@ import ComingUp from "@/components/dashboard/ComingUp";
 import StatsCard from "@/components/dashboard/StatsCard";
 
 const Home = () => {
-  const { stats, statsLoading } = useDishes();
+  const { dishes, isLoading: dishesLoading, error: dishesError } = useDishes();
   const { getTodaysMeals, getUpcomingMeals, isLoading: mealHistoryLoading } = useMealHistoryByDate();
   const { toast } = useToast();
 
-  const isLoading = statsLoading || mealHistoryLoading;
+  const isLoading = dishesLoading || mealHistoryLoading;
+
+  // Calculate stats from dishes data
+  const stats = dishes ? {
+    totalDishes: dishes.length,
+    timesCooked: dishes.reduce((sum, dish) => sum + (dish.timesCooked || 0), 0),
+    cuisines: [...new Set(dishes.flatMap(dish => dish.cuisines || []))].length
+  } : undefined;
 
   // Get today's and upcoming dishes from meal history
   const todaysDishes = getTodaysMeals();
   const upcomingDishes = getUpcomingMeals();
 
+  // Handle critical errors that prevent page from loading
+  if (dishesError && !isLoading) {
+    return (
+      <Layout>
+        <SEOHead {...getPageSEO('home')} />
+        <ErrorFallback 
+          error={dishesError}
+          onRetry={() => window.location.reload()}
+          onGoHome={() => window.location.href = '/'}
+          context="dashboard"
+        />
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <SEOHead {...getPageSEO('home')} />
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Show error message for non-critical errors */}
+        {dishesError && isNetworkError(dishesError) && (
+          <ErrorMessage 
+            error={dishesError}
+            onRetry={() => window.location.reload()}
+            onDismiss={() => {
+              // In a real app, you might want to retry the specific query
+              toast({
+                title: "Error dismissed",
+                description: "Some data may be incomplete."
+              });
+            }}
+            compact
+          />
+        )}
+
         {/* Today's Menu - Hero Card */}
         <TodaysMenu 
           todaysDishes={todaysDishes}

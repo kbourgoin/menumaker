@@ -4,15 +4,42 @@ import { useSourceMutations } from './useSourceMutations';
 import { useSourceMerge } from './useSourceMerge';
 
 export function useSources() {
-  const { sources, isLoadingSources, sourcesError, getSources, getSource, getDishesBySource, findSourceByName } = useSourceQueries();
-  const { addSource, updateSource, deleteSource } = useSourceMutations();
-  const { mergeSources } = useSourceMerge();
+  const { 
+    sources, 
+    isLoadingSources, 
+    sourcesError, 
+    isSourcesError,
+    refetchSources,
+    getSources, 
+    getSource, 
+    getDishesBySource, 
+    findSourceByName,
+    createSourceError
+  } = useSourceQueries();
+  
+  const { 
+    addSource, 
+    updateSource, 
+    deleteSource,
+    isAddingSource,
+    isUpdatingSource,
+    isDeletingSource,
+    createSourceMutationError
+  } = useSourceMutations();
+  
+  const { 
+    mergeSources,
+    isMergingSources,
+    createSourceMergeError
+  } = useSourceMerge();
 
   return {
     // Source queries
     sources,
     isLoadingSources,
     sourcesError,
+    isSourcesError,
+    refetchSources,
     getSources,
     getSource,
     getDishesBySource,
@@ -22,9 +49,18 @@ export function useSources() {
     addSource,
     updateSource,
     deleteSource,
+    isAddingSource,
+    isUpdatingSource,
+    isDeletingSource,
     
     // Source merge
-    mergeSources
+    mergeSources,
+    isMergingSources,
+    
+    // Error utilities
+    createSourceError,
+    createSourceMutationError,
+    createSourceMergeError
   };
 }
 
