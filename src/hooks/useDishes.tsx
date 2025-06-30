@@ -1,7 +1,7 @@
 
 import { useDishQueries } from "./dish/useDishQueries";
 import { useDishMutations } from "./dish/useDishMutations";
-import { useMealHistory } from "./useMealHistory";
+import { useMealHistory } from "./meal-history";
 
 /**
  * Main hook that combines dish queries and mutations

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { usePWAInstall } from "@/hooks/ui/usePWAInstall";
 
 export const PWAInstallButton = () => {
   const { isInstallable, isInstalled, installApp } = usePWAInstall();

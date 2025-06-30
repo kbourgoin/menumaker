@@ -6,7 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { useTagQueries, useTagMutations } from "@/hooks/tag";
+import { useTagQueries, useTagMutations } from "@/hooks/tags";
 import { Input } from "@/components/ui/input";
 import CuisineTag from "@/components/CuisineTag";
 

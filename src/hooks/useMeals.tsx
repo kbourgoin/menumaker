@@ -1,9 +1,9 @@
 
 import { useDishQueries, useDishMutations } from "./dish";
-import { useMealHistory } from "./useMealHistory";
+import { useMealHistory } from "./meal-history";
 import { useWeeklyMenu } from "./useWeeklyMenu";
 import { useSources } from "./sources";
-import { useStats } from "./useStats";
+import { useStats } from "./stats";
 
 /**
  * This is a composite hook that combines all meal-related functionality.

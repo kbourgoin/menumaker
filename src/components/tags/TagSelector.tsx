@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Check, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTagQueries, useTagMutations } from "@/hooks/tag";
+import { useTagQueries, useTagMutations } from "@/hooks/tags";
 import { TagBadge } from "./TagBadge";
 import type { TagCategory } from "@/types";
 

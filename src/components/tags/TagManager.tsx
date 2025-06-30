@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Plus, Trash2 } from "lucide-react";
-import { useTagQueries, useTagMutations, type Tag } from "@/hooks/tag";
+import { useTagQueries, useTagMutations, type Tag } from "@/hooks/tags";
 import { TagBadge } from "./TagBadge";
 
 interface TagManagerProps {
