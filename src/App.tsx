@@ -33,14 +33,46 @@ const App = () => (
             <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." />}>
               <AnimatePresence mode="wait">
                 <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/" element={<Index />} />
-                  <Route path="/all-meals" element={<AllDishes />} />
-                  <Route path="/add-meal" element={<AddDish />} />
-                  <Route path="/weekly-menu" element={<WeeklyMenu />} />
-                  <Route path="/meal/:id" element={<MealDetail />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="/auth" element={
+                    <ErrorBoundary context="auth-page">
+                      <Auth />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/" element={
+                    <ErrorBoundary context="dashboard-page">
+                      <Index />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/all-meals" element={
+                    <ErrorBoundary context="all-meals-page">
+                      <AllDishes />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/add-meal" element={
+                    <ErrorBoundary context="add-meal-page">
+                      <AddDish />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/weekly-menu" element={
+                    <ErrorBoundary context="weekly-menu-page">
+                      <WeeklyMenu />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/meal/:id" element={
+                    <ErrorBoundary context="meal-detail-page">
+                      <MealDetail />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/settings" element={
+                    <ErrorBoundary context="settings-page">
+                      <Settings />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="*" element={
+                    <ErrorBoundary context="not-found-page">
+                      <NotFound />
+                    </ErrorBoundary>
+                  } />
                 </Routes>
               </AnimatePresence>
             </Suspense>
