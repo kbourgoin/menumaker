@@ -28,7 +28,7 @@ export function useMealHistoryByDate() {
         if (!historyData || historyData.length === 0) return [];
         
         // Group all meal history by dish ID for proper statistics calculation
-        const historyByDishId: Record<string, any[]> = {};
+        const historyByDishId: Record<string, unknown[]> = {};
         (allHistoryData || []).forEach(entry => {
           if (!historyByDishId[entry.dishid]) {
             historyByDishId[entry.dishid] = [];

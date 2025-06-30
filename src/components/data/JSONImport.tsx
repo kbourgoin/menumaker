@@ -1,13 +1,13 @@
 
 import { useState, useRef } from "react";
-import { useJSONImport } from "@/hooks/import";
+import { useJSONImport } from "@/hooks/import-export";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ExportData } from "@/hooks/import/useDataExport";
+import { ExportData } from "@/hooks/import-export/useDataExport";
 
 export function JSONImport() {
   const { importFromJSON, validateJSONData, isImporting, progress: importProgress } = useJSONImport();

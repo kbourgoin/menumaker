@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Search, X, Hash, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTagQueries } from "@/hooks/tag";
+import { useTagQueries } from "@/hooks/tags";
 import { TagBadge } from "@/components/tags";
 import { CUISINES } from "@/components/dish-form/constants";
 import CuisineTag from "@/components/CuisineTag";

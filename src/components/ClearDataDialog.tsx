@@ -10,7 +10,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useClearData } from "@/hooks/useClearData";
+import { useClearData } from "@/hooks/data/useClearData";
 import { toast } from "sonner";
 
 export function ClearDataDialog() {

@@ -2,7 +2,7 @@
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
-import { useMealHistoryByDate } from "@/hooks/useMealHistoryByDate";
+import { useMealHistoryByDate } from "@/hooks/meal-history/useMealHistoryByDate";
 import Layout from "@/components/Layout";
 import SEOHead, { getPageSEO } from "@/components/SEOHead";
 import { Dish } from "@/types";

@@ -16,7 +16,7 @@ import LocationField from "./LocationField";
 import { useSources } from "@/hooks/sources";
 import { TagSelector } from "@/components/tags";
 import CuisineTagSelector from "@/components/tags/CuisineTagSelector";
-import { useTagMutations, useTagQueries } from "@/hooks/tag";
+import { useTagMutations, useTagQueries } from "@/hooks/tags";
 
 interface DishFormProps {
   existingDish?: Dish;
