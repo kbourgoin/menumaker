@@ -7,7 +7,7 @@ export interface Dish {
   sourceId?: string;
   lastMade?: string;
   timesCooked: number;
-  user_id: string;
+  userId: string;
   location?: string;
   lastComment?: string;
   tags: string[];
@@ -18,7 +18,7 @@ export interface MealHistory {
   dishId: string;
   date: string;
   notes?: string;
-  user_id: string;
+  userId: string;
 }
 
 export interface Source {
@@ -28,7 +28,7 @@ export interface Source {
   description?: string;
   url?: string;
   createdAt: string;
-  user_id: string;
+  userId: string;
 }
 
 export type CuisineType = 
@@ -61,8 +61,8 @@ export interface Tag {
   category: TagCategory;
   color?: string;
   description?: string;
-  user_id: string;
-  created_at: string;
+  userId: string;
+  createdAt: string;
 }
 
 export interface MealHistoryWithDish {
@@ -70,7 +70,7 @@ export interface MealHistoryWithDish {
   dishId: string;
   date: string;
   notes?: string;
-  user_id: string;
+  userId: string;
   dish?: Dish;
 }
 
