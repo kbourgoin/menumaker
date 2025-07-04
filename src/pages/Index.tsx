@@ -3,6 +3,7 @@ import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
 import { useMealHistoryByDate } from "@/hooks/meal-history/useMealHistoryByDate";
+import { useStats } from "@/hooks/stats/useStats";
 import Layout from "@/components/Layout";
 import SEOHead, { getPageSEO } from "@/components/SEOHead";
 import { Dish } from "@/types";
@@ -17,16 +18,10 @@ import StatsCard from "@/components/dashboard/StatsCard";
 const Home = () => {
   const { dishes, isLoading: dishesLoading, error: dishesError } = useDishes();
   const { getTodaysMeals, getUpcomingMeals, isLoading: mealHistoryLoading } = useMealHistoryByDate();
+  const { stats, isLoading: statsLoading } = useStats();
   const { toast } = useToast();
 
   const isLoading = dishesLoading || mealHistoryLoading;
-
-  // Calculate stats from dishes data
-  const stats = dishes ? {
-    totalDishes: dishes.length,
-    timesCooked: dishes.reduce((sum, dish) => sum + (dish.timesCooked || 0), 0),
-    cuisines: [...new Set(dishes.flatMap(dish => dish.cuisines || []))].length
-  } : undefined;
 
   // Get today's and upcoming dishes from meal history
   const todaysDishes = getTodaysMeals();
@@ -79,7 +74,7 @@ const Home = () => {
             upcomingDishes={upcomingDishes}
             isLoading={isLoading}
           />
-          <StatsCard stats={stats} isLoading={isLoading} />
+          <StatsCard stats={stats} isLoading={statsLoading} />
         </div>
       </div>
     </Layout>

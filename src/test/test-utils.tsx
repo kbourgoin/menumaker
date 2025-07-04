@@ -51,7 +51,7 @@ export const mockDish = {
   sourceId: 'test-source-1',
   lastMade: '2024-01-15T00:00:00Z',
   timesCooked: 3,
-  user_id: 'test-user-1',
+  userId: 'test-user-1',
   location: 'Page 42',
   lastComment: 'Delicious!',
   tags: ['favorite', 'quick'],
@@ -62,7 +62,7 @@ export const mockMealHistory = {
   dishId: 'test-dish-1',
   date: '2024-01-15T00:00:00Z',
   notes: 'Great dinner',
-  user_id: 'test-user-1',
+  userId: 'test-user-1',
 }
 
 export const mockSource = {
@@ -72,7 +72,7 @@ export const mockSource = {
   description: 'A great cookbook',
   url: undefined,
   createdAt: '2024-01-01T00:00:00Z',
-  user_id: 'test-user-1',
+  userId: 'test-user-1',
 }
 
 export const mockStats = {
