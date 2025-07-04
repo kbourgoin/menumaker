@@ -122,7 +122,7 @@ export function useStats() {
         // Transform recent history to include dish data
         const recentlyCooked = recentHistoryData.map(entry => ({
           date: entry.date,
-          dish: entry.dishes ? mapDishFromDB(entry.dishes, historyByDishId[entry.dishes.id] || []) : null,
+          dish: entry.dishes ? mapDishFromDB(entry.dishes as Tables<'dishes'>['Row'], historyByDishId[entry.dishes.id] || []) : null,
           notes: entry.notes
         }));
         
