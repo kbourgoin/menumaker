@@ -38,7 +38,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     )
     
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
+    expect(screen.getByText('Unexpected Error')).toBeInTheDocument()
     expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument()
   })
 
@@ -63,7 +63,7 @@ describe('ErrorBoundary', () => {
     )
     
     expect(screen.getByText('Custom error message')).toBeInTheDocument()
-    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument()
+    expect(screen.queryByText('Unexpected Error')).not.toBeInTheDocument()
   })
 
   it('shows error details in development mode', () => {
