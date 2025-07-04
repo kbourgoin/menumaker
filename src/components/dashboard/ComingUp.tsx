@@ -49,7 +49,7 @@ const ComingUp = ({ upcomingDishes, isLoading }: ComingUpProps) => {
           <Clock className="h-4 w-4 text-terracotta-500" />
           <div>
             <CardTitle className="text-lg">Coming Up</CardTitle>
-            <CardDescription>Next few days</CardDescription>
+            <CardDescription>All upcoming meals</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -64,14 +64,14 @@ const ComingUp = ({ upcomingDishes, isLoading }: ComingUpProps) => {
             ))}
           </div>
         ) : upcomingDishes.length > 0 ? (
-          <div className="space-y-4">
-            {upcomingDishes.slice(0, 2).map(({ date, dishes }, index) => (
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {upcomingDishes.map(({ date, dishes }, index) => (
               <div key={index} className="space-y-2">
                 <div className="text-sm font-medium text-muted-foreground">
                   {getDateLabel(date)}
                 </div>
                 <div className="space-y-1">
-                  {dishes.slice(0, 2).map(dish => (
+                  {dishes.map(dish => (
                     <Link 
                       key={dish.id} 
                       to={`/meal/${dish.id}`}

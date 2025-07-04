@@ -83,22 +83,25 @@ export function useMealHistoryByDate() {
   const getUpcomingMeals = (): Array<{ date: string; dishes: Dish[] }> => {
     const today = new Date();
     const todayKey = getLocalDateString(today);
-    const upcoming = [];
+    const upcomingMap = new Map<string, Dish[]>();
     
-    // Check next 3 days
-    for (let i = 1; i <= 3; i++) {
-      const futureDate = new Date(today);
-      futureDate.setDate(today.getDate() + i);
-      const dateKey = getLocalDateString(futureDate);
-      const mealsForDate = getMealsForDate(dateKey);
+    // Get all future meals from meal history
+    mealHistoryWithDishes.forEach(meal => {
+      const mealDate = meal.date.split('T')[0]; // Get date part only
       
-      if (mealsForDate.length > 0) {
-        upcoming.push({
-          date: dateKey,
-          dishes: mealsForDate
-        });
+      // Only include meals that are in the future (after today)
+      if (mealDate > todayKey && meal.dish) {
+        if (!upcomingMap.has(mealDate)) {
+          upcomingMap.set(mealDate, []);
+        }
+        upcomingMap.get(mealDate)!.push(meal.dish);
       }
-    }
+    });
+    
+    // Convert to array and sort by date
+    const upcoming = Array.from(upcomingMap.entries())
+      .map(([date, dishes]) => ({ date, dishes }))
+      .sort((a, b) => a.date.localeCompare(b.date));
     
     return upcoming;
   };
