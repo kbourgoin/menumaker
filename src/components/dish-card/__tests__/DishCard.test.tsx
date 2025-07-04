@@ -5,7 +5,7 @@ import { mockDish } from '@/test/test-utils'
 
 // Mock the child components
 vi.mock('../DishCardHeader', () => ({
-  default: ({ name, dishId, compact }: any) => (
+  default: ({ name, dishId, compact }: { name: string; dishId: string; compact: boolean }) => (
     <div data-testid="dish-card-header">
       {name} - {dishId} - {compact ? 'compact' : 'normal'}
     </div>
@@ -13,7 +13,7 @@ vi.mock('../DishCardHeader', () => ({
 }))
 
 vi.mock('../DishCardContent', () => ({
-  default: ({ cuisines, timesCooked }: any) => (
+  default: ({ cuisines, timesCooked }: { cuisines: string[]; timesCooked: number }) => (
     <div data-testid="dish-card-content">
       {cuisines.join(', ')} - Cooked {timesCooked} times
     </div>
@@ -21,7 +21,7 @@ vi.mock('../DishCardContent', () => ({
 }))
 
 vi.mock('../DishCardActions', () => ({
-  default: ({ dish, compact, onDeleted }: any) => (
+  default: ({ dish, compact }: { dish: { name: string }; compact: boolean }) => (
     <div data-testid="dish-card-actions">
       Actions for {dish.name} - {compact ? 'compact' : 'normal'}
     </div>
@@ -81,7 +81,7 @@ describe('DishCard', () => {
 
   it('returns null for invalid dish object', () => {
     // Test with null dish - DishCard returns null, so only test provider wrapper exists
-    const { container } = render(<DishCard dish={null as any} />)
+    const { container } = render(<DishCard dish={null as unknown as typeof mockDish} />)
     expect(container.querySelector('[data-testid="mock-auth-provider"]')).toBeInTheDocument()
     expect(container.querySelector('[data-testid="dish-card-header"]')).not.toBeInTheDocument()
     

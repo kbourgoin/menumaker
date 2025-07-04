@@ -170,7 +170,7 @@ describe('Error Handling Integration', () => {
   test('hook error states can be properly typed', () => {
     // This test ensures our enhanced hook return types work correctly
     type MockHookReturn = {
-      data: any[];
+      data: unknown[];
       isLoading: boolean;
       error: ReturnType<typeof classifyError> | null;
       isAddingItem: boolean;
