@@ -208,7 +208,7 @@ describe('Enhanced Hook Error Handling', () => {
       });
 
       // Mock slow database operation
-      let resolveInsert: (value: any) => void;
+      let resolveInsert: (value: unknown) => void;
       const insertPromise = new Promise((resolve) => {
         resolveInsert = resolve;
       });
@@ -306,7 +306,7 @@ describe('Enhanced Hook Error Handling', () => {
       });
 
       // Mock meal history delete success but dish delete failure
-      let callCount = 0;
+      const callCount = 0;
       mockSupabase.from.mockImplementation((table) => {
         if (table === 'meal_history') {
           return {
