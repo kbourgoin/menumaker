@@ -40,7 +40,7 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: Tables<'meal_history'>
     lastMade,  // Derived value
     timesCooked, // Derived value
     lastComment, // Derived value from most recent note
-    user_id: dish.user_id,
+    userId: dish.user_id,
     tags: [] // Default empty array for dishes fetched without tags
   };
 };
@@ -57,7 +57,7 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
     lastMade: summary.last_made,
     timesCooked: summary.times_cooked || 0,
     lastComment: summary.last_comment,
-    user_id: summary.user_id,
+    userId: summary.user_id,
     tags: summary.tags || []
   };
 };
@@ -75,6 +75,6 @@ export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Ta
     cuisines: dish.cuisines,
     source_id: dish.sourceId,
     location: dish.location,
-    user_id: dish.user_id
+    user_id: dish.userId
   };
 };

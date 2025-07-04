@@ -10,7 +10,7 @@ const mockDishes: Dish[] = [
     cuisines: ['Italian'],
     timesCooked: 5,
     lastMade: '2024-01-15T00:00:00Z',
-    user_id: 'user1',
+    userId: 'user1',
     tags: [],
   },
   {
@@ -20,7 +20,7 @@ const mockDishes: Dish[] = [
     cuisines: ['American'],
     timesCooked: 3,
     lastMade: '2024-01-10T00:00:00Z',
-    user_id: 'user1',
+    userId: 'user1',
     tags: [],
   },
   {
@@ -30,7 +30,7 @@ const mockDishes: Dish[] = [
     cuisines: ['Healthy'],
     timesCooked: 1,
     lastMade: '2024-01-20T00:00:00Z',
-    user_id: 'user1',
+    userId: 'user1',
     tags: [],
   },
 ]
@@ -73,7 +73,7 @@ describe('dishUtils', () => {
           createdAt: '2024-01-04T00:00:00Z',
           cuisines: ['Test'],
           timesCooked: 0,
-          user_id: 'user1',
+          userId: 'user1',
           tags: [],
         }
       ]

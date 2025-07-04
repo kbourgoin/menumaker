@@ -8,7 +8,7 @@ export const mapMealHistoryFromDB = (history: DBMealHistory): MealHistory => ({
   dishId: history.dishid,
   date: history.date,
   notes: history.notes || undefined,
-  user_id: history.user_id
+  userId: history.user_id
 });
 
 export const mapMealHistoryToDB = (history: Partial<MealHistory>): Partial<Database['public']['Tables']['meal_history']['Insert']> => {
@@ -22,6 +22,6 @@ export const mapMealHistoryToDB = (history: Partial<MealHistory>): Partial<Datab
     dishid: history.dishId,
     date: history.date,
     notes: history.notes,
-    user_id: history.user_id
+    user_id: history.userId
   };
 };

@@ -5,6 +5,21 @@ All notable changes to MenuMaker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-06-30
+
+### Technical Debt Reduction - Phase 2
+- **Hook Architecture Consolidation**: Major refactoring to improve code organization and maintainability (#37)
+  - **Domain-Specific Organization**: Reorganized hooks into logical directories (`meal-history/`, `auth/`, `stats/`, `data/`, `ui/`, `tags/`, `import-export/`)
+  - **Enhanced Error Handling**: Applied consistent error handling patterns with retry logic and proper error classification across all hooks
+  - **Backward Compatibility**: Maintained seamless API compatibility through consolidated index exports during transition
+  - **Import Standardization**: Updated all component and page imports to use new organized structure
+  - **Code Quality**: Removed duplicate files, improved TypeScript type safety, and enhanced separation of concerns
+  - **Testing**: Verified build system and core functionality (91/106 tests passing with enhanced error coverage)
+
+### Developer Experience  
+- **Architecture Documentation**: Enhanced project structure with clear domain boundaries and consistent patterns
+- **Error Handling Framework**: Established robust error handling foundation building on comprehensive error handling from Issue #35
+
 ## [0.2.3] - 2025-06-28
 
 ### Security
