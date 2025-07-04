@@ -11,37 +11,36 @@ import { ErrorType } from '@/types/errors';
 // Import the mocked supabase client
 import { supabase } from '@/integrations/supabase/client';
 
-// Mock the Supabase client module
-vi.mock('@/integrations/supabase/client', () => {
-  const mockSupabase = {
-    auth: {
-      getUser: vi.fn()
-    },
-    from: vi.fn(() => ({
+// Create mock functions that can be accessed in tests
+const mockSupabase = {
+  auth: {
+    getUser: vi.fn()
+  },
+  from: vi.fn(() => ({
+    select: vi.fn(() => ({
+      order: vi.fn(() => Promise.resolve({ data: [], error: null }))
+    })),
+    insert: vi.fn(() => ({
       select: vi.fn(() => ({
-        order: vi.fn(() => Promise.resolve({ data: [], error: null }))
-      })),
-      insert: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ error: null }))
-      })),
-      delete: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ error: null }))
+        single: vi.fn(() => Promise.resolve({ data: null, error: null }))
       }))
+    })),
+    update: vi.fn(() => ({
+      eq: vi.fn(() => Promise.resolve({ error: null }))
+    })),
+    delete: vi.fn(() => ({
+      eq: vi.fn(() => Promise.resolve({ error: null }))
     }))
-  };
+  }))
+};
 
-  return {
-    supabase: mockSupabase,
-    mapDishFromSummary: vi.fn((data) => data),
-    mapDishFromDB: vi.fn((data) => data),
-    mapDishToDB: vi.fn((data) => data)
-  };
-});
+// Mock the Supabase client module
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: mockSupabase,
+  mapDishFromSummary: vi.fn((data) => data),
+  mapDishFromDB: vi.fn((data) => data),
+  mapDishToDB: vi.fn((data) => data)
+}));
 
 // Mock the dish fetch utils
 vi.mock('../dish/utils/dishFetchUtils', () => ({

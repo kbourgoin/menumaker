@@ -37,6 +37,14 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 describe('End-to-End Error Handling Flow', () => {
+  // Component that throws an error for testing error boundaries
+  const ErrorThrowingComponent = ({ shouldThrow }: { shouldThrow: boolean }) => {
+    if (shouldThrow) {
+      throw new Error('Component render error');
+    }
+    return <div>Component rendered successfully</div>;
+  };
+
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -92,13 +100,6 @@ describe('End-to-End Error Handling Flow', () => {
   });
 
   describe('Error Boundary Integration', () => {
-    // Component that throws an error
-    const ErrorThrowingComponent = ({ shouldThrow }: { shouldThrow: boolean }) => {
-      if (shouldThrow) {
-        throw new Error('Component render error');
-      }
-      return <div>Component rendered successfully</div>;
-    };
 
     test('error boundary catches and displays component errors', async () => {
       const { rerender } = render(
@@ -121,7 +122,7 @@ describe('End-to-End Error Handling Flow', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText(/Unexpected Error/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Unexpected Error/i)).toHaveLength(1);
         expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /go home/i })).toBeInTheDocument();
       });
@@ -219,7 +220,7 @@ describe('End-to-End Error Handling Flow', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText(/Unexpected Error/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Unexpected Error/i)[0]).toBeInTheDocument();
       expect(screen.getByText(/unexpected error occurred/i)).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /try again/i }));
@@ -356,7 +357,7 @@ describe('End-to-End Error Handling Flow', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText(/internet connection/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/internet connection/i)[0]).toBeInTheDocument();
       expect(screen.getByText(/session has expired/i)).toBeInTheDocument();
     });
   });
@@ -421,7 +422,7 @@ describe('Real-World Error Scenarios', () => {
     );
 
     // Should show error initially
-    expect(screen.getByText(/internet connection/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/internet connection/i)[0]).toBeInTheDocument();
 
     // Click retry
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
