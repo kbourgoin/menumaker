@@ -155,7 +155,7 @@ describe('useStats', () => {
     })
 
     // Mock mapDishFromDB implementation
-    const { mapDishFromDB } = await import('@/integrations/supabase/client')
+    const { mapDishFromDB } = require('@/integrations/supabase/client')
     mapDishFromDB.mockImplementation((dish: Record<string, unknown>, history: Record<string, unknown>[] = []) => {
       const dishHistory = history.filter(h => h.dishid === dish.id)
       const timesCooked = dishHistory.length

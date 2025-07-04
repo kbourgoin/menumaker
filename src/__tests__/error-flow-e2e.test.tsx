@@ -122,7 +122,7 @@ describe('End-to-End Error Handling Flow', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getAllByText(/Unexpected Error/i)).toHaveLength(1);
+        expect(screen.getByRole('heading', { name: /Unexpected Error/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /go home/i })).toBeInTheDocument();
       });

@@ -11,7 +11,7 @@ import { ErrorType } from '@/types/errors';
 // Import the mocked supabase client
 import { supabase } from '@/integrations/supabase/client';
 
-// Create mock functions that can be accessed in tests
+// Mock the Supabase client module
 const mockSupabase = {
   auth: {
     getUser: vi.fn()
@@ -34,7 +34,6 @@ const mockSupabase = {
   }))
 };
 
-// Mock the Supabase client module
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: mockSupabase,
   mapDishFromSummary: vi.fn((data) => data),
