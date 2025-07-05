@@ -54,7 +54,7 @@ const Layout = ({ children }: LayoutProps) => {
       </motion.main>
       <footer className="py-6 border-t border-terracotta-100 bg-cream-50">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p className="text-sm">Family Meal Memories © {new Date().getFullYear()}</p>
+          <p className="text-sm">Keith Bourgoin © {new Date().getFullYear()}</p>
         </div>
       </footer>
     </div>
