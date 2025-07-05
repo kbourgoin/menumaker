@@ -46,6 +46,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 4. **Commit your changes** with descriptive messages
 5. **Push the feature branch**: `git push -u origin feature/descriptive-name`
 6. **Create a Pull Request** from the feature branch to main
+7. **Wait for all GitHub Actions to pass** before merging
+
+### Pull Request Requirements:
+- ✅ **All GitHub Actions must pass**: Linting, type checking, tests, and build must all succeed
+- ✅ **Status checks must be green**: No failing automated checks are allowed
+- 🚫 **PRs cannot be merged with failing checks**: This rule is strictly enforced
+- 📋 **Manual review**: Code review and approval from maintainers is still required
 
 ### Example:
 ```bash

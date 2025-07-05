@@ -60,7 +60,12 @@ bun run dev
    - Link any related issues
    - Request review from maintainers
 
-5. **After review and approval**, the PR will be merged to main
+5. **Wait for automated checks** to pass:
+   - ✅ All GitHub Actions must pass (linting, type checking, tests, build)
+   - ✅ All status checks must be green before merging
+   - 🚫 **PRs cannot be merged with failing checks**
+
+6. **After review, approval, and passing checks**, the PR will be merged to main
 
 ### Branch Naming Convention
 - `feature/` - New features or enhancements
