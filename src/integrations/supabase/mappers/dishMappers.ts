@@ -1,10 +1,28 @@
+/**
+ * DEPRECATED: This file is deprecated in favor of centralized type mapping.
+ * Use @/utils/typeMapping instead for all new code.
+ * This file is kept for backward compatibility during migration.
+ */
 
 import { Database, Json, Tables } from '../types';
 import { DBDish, DishSummary } from './types';
 import { Dish } from '@/types';
 
-// Mapping functions to convert between database and client formats
-export const mapDishFromDB = (dish: DBDish, mealHistory?: Tables<'meal_history'>[]): Dish => {
+// Re-export the new standardized mappers
+export { 
+  mapDishFromDB, 
+  mapDishFromSummary, 
+  mapDishToDB 
+} from '@/utils/typeMapping';
+
+// DEPRECATED: Legacy mapping functions below
+// These are kept for backward compatibility only
+// Use imports above for all new code
+
+/**
+ * @deprecated Use mapDishFromDB from @/utils/typeMapping instead
+ */
+export const mapDishFromDB_LEGACY = (dish: DBDish, mealHistory?: Tables<'meal_history'>[]): Dish => {
   // Default values for derived fields
   let timesCooked = 0;
   let lastMade: string | undefined = undefined;
@@ -45,8 +63,10 @@ export const mapDishFromDB = (dish: DBDish, mealHistory?: Tables<'meal_history'>
   };
 };
 
-// Updated function to map from our materialized view without source field
-export const mapDishFromSummary = (summary: DishSummary): Dish => {
+/**
+ * @deprecated Use mapDishFromSummary from @/utils/typeMapping instead
+ */
+export const mapDishFromSummary_LEGACY = (summary: DishSummary): Dish => {
   return {
     id: summary.id,
     name: summary.name,
@@ -62,7 +82,10 @@ export const mapDishFromSummary = (summary: DishSummary): Dish => {
   };
 };
 
-export const mapDishToDB = (dish: Partial<Dish>): Partial<Database['public']['Tables']['dishes']['Insert']> => {
+/**
+ * @deprecated Use mapDishToDB from @/utils/typeMapping instead
+ */
+export const mapDishToDB_LEGACY = (dish: Partial<Dish>): Partial<Database['public']['Tables']['dishes']['Insert']> => {
   // Ensure required fields are present when inserting a new dish
   if (dish.name === undefined && !dish.id) {
     throw new Error('Name is required when creating a new dish');

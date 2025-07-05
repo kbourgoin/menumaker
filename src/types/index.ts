@@ -1,5 +1,24 @@
+/**
+ * Main Types Export
+ * 
+ * This file re-exports all entity types from the unified type system.
+ * Use this file as the main import point for all application types.
+ */
 
-export interface Dish {
+// Re-export all entity types from the new unified system
+export * from './entities';
+
+// Re-export database types for convenience
+export * from './database';
+
+// DEPRECATED: Legacy type definitions below
+// These are kept for backward compatibility only
+// All new code should use imports from ./entities
+
+/**
+ * @deprecated Use Dish from './entities' instead
+ */
+export interface DishLegacy {
   id: string;
   name: string;
   createdAt: string;
@@ -13,7 +32,10 @@ export interface Dish {
   tags: string[];
 }
 
-export interface MealHistory {
+/**
+ * @deprecated Use MealHistory from './entities' instead
+ */
+export interface MealHistoryLegacy {
   id: string;
   dishId: string;
   date: string;
@@ -21,7 +43,10 @@ export interface MealHistory {
   userId: string;
 }
 
-export interface Source {
+/**
+ * @deprecated Use Source from './entities' instead
+ */
+export interface SourceLegacy {
   id: string;
   name: string;
   type: 'book' | 'website';  // Removed 'document' from the type options
@@ -31,31 +56,10 @@ export interface Source {
   userId: string;
 }
 
-export type CuisineType = 
-  | 'Italian' 
-  | 'Mexican' 
-  | 'American' 
-  | 'Asian' 
-  | 'Mediterranean' 
-  | 'Indian' 
-  | 'French'
-  | 'Greek'
-  | 'Thai'
-  | 'Japanese'
-  | 'Chinese'
-  | 'Korean'
-  | 'Middle Eastern'
-  | 'Vietnamese'
-  | 'Spanish'
-  | 'Caribbean'
-  | 'German'
-  | 'British'
-  | 'Fusion'
-  | 'Other';
-
-export type TagCategory = 'cuisine' | 'general';
-
-export interface Tag {
+/**
+ * @deprecated Use Tag from './entities' instead
+ */
+export interface TagLegacy {
   id: string;
   name: string;
   category: TagCategory;
@@ -63,29 +67,4 @@ export interface Tag {
   description?: string;
   userId: string;
   createdAt: string;
-}
-
-export interface MealHistoryWithDish {
-  id: string;
-  dishId: string;
-  date: string;
-  notes?: string;
-  userId: string;
-  dish?: Dish;
-}
-
-export interface StatsData {
-  totalDishes: number;
-  totalTimesCooked: number;
-  mostCooked?: {
-    name: string;
-    timesCooked: number;
-  };
-  topDishes: Dish[];
-  cuisineBreakdown: Record<string, number>;
-  recentlyCooked: Array<{
-    date: string;
-    dish: Dish | null;
-    notes?: string;
-  }>;
 }
