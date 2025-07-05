@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "./AuthProvider";
 import { Navigate } from "react-router-dom";
 import { Progress } from "./ui/progress";
+import PerformanceMonitor from "./dev/PerformanceMonitor";
 
 interface LayoutProps {
   children: ReactNode;
@@ -57,6 +58,9 @@ const Layout = ({ children }: LayoutProps) => {
           <p className="text-sm">Keith Bourgoin © {new Date().getFullYear()}</p>
         </div>
       </footer>
+      
+      {/* Development performance monitor */}
+      <PerformanceMonitor />
     </div>
   );
 };
