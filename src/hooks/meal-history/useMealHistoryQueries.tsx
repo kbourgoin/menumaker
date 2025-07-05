@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { classifyError, logError, retryOperation } from "@/utils/errorHandling";
 import { ErrorType } from "@/types/errors";
+import { measureAsync, trackQuery } from "@/utils/performance";
 
 export function useMealHistoryQueries() {
   // Get meal history for a specific dish
@@ -11,9 +12,10 @@ export function useMealHistoryQueries() {
     return useQuery({
       queryKey: ['mealHistory', dishId],
       queryFn: async (): Promise<MealHistory[]> => {
-        try {
-          // Validate inputs
-          if (!dishId?.trim()) {
+        return await measureAsync(`meal-history-${dishId}`, async () => {
+          try {
+            // Validate inputs
+            if (!dishId?.trim()) {
             const validationError = classifyError(new Error('Dish ID is required'));
             logError(validationError, 'useMealHistoryQueries:mealHistoryForDish:validation');
             return [];
@@ -41,20 +43,36 @@ export function useMealHistoryQueries() {
           
           if (!data || data.length === 0) return [];
           
-          // Map database records to MealHistory objects with proper typing
-          return data.map(record => ({
-            id: String(record.id),
-            dishId: record.dishid,
-            date: record.date,
-            notes: record.notes || undefined,
-            user_id: record.user_id
-          }));
+            // Map database records to MealHistory objects with proper typing
+            const mealHistory = data.map(record => ({
+              id: String(record.id),
+              dishId: record.dishid,
+              date: record.date,
+              notes: record.notes || undefined,
+              user_id: record.user_id
+            }));
+            
+            trackQuery({
+              queryType: 'meal-history-for-dish',
+              duration: 0,
+              recordCount: mealHistory.length,
+              success: true
+            });
+            
+            return mealHistory;
           
-        } catch (error) {
-          const appError = classifyError(error);
-          logError(appError, 'useMealHistoryQueries:mealHistoryForDish:top-level');
-          return [];
-        }
+          } catch (error) {
+            const appError = classifyError(error);
+            logError(appError, 'useMealHistoryQueries:mealHistoryForDish:top-level');
+            trackQuery({
+              queryType: 'meal-history-for-dish',
+              duration: 0,
+              recordCount: 0,
+              success: false
+            });
+            return [];
+          }
+        });
       },
       staleTime: 2 * 60 * 1000, // 2 minutes
       gcTime: 5 * 60 * 1000, // 5 minutes
@@ -78,9 +96,10 @@ export function useMealHistoryQueries() {
     return useQuery({
       queryKey: ['mealHistory', 'all'],
       queryFn: async (): Promise<MealHistory[]> => {
-        try {
-          // Auth check with retry
-          const user = await retryOperation(
+        return await measureAsync('all-meal-history', async () => {
+          try {
+            // Auth check with retry
+            const user = await retryOperation(
             async () => {
               const userResult = await supabase.auth.getUser();
               if (userResult.error) {
@@ -119,19 +138,35 @@ export function useMealHistoryQueries() {
           
           if (!data || data.length === 0) return [];
           
-          return data.map(record => ({
-            id: String(record.id),
-            dishId: record.dishid,
-            date: record.date,
-            notes: record.notes || undefined,
-            user_id: record.user_id
-          }));
+            const mealHistory = data.map(record => ({
+              id: String(record.id),
+              dishId: record.dishid,
+              date: record.date,
+              notes: record.notes || undefined,
+              user_id: record.user_id
+            }));
+            
+            trackQuery({
+              queryType: 'all-meal-history',
+              duration: 0,
+              recordCount: mealHistory.length,
+              success: true
+            });
+            
+            return mealHistory;
           
-        } catch (error) {
-          const appError = classifyError(error);
-          logError(appError, 'useMealHistoryQueries:allMealHistory:top-level');
-          return [];
-        }
+          } catch (error) {
+            const appError = classifyError(error);
+            logError(appError, 'useMealHistoryQueries:allMealHistory:top-level');
+            trackQuery({
+              queryType: 'all-meal-history',
+              duration: 0,
+              recordCount: 0,
+              success: false
+            });
+            return [];
+          }
+        });
       },
       staleTime: 1 * 60 * 1000, // 1 minute
       gcTime: 10 * 60 * 1000, // 10 minutes

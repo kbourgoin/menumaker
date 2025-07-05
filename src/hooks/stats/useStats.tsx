@@ -2,19 +2,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
+import { measureAsync, trackQuery } from "@/utils/performance";
 
 export function useStats() {
   // Get dish stats with React Query
   const { data: stats, isLoading } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      try {
-        // Fetch dishes data
-        const { data: dishesData, error: dishesError } = await supabase
-          .from('dishes')
-          .select('*');
-          
-        if (dishesError) throw dishesError;
+      return await measureAsync('stats-query', async () => {
+        try {
+          // Fetch dishes data
+          const dishesData = await measureAsync('stats-dishes-query', async () => {
+            const { data, error } = await supabase
+              .from('dishes')
+              .select('*');
+            if (error) throw error;
+            return data;
+          });
         
         // Fetch ALL meal history data with pagination to handle the 1000 row limit
         let allHistoryData: Tables<'meal_history'>[] = [];
@@ -126,18 +130,32 @@ export function useStats() {
           notes: entry.notes
         }));
         
-        return {
-          totalDishes: dishes.length,
-          totalTimesCooked: allHistoryData.length, // Total count of ALL meal history entries
-          mostCooked,
-          topDishes,
-          cuisineBreakdown,
-          recentlyCooked
-        };
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-        throw error;
-      }
+          trackQuery({
+            queryType: 'stats-complete',
+            duration: 0, // Will be set by measureAsync
+            recordCount: dishes.length,
+            success: true
+          });
+          
+          return {
+            totalDishes: dishes.length,
+            totalTimesCooked: allHistoryData.length, // Total count of ALL meal history entries
+            mostCooked,
+            topDishes,
+            cuisineBreakdown,
+            recentlyCooked
+          };
+        } catch (error) {
+          console.error("Error fetching stats:", error);
+          trackQuery({
+            queryType: 'stats-complete',
+            duration: 0,
+            recordCount: 0,
+            success: false
+          });
+          throw error;
+        }
+      });
     }
   });
 
