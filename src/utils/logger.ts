@@ -17,8 +17,9 @@ interface LogEntry {
 }
 
 class Logger {
-  private isDevelopment = import.meta.env.DEV;
-  private isTest = import.meta.env.MODE === 'test';
+  // Check environment dynamically instead of caching at instantiation
+  private get isDevelopment() { return import.meta.env.DEV; }
+  private get isTest() { return import.meta.env.MODE === 'test'; }
 
   /**
    * Debug logging - only in development
