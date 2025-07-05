@@ -1,9 +1,27 @@
+/**
+ * DEPRECATED: This file is deprecated in favor of centralized type mapping.
+ * Use @/utils/typeMapping instead for all new code.
+ * This file is kept for backward compatibility during migration.
+ */
 
 import { Database } from '../types';
 import { DBMealHistory } from './types';
 import { MealHistory } from '@/types';
 
-export const mapMealHistoryFromDB = (history: DBMealHistory): MealHistory => ({
+// Re-export the new standardized mappers
+export { 
+  mapMealHistoryFromDB, 
+  mapMealHistoryToDB 
+} from '@/utils/typeMapping';
+
+// DEPRECATED: Legacy mapping functions below
+// These are kept for backward compatibility only
+// Use imports above for all new code
+
+/**
+ * @deprecated Use mapMealHistoryFromDB from @/utils/typeMapping instead
+ */
+export const mapMealHistoryFromDB_LEGACY = (history: DBMealHistory): MealHistory => ({
   id: history.id,
   dishId: history.dishid,
   date: history.date,
@@ -11,7 +29,10 @@ export const mapMealHistoryFromDB = (history: DBMealHistory): MealHistory => ({
   userId: history.user_id
 });
 
-export const mapMealHistoryToDB = (history: Partial<MealHistory>): Partial<Database['public']['Tables']['meal_history']['Insert']> => {
+/**
+ * @deprecated Use mapMealHistoryToDB from @/utils/typeMapping instead
+ */
+export const mapMealHistoryToDB_LEGACY = (history: Partial<MealHistory>): Partial<Database['public']['Tables']['meal_history']['Insert']> => {
   // Ensure required fields are present when inserting a new meal history record
   if (history.dishId === undefined && !history.id) {
     throw new Error('DishId is required when creating a new meal history record');
