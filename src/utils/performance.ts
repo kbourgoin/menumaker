@@ -2,6 +2,8 @@
  * Performance monitoring utilities for database queries and other operations
  */
 
+import { perfLog, warnLog } from './logger';
+
 interface PerformanceTimer {
   start: number;
   end?: number;
@@ -23,7 +25,7 @@ export const startTimer = (name: string): void => {
 export const endTimer = (name: string): number => {
   const timer = timers.get(name);
   if (!timer) {
-    console.warn(`Timer "${name}" was not started`);
+    warnLog(`Timer "${name}" was not started`, 'Performance');
     return 0;
   }
   
@@ -33,11 +35,11 @@ export const endTimer = (name: string): number => {
   timer.end = end;
   timer.duration = duration;
   
-  // Log slow operations
+  // Log slow operations - development only
   if (duration > 1000) {
-    console.warn(`Slow operation "${name}": ${duration.toFixed(2)}ms`);
+    warnLog(`Slow operation "${name}": ${duration.toFixed(2)}ms`, 'Performance');
   } else if (duration > 500) {
-    console.info(`Operation "${name}": ${duration.toFixed(2)}ms`);
+    perfLog(`Operation "${name}"`, duration, 'Performance');
   }
   
   timers.delete(name);
@@ -86,9 +88,9 @@ export const trackQuery = (metrics: QueryMetrics): void => {
     queryMetrics.shift();
   }
   
-  // Log slow queries
+  // Log slow queries - development only
   if (metrics.duration > 2000) {
-    console.warn(`Slow query: ${metrics.queryType} took ${metrics.duration.toFixed(2)}ms for ${metrics.recordCount} records`);
+    warnLog(`Slow query: ${metrics.queryType} took ${metrics.duration.toFixed(2)}ms for ${metrics.recordCount} records`, 'Performance');
   }
 };
 
@@ -117,8 +119,11 @@ export const getPerformanceStats = () => {
 
 /**
  * Development helper to log performance stats
+ * Only logs in development mode
  */
 export const logPerformanceStats = (): void => {
+  if (!import.meta.env.DEV) return;
+  
   const stats = getPerformanceStats();
   if (stats) {
     console.group('📊 Query Performance Stats');

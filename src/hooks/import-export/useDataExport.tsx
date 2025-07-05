@@ -9,6 +9,7 @@ import {
   mapMealHistoryFromDB, 
   mapSourceFromDB
 } from "@/integrations/supabase/client";
+import { operationLog, debugLog } from "@/utils/logger";
 
 export interface ExportData {
   dishes: Dish[];
@@ -63,7 +64,7 @@ export function useDataExport() {
         }
       }
       
-      console.log(`Exported ${allDishes.length} dishes`);
+      operationLog(`Exported ${allDishes.length} dishes`, 'Export');
       
       // Fetch all meal history with pagination
       let allMealHistory: Tables<'meal_history'>[] = [];
@@ -98,7 +99,7 @@ export function useDataExport() {
         }
       }
       
-      console.log(`Exported ${allMealHistory.length} meal history entries`);
+      operationLog(`Exported ${allMealHistory.length} meal history entries`, 'Export');
       
       // Fetch all sources with pagination
       let allSources: Tables<'sources'>[] = [];
@@ -133,7 +134,7 @@ export function useDataExport() {
         }
       }
       
-      console.log(`Exported ${allSources.length} sources`);
+      operationLog(`Exported ${allSources.length} sources`, 'Export');
       
       // Fetch user profile to include all user data with dates
       const { data: profile } = await supabase
