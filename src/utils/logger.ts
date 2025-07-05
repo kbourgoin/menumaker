@@ -113,9 +113,9 @@ class Logger {
     switch (level) {
       case 'debug':
         if (data !== undefined) {
-          console.debug(fullMessage, data);
+          console.log(fullMessage, data);
         } else {
-          console.debug(fullMessage);
+          console.log(fullMessage);
         }
         break;
         
