@@ -33,6 +33,8 @@ bun run dev
 
 **⚠️ Important: All changes must go through pull requests. Direct pushes to main are not allowed.**
 
+**🧪 Critical: ALL TESTS MUST PASS LOCALLY before creating a PR. Run `bun run test:run` and ensure 100% pass rate.**
+
 1. **Create a feature branch** from main:
    ```sh
    git checkout main
@@ -40,12 +42,12 @@ bun run dev
    git checkout -b feature/your-feature-name
    ```
 
-2. **Make your changes** and test locally:
+2. **Make your changes** and test locally (**REQUIRED before creating PR**):
    ```sh
-   bun run dev     # Start development server
-   bun run test    # Run tests
-   bun run lint    # Check code quality
-   bun run build   # Test production build
+   bun run dev        # Start development server
+   bun run test:run   # Run tests - MUST pass all tests
+   bun run lint       # Check code quality - MUST pass
+   bun run build      # Test production build - MUST succeed
    ```
 
 3. **Commit and push your branch**:
@@ -61,9 +63,11 @@ bun run dev
    - Request review from maintainers
 
 5. **Wait for automated checks** to pass:
+   - ✅ **All tests MUST pass locally before creating PR** (`bun run test:run`)
    - ✅ All GitHub Actions must pass (linting, type checking, tests, build)
    - ✅ All status checks must be green before merging
    - 🚫 **PRs cannot be merged with failing checks**
+   - 🚫 **PRs with failing tests will be rejected** - Always test locally first
 
 6. **After review, approval, and passing checks**, the PR will be merged to main
 

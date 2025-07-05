@@ -42,29 +42,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Proper Development Workflow:
 1. **Start with a feature branch**: `git checkout -b feature/descriptive-name`
 2. **Make your changes** on the feature branch
-3. **Test thoroughly** using the development commands above
+3. **Test thoroughly** - **REQUIRED before creating PR**:
+   - `bun run test:run` - **MUST pass all tests**
+   - `bun run lint` - **MUST pass linting**
+   - `bun run build` - **MUST build successfully**
 4. **Commit your changes** with descriptive messages
 5. **Push the feature branch**: `git push -u origin feature/descriptive-name`
 6. **Create a Pull Request** from the feature branch to main
 7. **Wait for all GitHub Actions to pass** before merging
 
 ### Pull Request Requirements:
+- ✅ **All tests MUST pass locally before creating PR**: Run `bun run test:run` and ensure 100% pass rate
 - ✅ **All GitHub Actions must pass**: Linting, type checking, tests, and build must all succeed
 - ✅ **Status checks must be green**: No failing automated checks are allowed
 - 🚫 **PRs cannot be merged with failing checks**: This rule is strictly enforced
+- 🚫 **PRs with failing tests will be rejected**: Always run tests locally first
 - 📋 **Manual review**: Code review and approval from maintainers is still required
 
 ### Example:
 ```bash
 # ✅ CORRECT - Create feature branch first
 git checkout -b feature/fix-dashboard-loading
-# Make changes, test, commit
+# Make changes
+# REQUIRED: Test everything before creating PR
+bun run test:run    # Must pass all tests
+bun run lint        # Must pass linting  
+bun run build       # Must build successfully
+# Only then commit and push
+git add .
+git commit -m "fix: dashboard loading issue"
 git push -u origin feature/fix-dashboard-loading
 # Create PR
 
 # ❌ WRONG - Never do this
 git checkout main
 # Make changes directly on main - DON'T DO THIS!
+# Also wrong: Creating PR without running tests first
 ```
 
 This workflow prevents conflicts and makes it easier to review changes before they're merged to main.
