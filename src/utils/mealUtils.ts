@@ -34,6 +34,3 @@ export { getRandomDishSuggestions } from './suggestionUtils';
 
 // Stats utilities
 export { getDishStats } from './statsUtils';
-
-// Import utilities
-export { importMealHistory } from './importUtils';

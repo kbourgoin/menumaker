@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
+import { render, RenderOptions, renderHook, RenderHookOptions } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -39,8 +39,28 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllTheProviders, ...options })
 
+// Custom hook render function for testing hooks
+const customRenderHook = <TResult, TProps>(
+  hook: (initialProps: TProps) => TResult,
+  options?: Omit<RenderHookOptions<TProps>, 'wrapper'>
+) => renderHook(hook, { wrapper: AllTheProviders, ...options })
+
+// Create QueryClient for hook testing (without auto-retry)
+export const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      staleTime: 0,
+      gcTime: 0,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+})
+
 export * from '@testing-library/react'
-export { customRender as render }
+export { customRender as render, customRenderHook as renderHook }
 
 // Mock data helpers
 export const mockDish = {

@@ -346,6 +346,21 @@ export const validateProfile = (profile: Partial<Profile>): void => {
     throw new ValidationError('Invalid profile ID format', 'id', 'INVALID_FORMAT');
   }
 
+  // Username validation (optional field)
+  if (profile.username !== undefined) {
+    if (typeof profile.username !== 'string') {
+      throw new ValidationError('Username must be a string', 'username', 'INVALID_TYPE');
+    }
+    
+    if (profile.username.length < 3) {
+      throw new ValidationError('Username must be at least 3 characters long', 'username', 'MIN_LENGTH');
+    }
+    
+    if (profile.username.length > 50) {
+      throw new ValidationError('Username cannot exceed 50 characters', 'username', 'MAX_LENGTH_EXCEEDED');
+    }
+  }
+
   // Cuisine validation
   if (profile.cuisines) {
     if (!isStringArray(profile.cuisines)) {
@@ -376,6 +391,10 @@ export const validateEntity = (
   entityType: 'dish' | 'mealHistory' | 'source' | 'tag' | 'profile',
   entity: unknown
 ): void => {
+  if (entity === null || entity === undefined) {
+    throw new ValidationError('Entity cannot be null or undefined');
+  }
+  
   switch (entityType) {
     case 'dish':
       validateDish(entity);

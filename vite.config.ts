@@ -33,6 +33,30 @@ export default defineConfig(({ mode }) => ({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      thresholds: {
+        global: {
+          branches: 70,
+          functions: 75,
+          lines: 80,
+          statements: 80
+        }
+      },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/**/__tests__/**',
+        'src/test/**',
+        'src/**/*.stories.{ts,tsx}',
+        'src/**/*.d.ts',
+        'src/integrations/supabase/types.ts', // Generated types
+        'src/types/database.ts', // Generated types
+        'src/vite-env.d.ts'
+      ]
+    }
   },
   plugins: [
     react(),
