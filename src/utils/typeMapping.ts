@@ -85,9 +85,9 @@ export const mapDishFromDB = (
       id: dbDish.id,
       name: dbDish.name,
       createdAt: dbDish.createdat,
-      cuisines: dbDish.cuisines || [],
-      sourceId: dbDish.source_id || undefined,
-      location: dbDish.location || undefined,
+      cuisines: dbDish.cuisines,
+      sourceId: dbDish.source_id,
+      location: dbDish.location,
       userId: dbDish.user_id,
       tags: [], // Default empty - populated separately if needed
       // Computed fields
@@ -123,15 +123,15 @@ export const mapDishFromSummary = (summary: DBDishSummary): Dish => {
       id: summary.id,
       name: summary.name,
       createdAt: summary.createdat || '',
-      cuisines: summary.cuisines || [],
-      sourceId: summary.source_id || undefined,
-      location: summary.location || undefined,
+      cuisines: summary.cuisines,
+      sourceId: summary.source_id,
+      location: summary.location,
       userId: summary.user_id,
       tags: summary.tags || [],
       // Pre-computed fields from view
-      lastMade: summary.last_made || undefined,
+      lastMade: summary.last_made,
       timesCooked: summary.times_cooked || 0,
-      lastComment: summary.last_comment || undefined
+      lastComment: summary.last_comment
     };
 
     // Skip validation for now to maintain backward compatibility
@@ -153,17 +153,17 @@ export const mapDishFromSummary = (summary: DBDishSummary): Dish => {
 export const mapDishToDB = (dish: Partial<Dish>): DBDishInsert => {
   try {
     // Validate required fields for new dishes
-    if (!dish.id && (!dish.name || !dish.userId)) {
-      throw new ValidationError('Name and userId are required when creating a new dish');
+    if (!dish.id && !dish.name) {
+      throw new ValidationError('Name is required when creating a new dish');
     }
 
     const dbDish: DBDishInsert = {
       id: dish.id,
       name: dish.name!,
       createdat: dish.createdAt,
-      cuisines: dish.cuisines || [],
-      source_id: dish.sourceId || null,
-      location: dish.location || null,
+      cuisines: dish.cuisines,
+      source_id: dish.sourceId,
+      location: dish.location,
       user_id: dish.userId!
       // Note: computed fields (lastMade, timesCooked, lastComment) are excluded
     };
@@ -215,15 +215,15 @@ export const mapMealHistoryFromDB = (dbHistory: DBMealHistory): MealHistory => {
  */
 export const mapMealHistoryToDB = (mealHistory: Partial<MealHistory>): DBMealHistoryInsert => {
   try {
-    if (!mealHistory.id && (!mealHistory.dishId || !mealHistory.userId)) {
-      throw new ValidationError('DishId and userId are required when creating meal history');
+    if (!mealHistory.id && !mealHistory.dishId) {
+      throw new ValidationError('DishId is required when creating a new meal history record');
     }
 
     const dbMealHistory: DBMealHistoryInsert = {
       id: mealHistory.id,
       dishid: mealHistory.dishId!, // Note: no underscore in database field
-      date: mealHistory.date || new Date().toISOString(),
-      notes: mealHistory.notes || null,
+      date: mealHistory.date,
+      notes: mealHistory.notes,
       user_id: mealHistory.userId!
     };
 
@@ -285,15 +285,18 @@ export const mapSourceFromDB = (dbSource: DBSource | DBSourceExtended): Source =
  */
 export const mapSourceToDB = (source: Partial<Source>): DBSourceInsert & { url?: string } => {
   try {
-    if (!source.id && (!source.name || !source.type || !source.userId)) {
-      throw new ValidationError('Name, type, and userId are required when creating a source');
+    if (!source.id && !source.name) {
+      throw new ValidationError('Name is required when creating a new source');
+    }
+    if (!source.id && !source.type) {
+      throw new ValidationError('Type is required when creating a new source');
     }
 
     const dbSource: DBSourceInsert & { url?: string } = {
       id: source.id,
       name: source.name!,
       type: source.type!,
-      description: source.description || null,
+      description: source.description,
       url: source.url,
       created_at: source.createdAt,
       user_id: source.userId!
