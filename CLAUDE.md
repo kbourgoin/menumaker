@@ -58,6 +58,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 🚫 **PRs cannot be merged with failing checks**: This rule is strictly enforced
 - 🚫 **PRs with failing tests will be rejected**: Always run tests locally first
 - 📋 **Manual review**: Code review and approval from maintainers is still required
+- **Test Coverage**: All PRs *MUST* maintain at least 80% test coverage for business logic utilities
 
 ### Example:
 ```bash
