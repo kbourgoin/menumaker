@@ -3,6 +3,7 @@ import { Source, Dish, MealHistory } from "@/types";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapSourceFromDB, mapDishFromDB } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { measureAsync, trackQuery } from "@/utils/performance";
 
 // Error types for better error handling
 export interface SourceQueryError extends Error {
@@ -48,8 +49,9 @@ export function useSourceQueries() {
   } = useQuery({
     queryKey: ['sources'],
     queryFn: async (): Promise<Source[]> => {
-      try {
-        const { data: userData, error: authError } = await supabase.auth.getUser();
+      return await measureAsync('sources-query', async () => {
+        try {
+          const { data: userData, error: authError } = await supabase.auth.getUser();
         
         if (authError) {
           handleAuthError(authError);
@@ -71,12 +73,28 @@ export function useSourceQueries() {
           throw createSourceError(`Failed to fetch sources: ${error.message}`, error);
         }
         
-        return data ? data.map(mapSourceFromDB) : [];
-      } catch (error) {
-        console.error('Error in sources query:', error);
-        // Re-throw the error so React Query can handle it properly
-        throw error instanceof Error ? error : createSourceError('Unknown error occurred while fetching sources');
-      }
+          const sources = data ? data.map(mapSourceFromDB) : [];
+          
+          trackQuery({
+            queryType: 'sources-list',
+            duration: 0, // Will be set by measureAsync
+            recordCount: sources.length,
+            success: true
+          });
+          
+          return sources;
+        } catch (error) {
+          console.error('Error in sources query:', error);
+          trackQuery({
+            queryType: 'sources-list',
+            duration: 0,
+            recordCount: 0,
+            success: false
+          });
+          // Re-throw the error so React Query can handle it properly
+          throw error instanceof Error ? error : createSourceError('Unknown error occurred while fetching sources');
+        }
+      });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {

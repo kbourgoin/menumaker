@@ -1,125 +1,119 @@
 
 import { Dish, MealHistory } from "@/types";
 import { supabase, mapDishFromDB, mapDishFromSummary } from "@/integrations/supabase/client";
+import { measureAsync } from "@/utils/performance";
 
 /**
- * Fetch dishes using the original method (fallback if materialized view fails)
+ * Fetch dishes using optimized fallback method (when materialized view fails)
+ * Reduces database queries by fetching all meal history in bulk
  */
 export const fetchDishesOriginalMethod = async (user_id: string): Promise<Dish[]> => {
-  try {
-    // First get the dishes directly from the dishes table
-    const { data: dishesData, error: dishesError } = await supabase
-      .from('dishes')
-      .select('*')
-      .eq('user_id', user_id)
-      .order('name');
-    
-    if (dishesError) throw dishesError;
-    
-    // Create an array to store all mapped dishes
-    const mappedDishes: Dish[] = [];
-    
-    // Process each dish one by one to avoid hitting the 1000 row limit for all meal history at once
-    for (const dish of dishesData) {
-      // For each dish, get its meal history with pagination to handle the 1000 row limit
-      let historyForDish: MealHistory[] = [];
-      let hasMoreEntries = true;
-      let lastDate = null;
+  return await measureAsync('fallback-dishes-fetch', async () => {
+    // Get all dishes for the user
+    const dishesData = await measureAsync('fallback-dishes-query', async () => {
+      const { data, error } = await supabase
+        .from('dishes')
+        .select('*')
+        .eq('user_id', user_id)
+        .order('name');
       
-      while (hasMoreEntries) {
-        let query = supabase
-          .from('meal_history')
-          .select('*')
-          .eq('dishid', dish.id)
-          .order('date', { ascending: false });
-        
-        // Apply pagination if we have a lastDate
-        if (lastDate) {
-          query = query.lt('date', lastDate);
-        }
-        
-        // Limit to max rows per query
-        query = query.limit(1000);
-        
-        const { data: historyPage, error: historyError } = await query;
-        
-        if (historyError) {
-          console.error("Error fetching meal history for dish:", dish.id, historyError);
-          break;
-        }
-        
-        // If we got data, add it to our results
-        if (historyPage && historyPage.length > 0) {
-          historyForDish = [...historyForDish, ...historyPage];
-          
-          // Update lastDate for next page
-          lastDate = historyPage[historyPage.length - 1].date;
-          
-          // If we got fewer rows than the limit, we've reached the end
-          if (historyPage.length < 1000) {
-            hasMoreEntries = false;
-          }
-        } else {
-          hasMoreEntries = false;
-        }
-      }
-      
-      // Map the dish with its complete history
-      mappedDishes.push(mapDishFromDB(dish, historyForDish));
+      if (error) throw error;
+      return data || [];
+    });
+    
+    if (dishesData.length === 0) {
+      return [];
     }
     
-    return mappedDishes;
-  } catch (error) {
-    console.error("Error in fallback method:", error);
-    return [];
-  }
-};
-
-/**
- * Fetches a single dish by its ID
- */
-export const fetchDishById = async (id: string): Promise<Dish | null> => {
-  try {
-    // Always read directly from the dishes table for a single dish (not the view)
-    const { data, error } = await supabase
-      .from('dishes')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no results
+    // Get dish IDs for bulk meal history fetch
+    const dishIds = dishesData.map(dish => dish.id);
     
-    if (error) {
-      console.error("Error fetching dish:", error);
-      throw error;
-    }
-    
-    if (data) {
-      // Fetch meal history for this dish
-      const { data: historyData, error: historyError } = await supabase
+    // Fetch ALL meal history for all dishes in one query (more efficient)
+    const allMealHistory = await measureAsync('fallback-history-query', async () => {
+      const { data, error } = await supabase
         .from('meal_history')
         .select('*')
-        .eq('dishid', id);
-        
-      if (historyError) {
-        console.error("Error fetching meal history:", historyError);
-        return mapDishFromDB(data); // Return dish without history data
+        .in('dishid', dishIds)
+        .order('date', { ascending: false });
+      
+      if (error) {
+        console.warn("Error fetching meal history in fallback:", error);
+        return [];
       }
       
-      return mapDishFromDB(data, historyData);
-    }
+      return data || [];
+    });
     
-    console.log("No dish found with ID:", id);
-    return null;
-  } catch (error) {
-    console.error("Error getting dish:", error);
-    return null;
-  }
+    // Group meal history by dish ID for efficient lookup
+    const historyByDishId = new Map<string, MealHistory[]>();
+    allMealHistory.forEach(history => {
+      const dishId = history.dishid;
+      if (!historyByDishId.has(dishId)) {
+        historyByDishId.set(dishId, []);
+      }
+      historyByDishId.get(dishId)!.push({
+        id: String(history.id),
+        dishId: history.dishid,
+        date: history.date,
+        notes: history.notes || undefined,
+        user_id: history.user_id
+      });
+    });
+    
+    // Map dishes with their history (now in memory, no more DB queries)
+    return dishesData.map(dish => {
+      const dishHistory = historyByDishId.get(dish.id) || [];
+      return mapDishFromDB(dish, dishHistory);
+    });
+  });
 };
 
 /**
- * Fetches meal history for a specific dish
+ * Fetches a single dish by its ID with performance monitoring
+ */
+export const fetchDishById = async (id: string): Promise<Dish | null> => {
+  return await measureAsync(`fetch-dish-${id}`, async () => {
+    // Fetch dish data
+    const dishData = await measureAsync('single-dish-query', async () => {
+      const { data, error } = await supabase
+        .from('dishes')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    });
+    
+    if (!dishData) {
+      return null;
+    }
+    
+    // Fetch meal history for this dish
+    const historyData = await measureAsync('single-dish-history', async () => {
+      const { data, error } = await supabase
+        .from('meal_history')
+        .select('*')
+        .eq('dishid', id)
+        .order('date', { ascending: false });
+        
+      if (error) {
+        console.warn("Error fetching meal history for dish:", id, error);
+        return [];
+      }
+      
+      return data || [];
+    });
+    
+    return mapDishFromDB(dishData, historyData);
+  });
+};
+
+/**
+ * Fetches meal history for a specific dish with performance monitoring
  */
 export const fetchMealHistoryForDish = async (dishId: string): Promise<MealHistory[]> => {
-  try {
+  return await measureAsync(`meal-history-${dishId}`, async () => {
     const { data, error } = await supabase
       .from('meal_history')
       .select('*')
@@ -138,8 +132,5 @@ export const fetchMealHistoryForDish = async (dishId: string): Promise<MealHisto
       notes: history.notes || undefined,
       user_id: history.user_id
     }));
-  } catch (error) {
-    console.error("Error getting meal history:", error);
-    return [];
-  }
+  });
 };

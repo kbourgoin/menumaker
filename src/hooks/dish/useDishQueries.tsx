@@ -1,11 +1,11 @@
 
-import { useState } from "react";
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDishesOriginalMethod, fetchDishById, fetchMealHistoryForDish } from "./utils/dishFetchUtils";
-import { classifyError, logError, retryOperation } from "@/utils/errorHandling";
+import { classifyError, logError } from "@/utils/errorHandling";
 import { ErrorType } from "@/types/errors";
+import { measureAsync, trackQuery } from "@/utils/performance";
 
 /**
  * Hook that provides query functions for dishes
@@ -14,95 +14,97 @@ export function useDishQueries() {
   // Remove this local state as it conflicts with React Query's built-in loading state
   // const [isLoading, setIsLoading] = useState(true);
 
-  // Query to fetch dishes from the materialized view for better performance (READ ONLY)
+  // Query to fetch dishes with optimized performance monitoring
   const { data: dishes = [], isLoading, error: queryError } = useQuery({
     queryKey: ['dishes'],
     queryFn: async (): Promise<Dish[]> => {
-      try {
-        // Auth check with retry for transient failures
-        const user = await retryOperation(
-          async () => {
-            const userResult = await supabase.auth.getUser();
-            if (userResult.error) {
-              throw userResult.error;
-            }
-            return userResult.data.user;
-          },
-          { maxRetries: 2, initialDelay: 500 }
-        );
+      return await measureAsync('dishes-query', async () => {
+        // Simple auth check
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
         
-        if (!user?.id) {
-          const authError = classifyError(new Error('User not authenticated'));
-          logError(authError, 'useDishQueries:auth');
+        if (authError || !user?.id) {
+          const appError = classifyError(authError || new Error('User not authenticated'));
+          logError(appError, 'useDishQueries:auth');
+          trackQuery({
+            queryType: 'dishes-auth',
+            duration: 0,
+            recordCount: 0,
+            success: false
+          });
           return [];
         }
         
+        // Try materialized view first with performance tracking
         try {
-          // Primary fetch with retry for network failures
-          const summaryData = await retryOperation(
-            async () => {
-              const { data, error } = await supabase
-                .from('dish_summary_secure')
-                .select('*')
-                .order('name');
-              
-              if (error) {
-                const appError = classifyError(error);
-                logError(appError, 'useDishQueries:summary-view');
-                throw error;
-              }
-              
-              return data;
-            },
-            { maxRetries: 2, initialDelay: 1000 }
-          );
+          const result = await measureAsync('dishes-summary-view', async () => {
+            const { data, error } = await supabase
+              .from('dish_summary_secure')
+              .select('*')
+              .order('name');
+            
+            if (error) throw error;
+            return data || [];
+          });
           
-          if (!summaryData) {
-            return [];
-          }
+          const mappedDishes = result.map(summary => mapDishFromSummary(summary));
           
-          // Map the summary data to our Dish type
-          const mappedDishes = summaryData.map(summary => mapDishFromSummary(summary));
+          trackQuery({
+            queryType: 'dishes-summary-view',
+            duration: performance.now(), // Will be updated by measureAsync
+            recordCount: mappedDishes.length,
+            success: true,
+            fallbackUsed: false
+          });
+          
           return mappedDishes;
           
         } catch (viewError) {
           const appError = classifyError(viewError);
-          logError(appError, 'useDishQueries:summary-view-fallback');
+          logError(appError, 'useDishQueries:view-failed');
           
-          // Fallback to original method with retry
+          // Simple fallback without nested retries
           try {
-            return await retryOperation(
-              () => fetchDishesOriginalMethod(user.id),
-              { maxRetries: 1, initialDelay: 500 }
-            );
+            const fallbackResult = await measureAsync('dishes-fallback', async () => {
+              return await fetchDishesOriginalMethod(user.id);
+            });
+            
+            trackQuery({
+              queryType: 'dishes-fallback',
+              duration: performance.now(),
+              recordCount: fallbackResult.length,
+              success: true,
+              fallbackUsed: true
+            });
+            
+            return fallbackResult;
+            
           } catch (fallbackError) {
             const fallbackAppError = classifyError(fallbackError);
-            logError(fallbackAppError, 'useDishQueries:fallback-method');
+            logError(fallbackAppError, 'useDishQueries:fallback-failed');
+            
+            trackQuery({
+              queryType: 'dishes-fallback',
+              duration: performance.now(),
+              recordCount: 0,
+              success: false,
+              fallbackUsed: true
+            });
+            
             return [];
           }
         }
-      } catch (error) {
-        const appError = classifyError(error);
-        logError(appError, 'useDishQueries:top-level');
-        return [];
-      }
+      });
     },
-    // Enable caching to improve performance
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Optimized caching for better performance
+    staleTime: 2 * 60 * 1000, // 2 minutes (reduced for more responsive data)
     gcTime: 10 * 60 * 1000, // 10 minutes
-    // Enhanced retry configuration
+    // Simplified retry logic - let our internal fallback handle failures
     retry: (failureCount, error) => {
+      // Only retry transient network errors, not application errors
       const appError = classifyError(error);
-      // Don't retry auth errors or validation errors
-      if (appError.type === ErrorType.AUTH_ERROR || 
-          appError.type === ErrorType.UNAUTHORIZED ||
-          appError.type === ErrorType.VALIDATION_ERROR) {
-        return false;
-      }
-      // Retry network and server errors up to 3 times
-      return failureCount < 3;
+      return appError.type === ErrorType.NETWORK_ERROR && failureCount < 2;
     },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: 1000, // Fixed 1 second delay for simplicity
   });
 
   return {
