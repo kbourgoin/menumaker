@@ -2,6 +2,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { operationLog, errorLog } from "@/utils/logger";
 
 export function useClearData() {
   const queryClient = useQueryClient();
@@ -14,7 +15,7 @@ export function useClearData() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      console.log("Clearing data for user:", userId);
+      operationLog(`Clearing data for user: ${userId}`, 'Data');
       
       // Call the updated stored procedure
       const { error } = await supabase.rpc('clear_user_data', { 
@@ -22,17 +23,17 @@ export function useClearData() {
       });
       
       if (error) {
-        console.error("Error clearing data:", error);
+        errorLog("Error clearing data", 'Data', error);
         throw error;
       }
       
       // Invalidate ALL queries to ensure UI is refreshed
       queryClient.invalidateQueries();
       
-      console.log("All data cleared successfully");
+      operationLog("All data cleared successfully", 'Data');
       return { success: true };
     } catch (error) {
-      console.error("Error clearing data:", error);
+      errorLog("Error clearing data", 'Data', error);
       return { success: false, error };
     }
   };

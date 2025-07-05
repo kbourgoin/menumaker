@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ExportData } from "./useDataExport";
 import { mapDishToDB, mapMealHistoryToDB, mapSourceToDB } from "@/integrations/supabase/client";
+import { operationLog, errorLog, debugLog, warnLog } from "@/utils/logger";
 
 // Number of items to process in a single batch
 const BATCH_SIZE = 50;
@@ -26,7 +27,7 @@ export function useJSONImport() {
       
       if (!userId) throw new Error("User not authenticated");
       
-      console.log(`Import starting for user: ${userId}`);
+      operationLog(`Import starting for user: ${userId}`, 'Import');
       
       // Check if this is a same-account import by looking at user_ids in the data
       const exportedUserIds = new Set([
@@ -36,11 +37,11 @@ export function useJSONImport() {
       ]);
       
       const isSameAccountImport = exportedUserIds.size === 1 && exportedUserIds.has(userId);
-      console.log(`Same account import: ${isSameAccountImport}`);
+      debugLog(`Same account import: ${isSameAccountImport}`, 'Import');
       if (isSameAccountImport) {
-        console.log("Detected same-account import - will preserve existing IDs and use upsert behavior");
+        debugLog("Detected same-account import - will preserve existing IDs and use upsert behavior", 'Import');
       } else {
-        console.log("Detected cross-account import - will generate new IDs to prevent conflicts");
+        debugLog("Detected cross-account import - will generate new IDs to prevent conflicts", 'Import');
       }
       
       // Create ID mapping tables to handle cross-account imports
@@ -55,7 +56,7 @@ export function useJSONImport() {
       const updateUserIds = <T extends Record<string, unknown>>(obj: T): T & { user_id: string } => {
         const updated = {...obj, user_id: userId};
         if (obj.user_id && obj.user_id !== userId) {
-          console.log(`Updated user_id from ${obj.user_id} to ${userId}`);
+          debugLog(`Updated user_id from ${obj.user_id} to ${userId}`, 'Import');
         }
         return updated;
       };
@@ -65,7 +66,7 @@ export function useJSONImport() {
       let processedItems = 0;
       
       // Import sources first, as dishes may depend on them
-      console.log(`Importing ${jsonData.sources.length} sources...`);
+      operationLog(`Importing ${jsonData.sources.length} sources...`, 'Import');
       let successCount = 0;
       let errorCount = 0;
       let sourceImportSuccess = 0;
@@ -115,8 +116,8 @@ export function useJSONImport() {
             sourceImportSuccess += count || 0;
             successCount += count || 0;
           } catch (error) {
-            console.error("Error importing sources batch:", error);
-            console.error("Source batch data:", sourcesToDB);
+            errorLog("Error importing sources batch", 'Import', error);
+            debugLog("Source batch data", 'Import', sourcesToDB);
             errorCount += batch.length;
           }
         } else {
@@ -129,7 +130,7 @@ export function useJSONImport() {
       }
       
       // Import dishes in batches
-      console.log(`Importing ${jsonData.dishes.length} dishes...`);
+      operationLog(`Importing ${jsonData.dishes.length} dishes...`, 'Import');
       for (let i = 0; i < jsonData.dishes.length; i += BATCH_SIZE) {
         const batch = jsonData.dishes.slice(i, i + BATCH_SIZE);
         // Create properly typed dish objects (with or without new IDs based on import type)
@@ -177,8 +178,8 @@ export function useJSONImport() {
             dishImportSuccess += count || 0;
             successCount += count || 0;
           } catch (error) {
-            console.error("Error importing dishes batch:", error);
-            console.error("Dish batch data:", dishesToDB);
+            errorLog("Error importing dishes batch", 'Import', error);
+            debugLog("Dish batch data", 'Import', dishesToDB);
             errorCount += batch.length;
           }
         } else {
@@ -191,8 +192,8 @@ export function useJSONImport() {
       }
       
       // Import meal history in batches (only if dishes were imported successfully)
-      console.log(`Importing ${jsonData.mealHistory.length} meal history entries...`);
-      console.log(`Dishes imported successfully: ${dishImportSuccess}`);
+      operationLog(`Importing ${jsonData.mealHistory.length} meal history entries...`, 'Import');
+      debugLog(`Dishes imported successfully: ${dishImportSuccess}`, 'Import');
       for (let i = 0; i < jsonData.mealHistory.length; i += BATCH_SIZE) {
         const batch = jsonData.mealHistory.slice(i, i + BATCH_SIZE);
         // Create properly typed history objects (with or without new IDs based on import type)
@@ -230,7 +231,7 @@ export function useJSONImport() {
           };
         }).filter(h => {
           if (!h.dishid) {
-            console.warn(`Meal history entry missing ${isSameAccountImport ? 'original' : 'mapped'} dishid:`, h);
+            warnLog(`Meal history entry missing ${isSameAccountImport ? 'original' : 'mapped'} dishid`, 'Import', h);
             return false;
           }
           return true;
@@ -248,8 +249,8 @@ export function useJSONImport() {
             if (error) throw error;
             successCount += count || 0;
           } catch (error) {
-            console.error("Error importing meal history batch:", error);
-            console.error("Meal history batch data:", historyToDB);
+            errorLog("Error importing meal history batch", 'Import', error);
+            debugLog("Meal history batch data", 'Import', historyToDB);
             errorCount += batch.length;
           }
         } else {
@@ -267,11 +268,11 @@ export function useJSONImport() {
       // Refresh all queries to update data
       queryClient.invalidateQueries();
       
-      console.log(`Import complete. Success: ${successCount}, Errors: ${errorCount}`);
-      console.log(`ID mappings created:`);
-      console.log(`- Sources: ${sourceIdMap.size} mappings`);
-      console.log(`- Dishes: ${dishIdMap.size} mappings`);
-      console.log(`- Meal History: ${mealHistoryIdMap.size} mappings`);
+      operationLog(`Import complete. Success: ${successCount}, Errors: ${errorCount}`, 'Import');
+      debugLog(`ID mappings created:`, 'Import');
+      debugLog(`- Sources: ${sourceIdMap.size} mappings`, 'Import');
+      debugLog(`- Dishes: ${dishIdMap.size} mappings`, 'Import');
+      debugLog(`- Meal History: ${mealHistoryIdMap.size} mappings`, 'Import');
       
       // Ensure 100% progress is shown
       setProgress(100);
