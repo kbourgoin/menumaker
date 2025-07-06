@@ -2,7 +2,7 @@ import { Dish } from "@/types";
 
 // Mock functions that were previously imported from dishUtils
 const getDishes = (): Dish[] => [];
-const getDishById = (id: string): Dish | undefined => undefined;
+const getDishById = (_id: string): Dish | undefined => undefined;
 
 // Mock function for getMealHistory
 const getMealHistory = (): {

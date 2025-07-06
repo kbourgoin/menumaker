@@ -286,7 +286,7 @@ describe.skip("Enhanced Hook Error Handling", () => {
           name: "Test Dish",
           cuisines: ["Other"],
         });
-      } catch (error) {
+      } catch (_error) {
         // Error should be caught and logged
       }
 
@@ -322,7 +322,6 @@ describe.skip("Enhanced Hook Error Handling", () => {
       });
 
       // Mock meal history delete success but dish delete failure
-      const callCount = 0;
       mockSupabase.from.mockImplementation(table => {
         if (table === "meal_history") {
           return {
