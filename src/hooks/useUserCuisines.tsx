@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/components/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CuisineType } from "@/types";

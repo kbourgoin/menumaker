@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/layout";
 import { useDishes } from "@/hooks/useMeals";
 import DishForm from "@/components/dish-form";
 import { Button } from "@/components/ui/button";

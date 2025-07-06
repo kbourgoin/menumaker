@@ -74,3 +74,8 @@ jobs:
 
     - name: Run tests
       run: bun run test:run
+      env:
+        NODE_OPTIONS: "--max-old-space-size=8192"
+        # Mock environment variables for tests
+        VITE_SUPABASE_URL: https://example.supabase.co
+        VITE_SUPABASE_ANON_KEY: mock_anon_key_for_tests_only

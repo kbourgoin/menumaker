@@ -1,8 +1,8 @@
 
 import React from "react";
-import Layout from "@/components/Layout";
-import SourceManager from "@/components/SourceManager";
-import AccountSettings from "@/components/AccountSettings";
+import { Layout } from "@/components/layout";
+import { SourceManager } from "@/components/shared";
+import { AccountSettings } from "@/components/settings";
 import { DataManagement } from "@/components/data/DataManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed, Tag } from "lucide-react";
 import CuisineSettings from "@/components/settings/CuisineSettings";
 import { TagManager } from "@/components/tags";
-import { MigrationTrigger } from "@/components/MigrationTrigger";
+import { MigrationTrigger } from "@/components/data";
 
 const Settings = () => {
   return (

@@ -1,11 +1,11 @@
 
 import { ReactNode } from "react";
-import Header from "./Header";
+import { Header } from "@/components/layout";
 import { motion } from "framer-motion";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "@/components/auth";
 import { Navigate } from "react-router-dom";
-import { Progress } from "./ui/progress";
-import PerformanceMonitor from "./dev/PerformanceMonitor";
+import { Progress } from "@/components/ui/progress";
+import { PerformanceMonitor } from "@/components/dev";
 
 interface LayoutProps {
   children: ReactNode;

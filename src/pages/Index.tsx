@@ -4,10 +4,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
 import { useMealHistoryByDate } from "@/hooks/meal-history/useMealHistoryByDate";
 import { useStats } from "@/hooks/stats/useStats";
-import Layout from "@/components/Layout";
-import SEOHead, { getPageSEO } from "@/components/SEOHead";
+import { Layout } from "@/components/layout";
+import { SEOHead, getPageSEO } from "@/components/shared";
 import { Dish } from "@/types";
-import { ErrorMessage, ErrorFallback } from "@/components/ErrorMessage";
+import { ErrorMessage, ErrorFallback } from "@/components/shared";
 import { isNetworkError } from "@/utils/errorHandling";
 
 // Import our new component files

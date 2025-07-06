@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/components/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -5,9 +5,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./components/AuthProvider";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import LoadingSpinner from "./components/LoadingSpinner";
+import { AuthProvider } from "@/components/auth";
+import { ErrorBoundary } from "@/components/shared";
+import { LoadingSpinner } from "@/components/shared";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Lazy load pages for code splitting

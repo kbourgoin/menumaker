@@ -2,16 +2,12 @@
 import { useState } from "react";
 import { Source } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/components/auth";
 import { useSources } from "@/hooks/sources";
 
 // Import our new components
-import AddSourceDialog from "./source/AddSourceDialog";
-import EditSourceDialog from "./source/EditSourceDialog";
-import DeleteSourceDialog from "./source/DeleteSourceDialog";
-import SourceTable from "./source/SourceTable";
-import SourceEmptyState from "./source/SourceEmptyState";
-import SourceLoading from "./source/SourceLoading";
+import { AddSourceDialog, EditSourceDialog, DeleteSourceDialog } from "@/components/dialogs";
+import { SourceTable, SourceEmptyState, SourceLoading } from "@/components/source";
 
 const SourceManager = () => {
   const [currentSource, setCurrentSource] = useState<Source | null>(null);

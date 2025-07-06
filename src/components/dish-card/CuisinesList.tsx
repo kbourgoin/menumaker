@@ -1,5 +1,5 @@
 
-import CuisineTag from "../CuisineTag";
+import { CuisineTag } from "@/components/shared";
 
 interface CuisinesListProps {
   cuisines: string[];

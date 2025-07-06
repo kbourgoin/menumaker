@@ -1,7 +1,7 @@
 
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AddSourceDialog from "./AddSourceDialog";
+import { AddSourceDialog } from "@/components/dialogs";
 
 const SourceEmptyState = () => {
   return (
