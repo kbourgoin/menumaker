@@ -46,19 +46,11 @@ const DishesDisplay = ({
           ))}
         </div>
       ) : (
-        filteredDishes.length >= 100 ? (
-          <VirtualDishTable 
-            dishes={filteredDishes} 
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
-        ) : (
-          <DishTable 
-            dishes={filteredDishes} 
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
-        )
+        <DishTable 
+          dishes={filteredDishes} 
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+        />
       )}
     </>
   );
