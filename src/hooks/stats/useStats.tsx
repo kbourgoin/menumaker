@@ -32,7 +32,8 @@ export function useStats() {
   // Temporarily disable optimized stats until database functions are created
   const shouldUseOptimized = false; // (dishCount && dishCount > 100) || (historyCount && historyCount > 500);
   
-  const optimizedStats = useOptimizedStats();
+  // Temporarily disable optimized stats hook to prevent console errors
+  // const optimizedStats = useOptimizedStats();
   
   // Get dish stats with React Query (legacy method)
   const { data: stats, isLoading } = useQuery({
@@ -186,10 +187,12 @@ export function useStats() {
         }
       });
     },
-    enabled: !shouldUseOptimized, // Only run legacy query if not using optimized
+    enabled: true, // Always run legacy query until optimizations are ready
   });
 
   // Return optimized stats if applicable, otherwise legacy stats
+  // Commented out until database functions are created
+  /*
   if (shouldUseOptimized) {
     return {
       getStats: async () => optimizedStats.stats || {
@@ -204,6 +207,7 @@ export function useStats() {
       isLoading: optimizedStats.isLoading
     };
   }
+  */
 
   return {
     getStats: async () => stats || {
