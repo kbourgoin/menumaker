@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { beforeAll, afterEach, afterAll } from "vitest";
+import { beforeAll, afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 
 // Mock environment variables

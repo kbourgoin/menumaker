@@ -60,7 +60,7 @@ export const deleteSource = (id: string): Source[] => {
 };
 
 // Get dishes by source ID
-export const getDishesBySourceId = (sourceId: string): Dish[] => {
+export const getDishesBySourceId = (_sourceId: string): Dish[] => {
   // This function would normally get dishes from localStorage
   // But we're now using Supabase for this, so this is just a placeholder
   return [];

@@ -1,5 +1,4 @@
 import { Database } from "../types";
-import { Dish, MealHistory, Source } from "@/types";
 
 // Define types for the tables we've created - moved from client.ts
 export type DBDish = Database["public"]["Tables"]["dishes"]["Row"];

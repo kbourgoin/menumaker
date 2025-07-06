@@ -1,5 +1,4 @@
 import { vi } from "vitest";
-import type { Database } from "@/integrations/supabase/types";
 
 // Mock data for testing
 const mockDishes = [

@@ -3,8 +3,7 @@ import { getStorageItem, saveStorageItem } from "./storageUtils";
 
 // Mock functions that were previously imported from dishUtils
 const getDishes = (): Dish[] => [];
-const saveDishes = (dishes: Dish[]): void => {};
-const getDishById = (id: string): Dish | undefined => undefined;
+const saveDishes = (_dishes: Dish[]): void => {};
 
 // Get meal history from localStorage or initialize with empty array
 export const getMealHistory = (): {

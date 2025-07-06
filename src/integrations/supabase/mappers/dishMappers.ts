@@ -4,7 +4,7 @@
  * This file is kept for backward compatibility during migration.
  */
 
-import { Database, Json, Tables } from "../types";
+import { Database, Tables } from "../types";
 import { DBDish, DishSummary } from "./types";
 import { Dish } from "@/types";
 
