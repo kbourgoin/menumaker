@@ -72,7 +72,7 @@ const DeleteSourceDialog = ({
       }
 
       deleteSourceMutation.mutate(source.id);
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error checking linked dishes",
         description: "Could not verify if source has linked dishes.",

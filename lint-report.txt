@@ -1,0 +1,50 @@
+$ eslint .
+
+/Users/kfb/src/menumaker/src/components/auth/AuthProvider.tsx
+  26:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kfb/src/menumaker/src/components/dashboard/ComingUp.tsx
+  3:27  error  'ChefHat' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dashboard/StatsCard.tsx
+   3:10  error  'Clock' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  94:41  error  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/data/DataManagement.tsx
+  1:10  error  'Separator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/data/JSONImport.tsx
+  55:16  error  'e' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dev/QueryPerformanceDashboard.tsx
+  8:3  error  'getPerformanceStats' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dialogs/CookDishDialog.tsx
+  1:31  error  'useRef' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dialogs/DeleteSourceDialog.tsx
+  75:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dialogs/EditSourceDialog.tsx
+  43:11  error  'session' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dialogs/MergeSourceDialog.tsx
+  13:10  error  'useMutation' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  13:23  error  'useQueryClient' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  14:10  error  'useSources' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+  42:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dish-card/SourceInfo.tsx
+  3:10  error  'cn' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dish-form/DishForm.tsx
+  33:11  error  'dishes' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dish-table/TableRow.tsx
+   4:10  error  'formatDate' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  13:10  error  'TagBadge' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dish-table/useSourceInfo.tsx
+  2:10  error  'Source' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kfb/src/menumaker/src/components/dishes/DishesDisplay.tsx

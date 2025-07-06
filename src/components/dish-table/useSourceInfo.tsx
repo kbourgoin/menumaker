@@ -1,5 +1,4 @@
 import { useSources } from "@/hooks/sources";
-import { Source } from "@/types";
 
 export const useSourceInfo = () => {
   const { sources } = useSources();
