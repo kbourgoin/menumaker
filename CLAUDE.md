@@ -74,6 +74,97 @@ bun install
 
 **Note**: The anon key is safe for client-side use and is designed to be exposed in frontend applications.
 
+## Database Schema Management
+
+**IMPORTANT**: This project uses Supabase for database management with a structured migration system.
+
+### Schema Structure
+
+The database consists of several main tables:
+
+- `dishes` - Core dish information with foreign key to sources
+- `sources` - Recipe sources (books/websites)
+- `meal_history` - Cooking history entries linked to dishes
+- `profiles` - User profile data including custom cuisines
+- `tags` - Categorization system for dishes (cuisines, general tags)
+- `dish_tags` - Many-to-many junction table linking dishes to tags
+- `dish_summary` - Materialized view with aggregated dish data
+
+### Migration Management
+
+**Directory Structure**:
+
+```
+supabase/
+├── config.toml                    # Supabase configuration
+├── migrations/                    # Database migrations (version controlled)
+│   ├── 001_initial_schema.sql    # Complete baseline schema
+│   ├── 002_add_tag_categories.sql # Tag categorization system
+│   └── ...                       # Future migrations
+├── schema/                       # Schema components (for reference)
+│   ├── tables.sql               # Table definitions
+│   ├── functions.sql            # Database functions
+│   ├── policies.sql             # Row Level Security policies
+│   ├── indexes.sql              # Index definitions
+│   ├── views.sql                # Views and materialized views
+│   └── complete_schema.sql      # Full schema dump
+└── docs/                        # Schema documentation
+    └── schema-overview.md       # Database structure overview
+```
+
+### Schema Management Commands
+
+**Schema Extraction**:
+
+```bash
+# Extract complete production schema
+supabase db dump --linked --file supabase/schema/complete_schema.sql
+
+# Create new migration
+supabase migration new <migration_name>
+
+# Apply migrations to local database
+supabase migration up
+
+# Reset local database to clean state
+supabase db reset
+```
+
+**Schema Validation**:
+
+```bash
+# Validate schema consistency
+supabase db diff
+
+# Check migration status
+supabase migration list
+```
+
+### Schema Management Guidelines
+
+- **Baseline Migration**: `001_initial_schema.sql` represents the complete production schema as of July 2025
+- **Migration Naming**: Use descriptive names like `002_add_tag_categories.sql`
+- **Schema Safety**: Always use read-only access when extracting production schema
+- **Documentation**: All major schema changes should be documented in the migration files
+- **Testing**: Test migrations in local environment before applying to production
+
+### Key Database Features
+
+- **Row Level Security (RLS)**: All tables use RLS policies to ensure users can only access their own data
+- **Materialized Views**: `dish_summary` provides optimized queries for dish data with aggregated information
+- **Foreign Key Constraints**: Proper referential integrity between related tables
+- **Indexes**: Strategic indexing on foreign keys and frequently queried columns
+- **Triggers**: Automatic refresh of materialized views when underlying data changes
+
+### Development Workflow
+
+1. **Local Development**: Use `supabase start` to run local Supabase instance
+2. **Schema Changes**: Create new migration files for any schema modifications
+3. **Testing**: Test migrations thoroughly in local environment
+4. **Production**: Apply migrations to production through Supabase dashboard or CLI
+
+**Security Note**: The schema files contain no actual user data, only table structures and policies.
+
 ## Git Workflow
 
 **IMPORTANT**: Always create a feature branch before making any changes. Never develop directly on the main branch.
