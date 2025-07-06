@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Settings as SettingsIcon, BookOpen, UserCog, UtensilsCrossed, Tag } from "lucide-react";
-import CuisineSettings from "@/components/settings/CuisineSettings";
+import { CuisineSettings } from "@/components/settings";
 import { TagManager } from "@/components/tags";
 import { MigrationTrigger } from "@/components/data";
 
