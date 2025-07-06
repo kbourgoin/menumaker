@@ -1,5 +1,5 @@
 import { Dish, MealHistory } from "@/types";
-import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
+import { supabase, mapDishFromDB, mapDishFromSummary } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
 /**
@@ -101,20 +101,8 @@ export const fetchDishesFromView = async (user_id: string): Promise<Dish[]> => {
     
     if (!data) return [];
     
-    // Map the view data to Dish objects
-    return data.map(dish => ({
-      id: dish.id || '',
-      name: dish.name || '',
-      createdAt: dish.createdat || new Date().toISOString(),
-      cuisines: dish.cuisines || [],
-      sourceId: dish.source_id || undefined,
-      lastMade: dish.last_made || undefined,
-      timesCooked: dish.times_cooked || 0,
-      user_id: dish.user_id || '',
-      location: dish.location || undefined,
-      lastComment: dish.last_comment || undefined,
-      tags: dish.tags || []
-    }));
+    // Map the view data to Dish objects using centralized mapping
+    return data.map(dish => mapDishFromSummary(dish));
   } catch (error) {
     console.error("Error fetching dishes from view:", error);
     // Fallback to optimized fetch
