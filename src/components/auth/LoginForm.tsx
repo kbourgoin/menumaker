@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +34,7 @@ const LoginForm = ({
     try {
       setLoading(true);
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: _data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });

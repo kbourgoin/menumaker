@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/auth";
 import { ErrorBoundary } from "@/components/shared";
 import { LoadingSpinner } from "@/components/shared";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
