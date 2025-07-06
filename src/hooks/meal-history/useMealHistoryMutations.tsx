@@ -1,5 +1,4 @@
 // Meal history mutation operations with enhanced error handling
-import { MealHistory } from "@/types";
 import { supabase, mapMealHistoryFromDB } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { classifyError, logError, retryOperation } from "@/utils/errorHandling";

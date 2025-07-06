@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { useMeals } from "@/hooks/useMeals";
-import { useSources } from "@/hooks/sources";
 import { sortDishes } from "@/utils/dishUtils";
 import { SEOHead, getPageSEO } from "@/components/shared";
 import {
@@ -15,7 +14,6 @@ import {
 
 const AllDishes = () => {
   const { dishes, isLoading } = useMeals();
-  const { sources: sourcesData } = useSources();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("lastCooked");

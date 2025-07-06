@@ -2,11 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
 import { measureAsync, trackQuery } from "@/utils/performance";
-import { useOptimizedStats } from "./useOptimizedStats";
 
 export function useStats() {
   // Check if we should use optimized stats for large datasets
-  const { data: dishCount } = useQuery({
+  const { data: _dishCount } = useQuery({
     queryKey: ["dish-count"],
     queryFn: async () => {
       const { count } = await supabase
@@ -17,7 +16,7 @@ export function useStats() {
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const { data: historyCount } = useQuery({
+  const { data: _historyCount } = useQuery({
     queryKey: ["history-count"],
     queryFn: async () => {
       const { count } = await supabase
@@ -29,7 +28,6 @@ export function useStats() {
   });
 
   // Temporarily disable optimized stats until database functions are created
-  const shouldUseOptimized = false; // (dishCount && dishCount > 100) || (historyCount && historyCount > 500);
 
   // Temporarily disable optimized stats hook to prevent console errors
   // const optimizedStats = useOptimizedStats();
