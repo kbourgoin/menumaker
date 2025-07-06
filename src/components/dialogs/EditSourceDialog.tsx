@@ -40,7 +40,7 @@ const EditSourceDialog = ({
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
 
-  const { session } = useAuth();
+  const { session: _session } = useAuth();
   const { getDishesBySource, findSourceByName } = useSources();
   const { toast } = useToast();
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +15,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, Plus, X } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries, useTagMutations } from "@/hooks/tags";
 import { TagBadge } from "./TagBadge";
@@ -46,7 +45,8 @@ export const TagSelector = ({
   const { useTagsByCategory } = useTagQueries();
   const { createTag } = useTagMutations();
 
-  const { data: availableTags = [], isLoading } = useTagsByCategory(category);
+  const { data: availableTags = [], isLoading: _isLoading } =
+    useTagsByCategory(category);
 
   const handleTagSelect = (tagName: string) => {
     if (selectedTags.includes(tagName)) {

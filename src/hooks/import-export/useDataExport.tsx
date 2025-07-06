@@ -2,13 +2,12 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dish, MealHistory, Source } from "@/types";
 import { Tables } from "@/integrations/supabase/types";
-import { DishSummary } from "@/integrations/supabase/mappers/types";
 import {
   mapDishFromSummary,
   mapMealHistoryFromDB,
   mapSourceFromDB,
 } from "@/integrations/supabase/client";
-import { operationLog, debugLog } from "@/utils/logger";
+import { operationLog } from "@/utils/logger";
 
 export interface ExportData {
   dishes: Dish[];

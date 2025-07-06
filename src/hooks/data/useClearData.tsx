@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { operationLog, errorLog } from "@/utils/logger";
 
 export function useClearData() {

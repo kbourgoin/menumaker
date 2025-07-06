@@ -29,7 +29,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { useTagQueries, useTagMutations, type Tag } from "@/hooks/tags";
 import { TagBadge } from "./TagBadge";
@@ -43,7 +42,7 @@ export const TagManager = ({ className }: TagManagerProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const { useAllTags, useTagUsageCount } = useTagQueries();
+  const { useAllTags, useTagUsageCount: _useTagUsageCount } = useTagQueries();
   const { createTag, updateTag, deleteTag } = useTagMutations();
 
   const { data: tags = [], isLoading } = useAllTags();

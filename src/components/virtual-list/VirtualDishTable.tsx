@@ -1,6 +1,6 @@
 import React from "react";
 import { Dish } from "@/types";
-import { Table, TableBody, TableHeader } from "@/components/ui/table";
+import { Table, TableBody } from "@/components/ui/table";
 import DishTableHeader from "@/components/dish-table/TableHeader";
 import DishTableRow from "@/components/dish-table/TableRow";
 import { useTableSort } from "@/components/dish-table/useTableSort";

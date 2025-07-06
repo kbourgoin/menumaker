@@ -6,7 +6,6 @@ import {
 } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { classifyError, logError, retryOperation } from "@/utils/errorHandling";
-import { ErrorType } from "@/types/errors";
 
 /**
  * Hook that provides mutation functions for dishes
