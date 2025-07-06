@@ -12,7 +12,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun run test` - Run tests in watch mode
 - `bun run test:run` - Run tests once
 
-**Package Management**: This project uses Bun as the package manager. Use `bun install` to install dependencies and `bun add <package>` to add new packages.
+## Package Management
+
+**IMPORTANT**: This project uses Bun exclusively as the package manager. Do not use npm, yarn, or pnpm.
+
+### Adding Dependencies
+```bash
+# Add production dependency
+bun add <package-name>
+
+# Add development dependency  
+bun add -d <package-name>
+
+# Install all dependencies
+bun install
+```
+
+### Package Management Rules
+- ✅ **Always use bun** for all package operations
+- ✅ **Only `bun.lockb`** should exist - `package-lock.json`, `yarn.lock`, and `pnpm-lock.yaml` are gitignored
+- ✅ **Clean dependencies**: Unused packages are regularly audited and removed
+- 🚫 **Never use `npm install`** or `yarn install` - they will create unwanted lock files
+- 🚫 **Never commit lock files** other than `bun.lockb`
+
+### Dependency Guidelines
+- **Production dependencies**: Only add packages that are needed in the built application
+- **Development dependencies**: Use `-d` flag for tools, linters, test frameworks, and build utilities
+- **Audit regularly**: Remove unused dependencies to keep bundle size minimal
+- **Security**: Run `bun audit` before adding new dependencies
+
+### Troubleshooting
+- **"Package not found"**: Make sure to use `bun add` instead of `npm install`
+- **Multiple lock files**: Delete `package-lock.json` and `yarn.lock` if they appear
+- **Build issues**: Run `bun install` to ensure all dependencies are correctly installed
 
 ## Environment Setup
 
