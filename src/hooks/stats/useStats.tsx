@@ -29,8 +29,8 @@ export function useStats() {
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Use optimized stats for users with extensive data
-  const shouldUseOptimized = (dishCount && dishCount > 100) || (historyCount && historyCount > 500);
+  // Temporarily disable optimized stats until database functions are created
+  const shouldUseOptimized = false; // (dishCount && dishCount > 100) || (historyCount && historyCount > 500);
   
   const optimizedStats = useOptimizedStats();
   
