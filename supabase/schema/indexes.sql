@@ -1,0 +1,13 @@
+396:CREATE UNIQUE INDEX "dish_summary_id_idx" ON "public"."dish_summary" USING "btree" ("id");
+400:CREATE INDEX "idx_dish_tags_dish_id" ON "public"."dish_tags" USING "btree" ("dish_id");
+404:CREATE INDEX "idx_dish_tags_tag_id" ON "public"."dish_tags" USING "btree" ("tag_id");
+408:CREATE INDEX "idx_dishes_source_id" ON "public"."dishes" USING "btree" ("source_id");
+412:CREATE INDEX "idx_dishes_user_id" ON "public"."dishes" USING "btree" ("user_id");
+416:CREATE INDEX "idx_meal_history_dishid" ON "public"."meal_history" USING "btree" ("dishid");
+420:CREATE INDEX "idx_meal_history_dishid_date" ON "public"."meal_history" USING "btree" ("dishid", "date" DESC);
+424:CREATE INDEX "idx_meal_history_user_dish" ON "public"."meal_history" USING "btree" ("user_id", "dishid");
+428:CREATE INDEX "idx_meal_history_user_id" ON "public"."meal_history" USING "btree" ("user_id");
+432:CREATE INDEX "idx_tags_category" ON "public"."tags" USING "btree" ("category");
+440:CREATE INDEX "idx_tags_name" ON "public"."tags" USING "btree" ("name");
+448:CREATE INDEX "idx_tags_user_category" ON "public"."tags" USING "btree" ("user_id", "category");
+456:CREATE INDEX "idx_tags_user_id" ON "public"."tags" USING "btree" ("user_id");
