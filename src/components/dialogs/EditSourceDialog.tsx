@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -27,20 +26,24 @@ interface EditSourceDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProps) => {
+const EditSourceDialog = ({
+  source,
+  isOpen,
+  onOpenChange,
+}: EditSourceDialogProps) => {
   const [formData, setFormData] = useState<SourceFormData>({
     name: "",
-    type: "book" as 'book' | 'website',
+    type: "book" as "book" | "website",
     description: "",
   });
-  
+
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  
+
   const { session } = useAuth();
   const { getDishesBySource, findSourceByName } = useSources();
   const { toast } = useToast();
-  
+
   const {
     duplicateSource,
     affectedDishesCount,
@@ -48,7 +51,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
     setIsMergeDialogOpen,
     updateSourceMutation,
     handleSubmit,
-    handleMergeConfirm
+    handleMergeConfirm,
   } = useSourceEdit(source, () => onOpenChange(false));
 
   useEffect(() => {
@@ -64,14 +67,17 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
 
   // Query to fetch linked dishes
   const { data: linkedDishes = [] } = useQuery({
-    queryKey: ['sourceLinkedDishes', source?.id],
-    queryFn: () => source ? getDishesBySource(source.id) : Promise.resolve([]),
+    queryKey: ["sourceLinkedDishes", source?.id],
+    queryFn: () =>
+      source ? getDishesBySource(source.id) : Promise.resolve([]),
     enabled: isOpen && !!source?.id,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -79,16 +85,16 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
   };
 
   const handleTypeChange = (value: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      type: value as 'book' | 'website',
+      type: value as "book" | "website",
     }));
     setShowWarning(false); // Clear warning when user makes changes
   };
 
   const handleFormSubmit = async () => {
     if (!source) return;
-    
+
     if (!formData.name.trim()) {
       toast({
         title: "Name is required",
@@ -97,22 +103,27 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
       });
       return;
     }
-    
+
     // First check if name has changed
     if (formData.name.trim() !== source.name) {
       // Check for existing sources with the same name
-      const existingSource = await findSourceByName(formData.name.trim(), source.id);
-      
+      const existingSource = await findSourceByName(
+        formData.name.trim(),
+        source.id
+      );
+
       if (existingSource) {
         // If source exists with same name but different type, just warn the user
         if (existingSource.type !== formData.type) {
-          setWarningMessage(`A source with the name "${formData.name}" but different type already exists. Both will be kept as separate sources.`);
+          setWarningMessage(
+            `A source with the name "${formData.name}" but different type already exists. Both will be kept as separate sources.`
+          );
           setShowWarning(true);
           return;
         }
       }
     }
-    
+
     // Continue with normal submit process which will handle merge if needed
     handleSubmit(formData);
   };
@@ -137,13 +148,13 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
                 </AlertDescription>
               </Alert>
             )}
-            
-            <SourceFormFields 
+
+            <SourceFormFields
               formData={formData}
               handleInputChange={handleInputChange}
               handleTypeChange={handleTypeChange}
             />
-            
+
             {/* Linked Dishes Section */}
             <LinkedDishesSection dishes={linkedDishes} />
           </div>
@@ -151,15 +162,15 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleFormSubmit}
               disabled={updateSourceMutation.isPending}
             >
               {updateSourceMutation.isPending ? "Updating..." : "Update"}
             </Button>
             {showWarning && (
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 className="bg-amber-500 hover:bg-amber-600"
                 onClick={() => {
                   setShowWarning(false);
@@ -172,7 +183,7 @@ const EditSourceDialog = ({ source, isOpen, onOpenChange }: EditSourceDialogProp
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <MergeSourceDialog
         sourceToEdit={source}
         duplicateSource={duplicateSource}

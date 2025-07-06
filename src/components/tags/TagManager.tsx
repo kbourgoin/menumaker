@@ -1,11 +1,34 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { useTagQueries, useTagMutations, type Tag } from "@/hooks/tags";
@@ -92,7 +115,10 @@ export const TagManager = ({ className }: TagManagerProps) => {
               Create and manage your recipe tags
             </CardDescription>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
@@ -151,11 +177,11 @@ export const TagManager = ({ className }: TagManagerProps) => {
           </p>
         ) : (
           <div className="space-y-2">
-            {tags.map((tag) => (
+            {tags.map(tag => (
               <TagRow
                 key={tag.id}
                 tag={tag}
-                onEdit={(tag) => {
+                onEdit={tag => {
                   setEditingTag(tag);
                   setIsEditDialogOpen(true);
                 }}
@@ -239,16 +265,12 @@ const TagRow = ({ tag, onEdit, onDelete }: TagRowProps) => {
             <p className="text-sm text-muted-foreground">{tag.description}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            Used in {usageCount} dish{usageCount !== 1 ? 'es' : ''}
+            Used in {usageCount} dish{usageCount !== 1 ? "es" : ""}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onEdit(tag)}
-        >
+        <Button variant="ghost" size="sm" onClick={() => onEdit(tag)}>
           <Edit className="h-4 w-4" />
         </Button>
         <AlertDialog>
@@ -261,7 +283,8 @@ const TagRow = ({ tag, onEdit, onDelete }: TagRowProps) => {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Tag</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete the tag "{tag.name}"? This will remove it from all dishes and cannot be undone.
+                Are you sure you want to delete the tag "{tag.name}"? This will
+                remove it from all dishes and cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

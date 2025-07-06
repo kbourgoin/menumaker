@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useDataExport } from "@/hooks/import-export";
 import { Button } from "@/components/ui/button";
@@ -13,17 +12,17 @@ export function JSONExport() {
   const handleExport = async () => {
     try {
       const data = await exportAllData();
-      
+
       // Set counts for display
       setExportCount({
         dishes: data.dishes.length,
         meals: data.mealHistory.length,
-        sources: data.sources.length
+        sources: data.sources.length,
       });
-      
+
       // Download the file
       downloadExportFile(data);
-      
+
       toast({
         title: "Export successful",
         description: `Successfully exported ${data.dishes.length} dishes, ${data.mealHistory.length} meal entries, and ${data.sources.length} sources.`,
@@ -32,7 +31,8 @@ export function JSONExport() {
       console.error("Export failed:", error);
       toast({
         title: "Export failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
         variant: "destructive",
       });
     }
@@ -52,12 +52,8 @@ export function JSONExport() {
           </div>
         )}
       </div>
-      
-      <Button
-        onClick={handleExport}
-        disabled={isExporting}
-        className="gap-2"
-      >
+
+      <Button onClick={handleExport} disabled={isExporting} className="gap-2">
         {isExporting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />

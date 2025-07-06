@@ -1,10 +1,16 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import { classifyError, logError } from '@/utils/errorHandling';
-import { getErrorTitle, getErrorActions } from '@/utils/errorMessages';
-import { AppError } from '@/types/errors';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
+import { classifyError, logError } from "@/utils/errorHandling";
+import { getErrorTitle, getErrorActions } from "@/utils/errorMessages";
+import { AppError } from "@/types/errors";
 
 interface Props {
   children: ReactNode;
@@ -30,21 +36,21 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public static getDerivedStateFromError(error: Error): State {
     const classifiedError = classifyError(error);
-    return { 
-      hasError: true, 
-      error, 
-      errorInfo: null, 
-      classifiedError 
+    return {
+      hasError: true,
+      error,
+      errorInfo: null,
+      classifiedError,
     };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const classifiedError = classifyError(error);
-    const context = this.props.context || 'ErrorBoundary';
-    
+    const context = this.props.context || "ErrorBoundary";
+
     // Use our enhanced error logging
     logError(classifiedError, context);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -62,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   public render() {
@@ -72,9 +78,15 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       const { classifiedError } = this.state;
-      const errorTitle = classifiedError ? getErrorTitle(classifiedError.type) : 'Something went wrong';
-      const errorMessage = classifiedError?.userMessage || 'An unexpected error occurred. This has been logged and we\'ll look into it.';
-      const suggestedActions = classifiedError ? getErrorActions(classifiedError.type) : ['Refresh the page', 'Go home'];
+      const errorTitle = classifiedError
+        ? getErrorTitle(classifiedError.type)
+        : "Something went wrong";
+      const errorMessage =
+        classifiedError?.userMessage ||
+        "An unexpected error occurred. This has been logged and we'll look into it.";
+      const suggestedActions = classifiedError
+        ? getErrorActions(classifiedError.type)
+        : ["Refresh the page", "Go home"];
 
       return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -84,15 +96,15 @@ export class ErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
               <CardTitle>{errorTitle}</CardTitle>
-              <CardDescription>
-                {errorMessage}
-              </CardDescription>
+              <CardDescription>{errorMessage}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Suggested actions */}
               {suggestedActions.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Suggested actions:</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Suggested actions:
+                  </p>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     {suggestedActions.map((action, index) => (
                       <li key={index} className="flex items-center">
@@ -109,13 +121,17 @@ export class ErrorBoundary extends Component<Props, State> {
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Try Again
                 </Button>
-                <Button variant="outline" onClick={this.handleGoHome} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={this.handleGoHome}
+                  className="w-full"
+                >
                   <Home className="mr-2 h-4 w-4" />
                   Go Home
                 </Button>
               </div>
-              
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="mt-4">
                   <summary className="cursor-pointer text-sm font-medium flex items-center">
                     <Bug className="mr-2 h-4 w-4" />
@@ -124,10 +140,20 @@ export class ErrorBoundary extends Component<Props, State> {
                   <div className="mt-2 space-y-2">
                     {classifiedError && (
                       <div className="text-xs space-y-1">
-                        <p><strong>Type:</strong> {classifiedError.type}</p>
-                        <p><strong>Severity:</strong> {classifiedError.severity}</p>
-                        <p><strong>Retryable:</strong> {classifiedError.retryable ? 'Yes' : 'No'}</p>
-                        <p><strong>Timestamp:</strong> {classifiedError.timestamp.toISOString()}</p>
+                        <p>
+                          <strong>Type:</strong> {classifiedError.type}
+                        </p>
+                        <p>
+                          <strong>Severity:</strong> {classifiedError.severity}
+                        </p>
+                        <p>
+                          <strong>Retryable:</strong>{" "}
+                          {classifiedError.retryable ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <strong>Timestamp:</strong>{" "}
+                          {classifiedError.timestamp.toISOString()}
+                        </p>
                       </div>
                     )}
                     <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words bg-muted p-2 rounded">
@@ -151,10 +177,10 @@ export class ErrorBoundary extends Component<Props, State> {
 export const useErrorHandler = (context?: string) => {
   return (error: Error, errorInfo?: ErrorInfo) => {
     const classifiedError = classifyError(error);
-    const errorContext = context || 'useErrorHandler';
-    
+    const errorContext = context || "useErrorHandler";
+
     logError(classifiedError, errorContext);
-    
+
     return classifiedError;
   };
 };

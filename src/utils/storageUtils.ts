@@ -1,4 +1,3 @@
-
 // This file contains basic localStorage operations used by all other utility files
 
 // Generate a simple ID helper function

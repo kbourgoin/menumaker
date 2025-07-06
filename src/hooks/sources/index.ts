@@ -1,37 +1,33 @@
-
-import { useSourceQueries } from './useSourceQueries';
-import { useSourceMutations } from './useSourceMutations';
-import { useSourceMerge } from './useSourceMerge';
+import { useSourceQueries } from "./useSourceQueries";
+import { useSourceMutations } from "./useSourceMutations";
+import { useSourceMerge } from "./useSourceMerge";
 
 export function useSources() {
-  const { 
-    sources, 
-    isLoadingSources, 
-    sourcesError, 
+  const {
+    sources,
+    isLoadingSources,
+    sourcesError,
     isSourcesError,
     refetchSources,
-    getSources, 
-    getSource, 
-    getDishesBySource, 
+    getSources,
+    getSource,
+    getDishesBySource,
     findSourceByName,
-    createSourceError
+    createSourceError,
   } = useSourceQueries();
-  
-  const { 
-    addSource, 
-    updateSource, 
+
+  const {
+    addSource,
+    updateSource,
     deleteSource,
     isAddingSource,
     isUpdatingSource,
     isDeletingSource,
-    createSourceMutationError
+    createSourceMutationError,
   } = useSourceMutations();
-  
-  const { 
-    mergeSources,
-    isMergingSources,
-    createSourceMergeError
-  } = useSourceMerge();
+
+  const { mergeSources, isMergingSources, createSourceMergeError } =
+    useSourceMerge();
 
   return {
     // Source queries
@@ -44,7 +40,7 @@ export function useSources() {
     getSource,
     getDishesBySource,
     findSourceByName,
-    
+
     // Source mutations
     addSource,
     updateSource,
@@ -52,18 +48,18 @@ export function useSources() {
     isAddingSource,
     isUpdatingSource,
     isDeletingSource,
-    
+
     // Source merge
     mergeSources,
     isMergingSources,
-    
+
     // Error utilities
     createSourceError,
     createSourceMutationError,
-    createSourceMergeError
+    createSourceMergeError,
   };
 }
 
-export * from './useSourceQueries';
-export * from './useSourceMutations';
-export * from './useSourceMerge';
+export * from "./useSourceQueries";
+export * from "./useSourceMutations";
+export * from "./useSourceMerge";

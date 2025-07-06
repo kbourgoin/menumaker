@@ -1,10 +1,26 @@
-
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { FormValues } from "./FormSchema";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Check, ChevronsUpDown, Book, Globe } from "lucide-react";
 import { Source } from "@/types";
 import { useEffect, useState } from "react";
@@ -18,12 +34,12 @@ interface SourceSelectorProps {
 const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  
+
   const getSourceIcon = (type: string) => {
     switch (type) {
-      case 'book':
+      case "book":
         return <Book className="h-4 w-4 mr-2" />;
-      case 'website':
+      case "website":
         return <Globe className="h-4 w-4 mr-2" />;
       default:
         return null;
@@ -31,7 +47,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
   };
 
   // Filter sources based on search value
-  const filteredSources = sources.filter(source => 
+  const filteredSources = sources.filter(source =>
     source.name.toLowerCase().includes(searchValue.toLowerCase())
   );
 
@@ -64,8 +80,16 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                   >
                     {field.value ? (
                       <div className="flex items-center">
-                        {getSourceIcon(sources.find(source => source.id === field.value)?.type || '')}
-                        <span>{sources.find(source => source.id === field.value)?.name}</span>
+                        {getSourceIcon(
+                          sources.find(source => source.id === field.value)
+                            ?.type || ""
+                        )}
+                        <span>
+                          {
+                            sources.find(source => source.id === field.value)
+                              ?.name
+                          }
+                        </span>
                       </div>
                     ) : (
                       "No source selected"
@@ -76,8 +100,8 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
               </PopoverTrigger>
               <PopoverContent className="p-0 w-[300px]" align="start">
                 <Command shouldFilter={false}>
-                  <CommandInput 
-                    placeholder="Search sources..." 
+                  <CommandInput
+                    placeholder="Search sources..."
                     value={searchValue}
                     onValueChange={setSearchValue}
                   />
@@ -100,7 +124,7 @@ const SourceSelector = ({ form, sources }: SourceSelectorProps) => {
                         />
                         No source
                       </CommandItem>
-                      {filteredSources.map((source) => (
+                      {filteredSources.map(source => (
                         <CommandItem
                           key={source.id}
                           value={source.id}

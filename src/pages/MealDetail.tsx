@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
@@ -10,12 +9,12 @@ import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Dish, MealHistory } from "@/types";
-import { 
-  LoadingState, 
-  ErrorState, 
-  NotFoundState, 
+import {
+  LoadingState,
+  ErrorState,
+  NotFoundState,
   DishDetailsCard,
-  CookingHistoryTab
+  CookingHistoryTab,
 } from "@/components/meal-detail";
 
 const MealDetail = () => {
@@ -33,7 +32,7 @@ const MealDetail = () => {
 
   const fetchHistory = useCallback(async () => {
     if (!id) return;
-    
+
     try {
       const historyData = await getMealHistoryForDish(id);
       setHistory(historyData);
@@ -54,14 +53,14 @@ const MealDetail = () => {
       setIsLoading(true);
       setError(null);
       const dishData = await getDish(id);
-      
+
       if (!dishData) {
         setDish(null);
         setError("Dish not found");
         setIsLoading(false);
         return;
       }
-      
+
       setDish(dishData);
 
       // Only fetch history if we're on the history tab
@@ -71,7 +70,7 @@ const MealDetail = () => {
     } catch (fetchError) {
       console.error("Error fetching dish:", fetchError);
       setError("Failed to load dish details. Please try again later.");
-      
+
       toast({
         title: "Error loading dish",
         description: "There was a problem loading this dish's details.",
@@ -114,7 +113,7 @@ const MealDetail = () => {
 
   if (error) {
     return (
-      <ErrorState 
+      <ErrorState
         error={error}
         onBack={handleBack}
         onRefresh={handleRefresh}
@@ -130,41 +129,37 @@ const MealDetail = () => {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto animate-slide-down">
-        <Button 
-          variant="ghost" 
-          onClick={handleBack} 
-          className="mb-4"
-        >
+        <Button variant="ghost" onClick={handleBack} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        
+
         <DishDetailsCard dish={dish} />
-        
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <TabsList className="mb-4">
             <TabsTrigger value="details">Edit Dish</TabsTrigger>
             <TabsTrigger value="history">Cooking History</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="details" className="mt-0">
             <Card className="p-6">
-              <DishForm 
-                existingDish={dish} 
+              <DishForm
+                existingDish={dish}
                 onSuccess={() => {
                   toast({
                     title: "Dish updated",
                     description: "The dish has been updated successfully.",
                   });
                   navigate("/all-meals");
-                }} 
+                }}
               />
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="history" className="mt-0">
-            <CookingHistoryTab 
-              history={history} 
+            <CookingHistoryTab
+              history={history}
               dishId={dish.id}
               dishName={dish.name}
               onHistoryUpdated={handleHistoryUpdated}

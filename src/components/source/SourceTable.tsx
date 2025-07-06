@@ -1,12 +1,11 @@
-
 import { Source } from "@/types";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -21,11 +20,11 @@ interface SourceTableProps {
 const SourceTable = ({ sources, onEdit, onDelete }: SourceTableProps) => {
   const getSourceTypeLabel = (type: string) => {
     switch (type) {
-      case 'book':
+      case "book":
         return <Badge className="bg-blue-500">Book</Badge>;
-      case 'website':
+      case "website":
         return <Badge className="bg-green-500">Website</Badge>;
-      case 'document':
+      case "document":
         return <Badge className="bg-orange-500">Document</Badge>;
       default:
         return <Badge className="bg-gray-500">{type}</Badge>;
@@ -44,7 +43,7 @@ const SourceTable = ({ sources, onEdit, onDelete }: SourceTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sources.map((source) => (
+          {sources.map(source => (
             <TableRow key={source.id}>
               <TableCell className="font-medium">{source.name}</TableCell>
               <TableCell>{getSourceTypeLabel(source.type)}</TableCell>
@@ -52,7 +51,9 @@ const SourceTable = ({ sources, onEdit, onDelete }: SourceTableProps) => {
                 {source.description ? (
                   <span className="line-clamp-1">{source.description}</span>
                 ) : (
-                  <span className="text-muted-foreground italic">No description</span>
+                  <span className="text-muted-foreground italic">
+                    No description
+                  </span>
                 )}
               </TableCell>
               <TableCell className="text-right">

@@ -1,3 +1,2 @@
-
 // Re-export the refactored implementation
-export * from './sources/index';
+export * from "./sources/index";

@@ -1,9 +1,8 @@
-
 import { format, parseISO } from "date-fns";
 import { Clock, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
@@ -25,11 +24,11 @@ interface CookingHistoryTabProps {
   onHistoryUpdated?: () => void;
 }
 
-const CookingHistoryTab = ({ 
-  history, 
-  dishId, 
+const CookingHistoryTab = ({
+  history,
+  dishId,
   dishName,
-  onHistoryUpdated 
+  onHistoryUpdated,
 }: CookingHistoryTabProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
@@ -47,14 +46,14 @@ const CookingHistoryTab = ({
 
   const handleDelete = async () => {
     if (!selectedEntryId) return;
-    
+
     try {
       await deleteMealHistory(selectedEntryId);
       toast({
         title: "Entry deleted",
         description: "The cooking history entry has been deleted.",
       });
-      
+
       // Notify parent component that history was updated
       if (onHistoryUpdated) {
         onHistoryUpdated();
@@ -87,7 +86,7 @@ const CookingHistoryTab = ({
         <CardContent>
           {history.length > 0 ? (
             <div className="space-y-4">
-              {history.map((entry) => (
+              {history.map(entry => (
                 <div key={entry.id} className="p-4 border rounded-md">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-sm text-muted-foreground">
@@ -107,8 +106,8 @@ const CookingHistoryTab = ({
                       >
                         <Pencil className="w-4 h-4" />
                       </CookDishDialog>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="icon"
                         onClick={() => {
                           setSelectedEntryId(entry.id);
@@ -141,7 +140,8 @@ const CookingHistoryTab = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete cooking history entry?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this cooking history entry.
+              This action cannot be undone. This will permanently delete this
+              cooking history entry.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

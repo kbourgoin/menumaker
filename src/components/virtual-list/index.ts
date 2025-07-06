@@ -1,1 +1,1 @@
-export { default as VirtualDishTable } from './VirtualDishTable';
+export { default as VirtualDishTable } from "./VirtualDishTable";

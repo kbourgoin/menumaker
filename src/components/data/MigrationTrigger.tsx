@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertTriangle, CheckCircle } from "lucide-react";
-import { checkMigrationStatus, migrateCuisinesToTags, MigrationStats } from "@/utils/cuisineToTagMigration";
+import {
+  checkMigrationStatus,
+  migrateCuisinesToTags,
+  MigrationStats,
+} from "@/utils/cuisineToTagMigration";
 
 /**
  * Component that automatically checks if cuisine to tag migration is needed
@@ -37,7 +41,10 @@ export const MigrationTrigger = () => {
         setMigrationStatus(prev => ({
           ...prev,
           isChecking: false,
-          error: error instanceof Error ? error.message : "Failed to check migration status",
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to check migration status",
         }));
       }
     };
@@ -46,8 +53,12 @@ export const MigrationTrigger = () => {
   }, []);
 
   const runMigration = async () => {
-    setMigrationStatus(prev => ({ ...prev, isRunning: true, error: undefined }));
-    
+    setMigrationStatus(prev => ({
+      ...prev,
+      isRunning: true,
+      error: undefined,
+    }));
+
     try {
       const stats = await migrateCuisinesToTags();
       setMigrationStatus(prev => ({
@@ -86,11 +97,12 @@ export const MigrationTrigger = () => {
                 <strong>Cuisine System Update Available</strong>
               </p>
               <p>
-                We've improved the cuisine system! Click below to migrate your cuisines to the new tag-based system. 
-                This will preserve all your existing data while enabling new features.
+                We've improved the cuisine system! Click below to migrate your
+                cuisines to the new tag-based system. This will preserve all
+                your existing data while enabling new features.
               </p>
-              <Button 
-                onClick={runMigration} 
+              <Button
+                onClick={runMigration}
                 disabled={migrationStatus.isRunning}
                 size="sm"
                 className="mt-2"
@@ -118,14 +130,21 @@ export const MigrationTrigger = () => {
                 <strong>Migration Complete!</strong>
               </p>
               <ul className="text-sm space-y-1">
-                <li>✅ Created {migrationStatus.stats.cuisineTagsCreated} cuisine tags</li>
+                <li>
+                  ✅ Created {migrationStatus.stats.cuisineTagsCreated} cuisine
+                  tags
+                </li>
                 <li>✅ Updated {migrationStatus.stats.dishesUpdated} dishes</li>
-                <li>✅ Created {migrationStatus.stats.dishTagRelationsCreated} dish-cuisine relationships</li>
+                <li>
+                  ✅ Created {migrationStatus.stats.dishTagRelationsCreated}{" "}
+                  dish-cuisine relationships
+                </li>
               </ul>
               {migrationStatus.stats.errors.length > 0 && (
                 <div className="mt-2">
                   <p className="text-sm text-destructive">
-                    Some issues occurred: {migrationStatus.stats.errors.join(", ")}
+                    Some issues occurred:{" "}
+                    {migrationStatus.stats.errors.join(", ")}
                   </p>
                 </div>
               )}

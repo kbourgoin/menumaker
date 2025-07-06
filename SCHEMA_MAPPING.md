@@ -5,6 +5,7 @@ This document describes the standardized type mapping system implemented to ensu
 ## Overview
 
 The standardized mapping system provides:
+
 - **Single source of truth** for all entity types
 - **Consistent field mapping** between database (snake_case) and application (camelCase)
 - **Centralized validation** at database/application boundaries
@@ -40,8 +41,8 @@ interface Dish {
   name: string;
   createdAt: string;
   cuisines: string[];
-  sourceId?: string;      // Foreign key
-  userId: string;         // User reference
+  sourceId?: string; // Foreign key
+  userId: string; // User reference
   // ... computed fields
   lastMade?: string;
   timesCooked: number;
@@ -57,39 +58,39 @@ All database types use **snake_case** naming:
 type DBDish = {
   id: string;
   name: string;
-  createdat: string;      // Note: inconsistent naming in schema
+  createdat: string; // Note: inconsistent naming in schema
   cuisines: string[];
   source_id: string | null;
   user_id: string;
   // No computed fields - stored separately
-}
+};
 ```
 
 ## Field Mapping Conventions
 
 ### Standard Patterns
 
-| Application (camelCase) | Database (snake_case) | Notes |
-|------------------------|----------------------|-------|
-| `id` | `id` | Always consistent |
-| `userId` | `user_id` | User references |
-| `sourceId` | `source_id` | Foreign keys |
-| `createdAt` | `created_at` | Timestamps |
-| `updatedAt` | `updated_at` | Timestamps |
+| Application (camelCase) | Database (snake_case) | Notes             |
+| ----------------------- | --------------------- | ----------------- |
+| `id`                    | `id`                  | Always consistent |
+| `userId`                | `user_id`             | User references   |
+| `sourceId`              | `source_id`           | Foreign keys      |
+| `createdAt`             | `created_at`          | Timestamps        |
+| `updatedAt`             | `updated_at`          | Timestamps        |
 
 ### Special Cases
 
-| Application | Database | Entity | Notes |
-|------------|----------|---------|-------|
-| `dishId` | `dishid` | MealHistory | No underscore in DB |
-| `createdAt` | `createdat` | Dish | Legacy naming inconsistency |
+| Application | Database    | Entity      | Notes                       |
+| ----------- | ----------- | ----------- | --------------------------- |
+| `dishId`    | `dishid`    | MealHistory | No underscore in DB         |
+| `createdAt` | `createdat` | Dish        | Legacy naming inconsistency |
 
 ### Value Transformations
 
-| Application | Database | Transformation |
-|------------|----------|----------------|
-| `undefined` | `null` | Optional fields |
-| `[]` | `null` | Empty arrays |
+| Application     | Database   | Transformation               |
+| --------------- | ---------- | ---------------------------- |
+| `undefined`     | `null`     | Optional fields              |
+| `[]`            | `null`     | Empty arrays                 |
 | Computed fields | Not stored | Calculated from related data |
 
 ## Mapping Functions
@@ -105,7 +106,7 @@ mapDishFromSummary(summary) → Dish
 mapMealHistoryFromDB(dbHistory) → MealHistory
 mapSourceFromDB(dbSource) → Source
 
-// Application to Database  
+// Application to Database
 mapDishToDB(dish) → DBDishInsert
 mapMealHistoryToDB(history) → DBMealHistoryInsert
 mapSourceToDB(source) → DBSourceInsert
@@ -119,8 +120,8 @@ mapArrayFromDB.mealHistory(dbHistory) → MealHistory[]
 
 ```typescript
 // Fetching dishes with meal history
-const dishesData = await supabase.from('dishes').select('*');
-const mealHistory = await supabase.from('meal_history').select('*');
+const dishesData = await supabase.from("dishes").select("*");
+const mealHistory = await supabase.from("meal_history").select("*");
 
 // Group history by dish ID
 const historyMap = new Map();
@@ -145,10 +146,10 @@ const dishes = mapArrayFromDB.dishes(dishesData, historyMap);
 ### Validation Usage
 
 ```typescript
-import { validateEntity, ValidationError } from '@/utils/validation';
+import { validateEntity, ValidationError } from "@/utils/validation";
 
 try {
-  validateEntity('dish', dishData);
+  validateEntity("dish", dishData);
   // Validation passed
 } catch (error) {
   if (error instanceof ValidationError) {
@@ -165,18 +166,21 @@ try {
 ## Migration Strategy
 
 ### Phase 1: Infrastructure ✅
+
 - [x] Create unified type system
 - [x] Implement centralized mapping functions
 - [x] Add comprehensive validation
 - [x] Update existing mappers to use new system
 
 ### Phase 2: Application Updates (In Progress)
+
 - [ ] Update all database hooks to use new mappers
 - [ ] Fix test fixtures to match new validation rules
 - [ ] Re-enable validation in mapping functions
 - [ ] Remove deprecated mapper files
 
 ### Phase 3: Cleanup
+
 - [ ] Remove legacy mapper exports
 - [ ] Update import statements across codebase
 - [ ] Add comprehensive integration tests
@@ -185,6 +189,7 @@ try {
 ## Best Practices
 
 ### Do's ✅
+
 - Always use centralized mapping functions
 - Import types from `@/types` (main export)
 - Use `validateEntity()` for runtime type checking
@@ -192,6 +197,7 @@ try {
 - Include meal history when mapping dishes for computed fields
 
 ### Don'ts ❌
+
 - Don't create manual mapping logic
 - Don't import from deprecated mapper files
 - Don't mix database and application field naming

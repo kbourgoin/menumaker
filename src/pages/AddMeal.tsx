@@ -1,4 +1,3 @@
-
 import { Layout } from "@/components/layout";
 import DishForm from "@/components/dish-form";
 import { Card } from "@/components/ui/card";
@@ -13,7 +12,7 @@ const AddDish = () => {
             Create a new dish entry for your family collection
           </p>
         </div>
-        
+
         <Card className="p-6 animate-fade-in">
           <DishForm />
         </Card>

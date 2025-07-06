@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar as CalendarIcon, Search, Utensils } from "lucide-react";
 import { format } from "date-fns";
@@ -36,11 +35,12 @@ export default function AddCookedDishDialog() {
   const { toast } = useToast();
 
   // Filter dishes based on search query
-  const filteredDishes = dishes.filter(dish => 
-    dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dish.cuisines.some(cuisine => 
-      cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  const filteredDishes = dishes.filter(
+    dish =>
+      dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dish.cuisines.some(cuisine =>
+        cuisine.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   const handleSelectDish = (dish: Dish) => {
@@ -61,17 +61,21 @@ export default function AddCookedDishDialog() {
       toast({
         title: "No dish selected",
         description: "Please select a dish from the search results.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
-    await recordDishCooked(selectedDish.id, date.toISOString(), notes || undefined);
+    await recordDishCooked(
+      selectedDish.id,
+      date.toISOString(),
+      notes || undefined
+    );
     toast({
       title: "Dish cooked!",
       description: `${selectedDish.name} has been recorded in your meal history.`,
     });
-    
+
     // Reset the form
     setOpen(false);
     setSelectedDish(null);
@@ -88,12 +92,15 @@ export default function AddCookedDishDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      setOpen(newOpen);
-      if (!newOpen) resetDialog();
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={newOpen => {
+        setOpen(newOpen);
+        if (!newOpen) resetDialog();
+      }}
+    >
       <DialogTrigger asChild>
-        <Button 
+        <Button
           variant="outline"
           size="sm"
           className="border-terracotta-200 text-terracotta-500 hover:bg-terracotta-50 hover:border-terracotta-300"
@@ -117,15 +124,15 @@ export default function AddCookedDishDialog() {
               <Input
                 placeholder="Search dishes..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
-            
+
             {searchQuery && filteredDishes.length > 0 && !selectedDish && (
               <div className="border rounded-md mt-1 max-h-[200px] overflow-y-auto">
-                {filteredDishes.map((dish) => (
-                  <div 
+                {filteredDishes.map(dish => (
+                  <div
                     key={dish.id}
                     className="px-3 py-2 hover:bg-muted cursor-pointer border-b last:border-b-0"
                     onClick={() => handleSelectDish(dish)}
@@ -138,14 +145,14 @@ export default function AddCookedDishDialog() {
                 ))}
               </div>
             )}
-            
+
             {searchQuery && filteredDishes.length === 0 && (
               <div className="text-sm text-muted-foreground mt-1">
                 No dishes found matching "{searchQuery}"
               </div>
             )}
           </div>
-          
+
           {selectedDish && (
             <>
               <div className="grid gap-2">
@@ -181,7 +188,7 @@ export default function AddCookedDishDialog() {
                   id="notes"
                   placeholder="Any variations or notes about this meal..."
                   value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  onChange={e => setNotes(e.target.value)}
                 />
               </div>
             </>
@@ -191,7 +198,7 @@ export default function AddCookedDishDialog() {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleCook}
             className="bg-terracotta-500 hover:bg-terracotta-600"
             disabled={!selectedDish}

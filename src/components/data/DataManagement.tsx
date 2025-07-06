@@ -1,9 +1,14 @@
-
 import { Separator } from "@/components/ui/separator";
 import { JSONExport } from "./JSONExport";
 import { JSONImport } from "./JSONImport";
 import { ClearDataDialog } from "@/components/dialogs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 export function DataManagement() {
   return (
@@ -23,7 +28,7 @@ export function DataManagement() {
             </p>
             <JSONExport />
           </div>
-          
+
           <div className="space-y-4 border rounded-lg p-4 bg-slate-50 dark:bg-slate-950">
             <h3 className="text-lg font-medium">Import Data</h3>
             <p className="text-sm text-muted-foreground">

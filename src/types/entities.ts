@@ -1,9 +1,9 @@
 /**
  * Unified Entity Type Definitions
- * 
+ *
  * This file serves as the single source of truth for all application entity types.
  * These types represent the canonical structure used throughout the application layer.
- * 
+ *
  * Naming Convention:
  * - camelCase for all field names
  * - Consistent field naming patterns across entities
@@ -24,9 +24,9 @@ export interface DishEntity {
 
 // Extended dish with computed fields from meal history
 export interface Dish extends DishEntity {
-  lastMade?: string;      // Computed from meal_history
-  timesCooked: number;    // Computed from meal_history
-  lastComment?: string;   // Computed from meal_history
+  lastMade?: string; // Computed from meal_history
+  timesCooked: number; // Computed from meal_history
+  lastComment?: string; // Computed from meal_history
 }
 
 export interface MealHistoryEntity {
@@ -43,7 +43,7 @@ export type MealHistory = MealHistoryEntity;
 export interface SourceEntity {
   id: string;
   name: string;
-  type: 'book' | 'website';
+  type: "book" | "website";
   description?: string;
   url?: string;
   createdAt: string;
@@ -79,29 +79,29 @@ export interface ProfileEntity {
 export type Profile = ProfileEntity;
 
 // Type definitions
-export type TagCategory = 'cuisine' | 'general';
+export type TagCategory = "cuisine" | "general";
 
-export type CuisineType = 
-  | 'Italian' 
-  | 'Mexican' 
-  | 'American' 
-  | 'Asian' 
-  | 'Mediterranean' 
-  | 'Indian' 
-  | 'French'
-  | 'Greek'
-  | 'Thai'
-  | 'Japanese'
-  | 'Chinese'
-  | 'Korean'
-  | 'Middle Eastern'
-  | 'Vietnamese'
-  | 'Spanish'
-  | 'Caribbean'
-  | 'German'
-  | 'British'
-  | 'Fusion'
-  | 'Other';
+export type CuisineType =
+  | "Italian"
+  | "Mexican"
+  | "American"
+  | "Asian"
+  | "Mediterranean"
+  | "Indian"
+  | "French"
+  | "Greek"
+  | "Thai"
+  | "Japanese"
+  | "Chinese"
+  | "Korean"
+  | "Middle Eastern"
+  | "Vietnamese"
+  | "Spanish"
+  | "Caribbean"
+  | "German"
+  | "British"
+  | "Fusion"
+  | "Other";
 
 // Composite types for complex operations
 export interface MealHistoryWithDish extends MealHistoryEntity {
@@ -131,25 +131,21 @@ export const FIELD_MAPPING_CONVENTIONS = {
    * - Application: Always 'id'
    * - Database: Usually 'id', except for foreign keys
    */
-  
   /**
    * User Reference Fields:
-   * - Application: Always 'userId' 
+   * - Application: Always 'userId'
    * - Database: Always 'user_id'
    */
-  
   /**
    * Foreign Key Fields:
    * - Application: entityName + 'Id' (e.g., 'sourceId', 'dishId')
    * - Database: Usually entityname + 'id' (e.g., 'source_id', 'dishid')
    */
-  
   /**
    * Timestamp Fields:
    * - Application: Always camelCase (e.g., 'createdAt', 'updatedAt')
    * - Database: Always snake_case (e.g., 'created_at', 'updated_at')
    */
-  
   /**
    * Optional Fields:
    * - Application: Use undefined for missing values

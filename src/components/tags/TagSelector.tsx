@@ -3,8 +3,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Check, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries, useTagMutations } from "@/hooks/tags";
@@ -25,7 +36,7 @@ export const TagSelector = ({
   onTagsChange,
   placeholder = "Select tags...",
   className,
-  category = 'general',
+  category = "general",
   maxSelection,
 }: TagSelectorProps) => {
   const [open, setOpen] = useState(false);
@@ -34,7 +45,7 @@ export const TagSelector = ({
 
   const { useTagsByCategory } = useTagQueries();
   const { createTag } = useTagMutations();
-  
+
   const { data: availableTags = [], isLoading } = useTagsByCategory(category);
 
   const handleTagSelect = (tagName: string) => {
@@ -57,13 +68,13 @@ export const TagSelector = ({
 
   const handleCreateTag = async () => {
     if (!newTagName.trim()) return;
-    
+
     try {
       await createTag.mutateAsync({
         name: newTagName.trim(),
-        category: category,
+        category,
       });
-      
+
       // Add the new tag to selected tags
       if (maxSelection === 1) {
         onTagsChange([newTagName.trim()]);
@@ -77,16 +88,18 @@ export const TagSelector = ({
     }
   };
 
-  const unselectedTags = availableTags.filter(tag => !selectedTags.includes(tag.name));
+  const unselectedTags = availableTags.filter(
+    tag => !selectedTags.includes(tag.name)
+  );
 
   return (
     <div className={cn("space-y-2", className)}>
       <Label>Tags</Label>
-      
+
       {/* Selected Tags Display */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {selectedTags.map((tag) => (
+          {selectedTags.map(tag => (
             <TagBadge
               key={tag}
               tag={tag}
@@ -116,7 +129,9 @@ export const TagSelector = ({
             <CommandList>
               <CommandEmpty>
                 <div className="p-2">
-                  <p className="text-sm text-muted-foreground mb-2">No tags found.</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    No tags found.
+                  </p>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -128,7 +143,7 @@ export const TagSelector = ({
                   </Button>
                 </div>
               </CommandEmpty>
-              
+
               {/* Create New Tag Section */}
               {(isCreating || unselectedTags.length === 0) && (
                 <div className="p-2 border-b">
@@ -136,8 +151,8 @@ export const TagSelector = ({
                     <Input
                       placeholder="New tag name..."
                       value={newTagName}
-                      onChange={(e) => setNewTagName(e.target.value)}
-                      onKeyDown={(e) => {
+                      onChange={e => setNewTagName(e.target.value)}
+                      onKeyDown={e => {
                         if (e.key === "Enter") {
                           e.preventDefault();
                           handleCreateTag();
@@ -163,7 +178,7 @@ export const TagSelector = ({
               {/* Existing Tags */}
               {unselectedTags.length > 0 && (
                 <CommandGroup>
-                  {unselectedTags.map((tag) => (
+                  {unselectedTags.map(tag => (
                     <CommandItem
                       key={tag.id}
                       value={tag.name}
@@ -175,7 +190,9 @@ export const TagSelector = ({
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          selectedTags.includes(tag.name) ? "opacity-100" : "opacity-0"
+                          selectedTags.includes(tag.name)
+                            ? "opacity-100"
+                            : "opacity-0"
                         )}
                       />
                       {tag.name}

@@ -1,13 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Calendar, 
-  List, 
-  Settings,
-  Utensils 
-} from "lucide-react";
+import { Calendar, List, Settings, Utensils } from "lucide-react";
 import { AddCookedDishDialog } from "@/components/dialogs";
 import { PWAInstallButton } from "@/components/shared";
 
@@ -19,7 +13,7 @@ const Header = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -29,24 +23,28 @@ const Header = () => {
   };
 
   return (
-    <header className={`sticky top-0 z-10 transition-all duration-300 ${
-      scrolled ? "py-2 glass shadow-md" : "py-4"
-    }`}>
+    <header
+      className={`sticky top-0 z-10 transition-all duration-300 ${
+        scrolled ? "py-2 glass shadow-md" : "py-4"
+      }`}
+    >
       <div className="container px-4 mx-auto">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Utensils className="w-8 h-8 text-terracotta-500" />
-            <h1 className="text-xl md:text-2xl font-serif tracking-tight">Menu Maker</h1>
+            <h1 className="text-xl md:text-2xl font-serif tracking-tight">
+              Menu Maker
+            </h1>
           </Link>
-          
+
           <nav className="flex items-center space-x-1 sm:space-x-2">
             <Link to="/">
-              <Button 
-                variant={isActive("/") ? "secondary" : "ghost"} 
-                size="sm" 
+              <Button
+                variant={isActive("/") ? "secondary" : "ghost"}
+                size="sm"
                 className={`transition-all duration-300 ${
-                  isActive("/") 
-                    ? "bg-terracotta-100 text-terracotta-500" 
+                  isActive("/")
+                    ? "bg-terracotta-100 text-terracotta-500"
                     : "hover:bg-terracotta-50 hover:text-terracotta-500"
                 }`}
               >
@@ -54,14 +52,14 @@ const Header = () => {
                 <span className="hidden sm:inline">Dashboard</span>
               </Button>
             </Link>
-            
+
             <Link to="/weekly-menu">
-              <Button 
-                variant={isActive("/weekly-menu") ? "secondary" : "ghost"} 
+              <Button
+                variant={isActive("/weekly-menu") ? "secondary" : "ghost"}
                 size="sm"
                 className={`transition-all duration-300 ${
-                  isActive("/weekly-menu") 
-                    ? "bg-terracotta-100 text-terracotta-500" 
+                  isActive("/weekly-menu")
+                    ? "bg-terracotta-100 text-terracotta-500"
                     : "hover:bg-terracotta-50 hover:text-terracotta-500"
                 }`}
               >
@@ -69,14 +67,14 @@ const Header = () => {
                 <span className="hidden sm:inline">Weekly Menu</span>
               </Button>
             </Link>
-            
+
             <Link to="/all-meals">
-              <Button 
-                variant={isActive("/all-meals") ? "secondary" : "ghost"} 
+              <Button
+                variant={isActive("/all-meals") ? "secondary" : "ghost"}
                 size="sm"
                 className={`transition-all duration-300 ${
-                  isActive("/all-meals") 
-                    ? "bg-terracotta-100 text-terracotta-500" 
+                  isActive("/all-meals")
+                    ? "bg-terracotta-100 text-terracotta-500"
                     : "hover:bg-terracotta-50 hover:text-terracotta-500"
                 }`}
               >
@@ -84,18 +82,18 @@ const Header = () => {
                 <span className="hidden sm:inline">All Dishes</span>
               </Button>
             </Link>
-            
+
             <AddCookedDishDialog />
-            
+
             <PWAInstallButton />
-            
+
             <Link to="/settings">
-              <Button 
-                variant={isActive("/settings") ? "secondary" : "ghost"} 
+              <Button
+                variant={isActive("/settings") ? "secondary" : "ghost"}
                 size="sm"
                 className={`transition-all duration-300 ${
-                  isActive("/settings") 
-                    ? "bg-terracotta-100 text-terracotta-500" 
+                  isActive("/settings")
+                    ? "bg-terracotta-100 text-terracotta-500"
                     : "hover:bg-terracotta-50 hover:text-terracotta-500"
                 }`}
               >

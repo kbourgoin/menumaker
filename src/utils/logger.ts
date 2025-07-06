@@ -1,12 +1,12 @@
 /**
  * Environment-Aware Logging Utility
- * 
+ *
  * Provides structured logging that respects environment settings.
  * In production, only critical errors and warnings are logged.
  * In development, all logging levels are available.
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LogEntry {
   level: LogLevel;
@@ -18,8 +18,12 @@ interface LogEntry {
 
 class Logger {
   // Check environment dynamically instead of caching at instantiation
-  private get isDevelopment() { return import.meta.env.DEV; }
-  private get isTest() { return import.meta.env.MODE === 'test'; }
+  private get isDevelopment() {
+    return import.meta.env.DEV;
+  }
+  private get isTest() {
+    return import.meta.env.MODE === "test";
+  }
 
   /**
    * Debug logging - only in development
@@ -27,7 +31,7 @@ class Logger {
    */
   debug(message: string, context?: string, data?: unknown): void {
     if (this.isDevelopment && !this.isTest) {
-      this.log('debug', message, context, data);
+      this.log("debug", message, context, data);
     }
   }
 
@@ -37,7 +41,7 @@ class Logger {
    */
   info(message: string, context?: string, data?: unknown): void {
     if (this.isDevelopment && !this.isTest) {
-      this.log('info', message, context, data);
+      this.log("info", message, context, data);
     }
   }
 
@@ -46,7 +50,7 @@ class Logger {
    * Use for non-critical issues that should be monitored
    */
   warn(message: string, context?: string, data?: unknown): void {
-    this.log('warn', message, context, data);
+    this.log("warn", message, context, data);
   }
 
   /**
@@ -54,7 +58,7 @@ class Logger {
    * Use for errors that need immediate attention
    */
   error(message: string, context?: string, data?: unknown): void {
-    this.log('error', message, context, data);
+    this.log("error", message, context, data);
   }
 
   /**
@@ -63,8 +67,10 @@ class Logger {
    */
   performance(message: string, duration?: number, context?: string): void {
     if (this.isDevelopment && !this.isTest) {
-      const perfMessage = duration ? `${message} (${duration.toFixed(2)}ms)` : message;
-      this.log('info', `📊 ${perfMessage}`, context);
+      const perfMessage = duration
+        ? `${message} (${duration.toFixed(2)}ms)`
+        : message;
+      this.log("info", `📊 ${perfMessage}`, context);
     }
   }
 
@@ -74,10 +80,10 @@ class Logger {
    */
   migration(message: string, context?: string, data?: unknown): void {
     if (this.isDevelopment) {
-      this.log('info', `🔄 Migration: ${message}`, context, data);
+      this.log("info", `🔄 Migration: ${message}`, context, data);
     } else {
       // In production, only log migration errors/warnings
-      if (message.includes('error') || message.includes('failed')) {
+      if (message.includes("error") || message.includes("failed")) {
         this.error(message, context, data);
       }
     }
@@ -89,7 +95,7 @@ class Logger {
    */
   operation(message: string, context?: string): void {
     if (this.isDevelopment && !this.isTest) {
-      this.log('info', `⚙️ ${message}`, context);
+      this.log("info", `⚙️ ${message}`, context);
     }
     // In production, these should be user-facing notifications, not console logs
   }
@@ -100,42 +106,47 @@ class Logger {
    */
   auth(message: string, context?: string): void {
     if (this.isDevelopment && !this.isTest) {
-      this.log('info', `🔐 Auth: ${message}`, context);
+      this.log("info", `🔐 Auth: ${message}`, context);
     }
     // In production, auth events should go to security monitoring, not console
   }
 
-  private log(level: LogLevel, message: string, context?: string, data?: unknown): void {
+  private log(
+    level: LogLevel,
+    message: string,
+    context?: string,
+    data?: unknown
+  ): void {
     const timestamp = new Date().toISOString();
-    const contextInfo = context ? ` [${context}]` : '';
+    const contextInfo = context ? ` [${context}]` : "";
     const fullMessage = `${message}${contextInfo}`;
 
     switch (level) {
-      case 'debug':
+      case "debug":
         if (data !== undefined) {
           console.log(fullMessage, data);
         } else {
           console.log(fullMessage);
         }
         break;
-        
-      case 'info':
+
+      case "info":
         if (data !== undefined) {
           console.info(fullMessage, data);
         } else {
           console.info(fullMessage);
         }
         break;
-        
-      case 'warn':
+
+      case "warn":
         if (data !== undefined) {
           console.warn(fullMessage, data);
         } else {
           console.warn(fullMessage);
         }
         break;
-        
-      case 'error':
+
+      case "error":
         if (data !== undefined) {
           console.error(fullMessage, data);
         } else {
@@ -165,7 +176,7 @@ export const devConsole = {
   info: logger.info.bind(logger),
   warn: logger.warn.bind(logger),
   error: logger.error.bind(logger),
-  debug: logger.debug.bind(logger)
+  debug: logger.debug.bind(logger),
 };
 
 /**
@@ -177,22 +188,22 @@ export const conditionalLog = {
    * Log only in development
    */
   dev: (message: string, ...args: unknown[]) => {
-    if (import.meta.env.DEV && import.meta.env.MODE !== 'test') {
+    if (import.meta.env.DEV && import.meta.env.MODE !== "test") {
       console.log(message, ...args);
     }
   },
-  
+
   /**
    * Always log errors
    */
   error: (message: string, ...args: unknown[]) => {
     console.error(message, ...args);
   },
-  
+
   /**
    * Always log warnings
    */
   warn: (message: string, ...args: unknown[]) => {
     console.warn(message, ...args);
-  }
+  },
 };

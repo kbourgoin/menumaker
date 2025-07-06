@@ -1,4 +1,3 @@
-
 import { Book } from "lucide-react";
 
 const CookbookEmptyState = () => {

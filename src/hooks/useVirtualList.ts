@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface VirtualListOptions {
   itemHeight: number;
@@ -32,8 +32,8 @@ export function useVirtualList<T>(
   useEffect(() => {
     const element = scrollElementRef.current;
     if (element) {
-      element.addEventListener('scroll', handleScroll);
-      return () => element.removeEventListener('scroll', handleScroll);
+      element.addEventListener("scroll", handleScroll);
+      return () => element.removeEventListener("scroll", handleScroll);
     }
   }, [handleScroll]);
 
@@ -51,7 +51,7 @@ export function useVirtualList<T>(
     virtualItems.push({
       index: i,
       style: {
-        position: 'absolute' as const,
+        position: "absolute" as const,
         top: i * itemHeight,
         left: 0,
         right: 0,

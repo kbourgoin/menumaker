@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useDishes } from "@/hooks/useMeals";
@@ -17,7 +16,11 @@ import StatsCard from "@/components/dashboard/StatsCard";
 
 const Home = () => {
   const { dishes, isLoading: dishesLoading, error: dishesError } = useDishes();
-  const { getTodaysMeals, getUpcomingMeals, isLoading: mealHistoryLoading } = useMealHistoryByDate();
+  const {
+    getTodaysMeals,
+    getUpcomingMeals,
+    isLoading: mealHistoryLoading,
+  } = useMealHistoryByDate();
   const { stats, isLoading: statsLoading } = useStats();
   const { toast } = useToast();
 
@@ -31,11 +34,11 @@ const Home = () => {
   if (dishesError && !isLoading) {
     return (
       <Layout>
-        <SEOHead {...getPageSEO('home')} />
-        <ErrorFallback 
+        <SEOHead {...getPageSEO("home")} />
+        <ErrorFallback
           error={dishesError}
           onRetry={() => window.location.reload()}
-          onGoHome={() => window.location.href = '/'}
+          onGoHome={() => (window.location.href = "/")}
           context="dashboard"
         />
       </Layout>
@@ -44,18 +47,18 @@ const Home = () => {
 
   return (
     <Layout>
-      <SEOHead {...getPageSEO('home')} />
+      <SEOHead {...getPageSEO("home")} />
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Show error message for non-critical errors */}
         {dishesError && isNetworkError(dishesError) && (
-          <ErrorMessage 
+          <ErrorMessage
             error={dishesError}
             onRetry={() => window.location.reload()}
             onDismiss={() => {
               // In a real app, you might want to retry the specific query
               toast({
                 title: "Error dismissed",
-                description: "Some data may be incomplete."
+                description: "Some data may be incomplete.",
               });
             }}
             compact
@@ -63,17 +66,11 @@ const Home = () => {
         )}
 
         {/* Today's Menu - Hero Card */}
-        <TodaysMenu 
-          todaysDishes={todaysDishes}
-          isLoading={isLoading}
-        />
-        
+        <TodaysMenu todaysDishes={todaysDishes} isLoading={isLoading} />
+
         {/* Secondary Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ComingUp 
-            upcomingDishes={upcomingDishes}
-            isLoading={isLoading}
-          />
+          <ComingUp upcomingDishes={upcomingDishes} isLoading={isLoading} />
           <StatsCard stats={stats} isLoading={statsLoading} />
         </div>
       </div>

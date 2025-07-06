@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,33 +20,33 @@ interface LoginFormProps {
   onForgotPassword: () => void;
 }
 
-const LoginForm = ({ 
-  loading, 
-  setLoading, 
-  showPassword, 
-  setShowPassword, 
-  formData, 
+const LoginForm = ({
+  loading,
+  setLoading,
+  showPassword,
+  setShowPassword,
+  formData,
   handleInputChange,
-  onForgotPassword
+  onForgotPassword,
 }: LoginFormProps) => {
-  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       if (error) throw error;
-      
+
       // Navigate happens automatically via the auth state change listener
     } catch (error: unknown) {
       console.error("Login error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to log in";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to log in";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -73,13 +72,13 @@ const LoginForm = ({
             />
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Button 
-              type="button" 
-              variant="link" 
+            <Button
+              type="button"
+              variant="link"
               className="px-0 text-xs font-normal text-terracotta-600 hover:text-terracotta-700"
               onClick={onForgotPassword}
             >
@@ -117,10 +116,10 @@ const LoginForm = ({
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="flex flex-col">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full bg-terracotta-500 hover:bg-terracotta-600"
           disabled={loading}
         >

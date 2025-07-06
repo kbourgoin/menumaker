@@ -1,4 +1,3 @@
-
 import { CardContent } from "@/components/ui/card";
 import CuisinesList from "./CuisinesList";
 import CookingInfo from "./CookingInfo";
@@ -18,15 +17,15 @@ interface DishCardContentProps {
   tags?: string[];
 }
 
-const DishCardContent = ({ 
-  cuisines, 
-  lastMade, 
-  timesCooked, 
-  sourceId, 
-  location, 
+const DishCardContent = ({
+  cuisines,
+  lastMade,
+  timesCooked,
+  sourceId,
+  location,
   compact = false,
   lastComment,
-  tags = []
+  tags = [],
 }: DishCardContentProps) => {
   const { navigateToTag } = useTagNavigation();
 
@@ -39,27 +38,27 @@ const DishCardContent = ({
     <CardContent className={`${compact ? "pb-2 px-4" : "pb-6"} flex-grow`}>
       <div className="space-y-3">
         <CuisinesList cuisines={cuisines || []} compact={compact} />
-        
+
         {generalTags && generalTags.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {generalTags.map((tag) => (
-              <TagBadge 
-                key={tag} 
-                tag={tag} 
-                variant="outline" 
-                clickable 
+            {generalTags.map(tag => (
+              <TagBadge
+                key={tag}
+                tag={tag}
+                variant="outline"
+                clickable
                 onClick={() => navigateToTag(tag)}
               />
             ))}
           </div>
         )}
-        
-        <CookingInfo 
-          lastMade={lastMade} 
-          timesCooked={timesCooked || 0} 
-          compact={compact} 
+
+        <CookingInfo
+          lastMade={lastMade}
+          timesCooked={timesCooked || 0}
+          compact={compact}
         />
-        
+
         {lastComment && (
           <div className="mt-2">
             <p className="text-sm text-muted-foreground italic break-words">
@@ -67,7 +66,7 @@ const DishCardContent = ({
             </p>
           </div>
         )}
-        
+
         <SourceInfo sourceId={sourceId} location={location} />
       </div>
     </CardContent>

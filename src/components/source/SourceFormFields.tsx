@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,13 +11,15 @@ import {
 
 interface SourceFormData {
   name: string;
-  type: 'book' | 'website';
+  type: "book" | "website";
   description: string;
 }
 
 interface SourceFormFieldsProps {
   formData: SourceFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   handleTypeChange: (value: string) => void;
 }
 
@@ -40,15 +41,12 @@ const SourceFormFields: React.FC<SourceFormFieldsProps> = ({
           onChange={handleInputChange}
         />
       </div>
-      
+
       <div className="space-y-2">
         <label htmlFor="edit-type" className="text-sm font-medium">
           Type <span className="text-red-500">*</span>
         </label>
-        <Select
-          value={formData.type}
-          onValueChange={handleTypeChange}
-        >
+        <Select value={formData.type} onValueChange={handleTypeChange}>
           <SelectTrigger id="edit-type">
             <SelectValue placeholder="Select source type" />
           </SelectTrigger>
@@ -58,7 +56,7 @@ const SourceFormFields: React.FC<SourceFormFieldsProps> = ({
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
         <label htmlFor="edit-description" className="text-sm font-medium">
           Description

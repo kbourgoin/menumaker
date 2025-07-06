@@ -1,10 +1,9 @@
-
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { SortAsc, SortDesc } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,17 +15,17 @@ interface SortSelectProps {
 
 const SortSelect = ({ sortOption, setSortOption }: SortSelectProps) => {
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
-  
+
   // Extract the base sort option without any asc_ prefix
   const baseSortOption = sortOption.replace(/^asc_/, "");
-  
+
   // Handle selection changes
   const handleSortChange = (newOption: string) => {
     // If selecting the same option that's currently active, toggle direction
     if (newOption === baseSortOption) {
       const newDirection = direction === "asc" ? "desc" : "asc";
       setDirection(newDirection);
-      
+
       // Apply direction to the sort option
       setSortOption(newDirection === "asc" ? `asc_${newOption}` : newOption);
     } else {
@@ -34,7 +33,7 @@ const SortSelect = ({ sortOption, setSortOption }: SortSelectProps) => {
       setSortOption(direction === "asc" ? `asc_${newOption}` : newOption);
     }
   };
-  
+
   // Update the local direction state when sortOption changes externally
   useEffect(() => {
     if (sortOption.startsWith("asc_")) {
@@ -43,7 +42,7 @@ const SortSelect = ({ sortOption, setSortOption }: SortSelectProps) => {
       setDirection("desc");
     }
   }, [sortOption]);
-  
+
   return (
     <Select value={baseSortOption} onValueChange={handleSortChange}>
       <SelectTrigger>

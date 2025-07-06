@@ -1,13 +1,12 @@
-
 import React from "react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
   DialogFooter,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useClearData } from "@/hooks/data/useClearData";
@@ -23,7 +22,7 @@ export function ClearDataDialog() {
       setIsClearing(true);
       // Clear data from Supabase
       const result = await clearData();
-      
+
       if (result.success) {
         setOpen(false);
         toast.success("All data has been cleared from the database");
@@ -48,17 +47,17 @@ export function ClearDataDialog() {
         <DialogHeader>
           <DialogTitle>Clear All Data</DialogTitle>
           <DialogDescription>
-            This will delete all dishes, meal history, and sources from the database.
-            This action cannot be undone.
+            This will delete all dishes, meal history, and sources from the
+            database. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleClearData} 
+          <Button
+            variant="destructive"
+            onClick={handleClearData}
             disabled={isClearing}
           >
             {isClearing ? "Clearing..." : "Clear All Data"}

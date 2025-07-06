@@ -1,4 +1,3 @@
-
 import { TableHeader as UITableHeader, TableRow } from "@/components/ui/table";
 import TableColumnHeader from "./TableColumnHeader";
 import { Column, SortDirection } from "./types";
@@ -9,16 +8,16 @@ interface DishTableHeaderProps {
   onSort: (column: Column) => void;
 }
 
-const DishTableHeader = ({ 
-  currentSortColumn, 
-  sortDirection, 
-  onSort 
+const DishTableHeader = ({
+  currentSortColumn,
+  sortDirection,
+  onSort,
 }: DishTableHeaderProps) => {
   return (
     <UITableHeader>
       <TableRow>
-        <TableColumnHeader 
-          column="name" 
+        <TableColumnHeader
+          column="name"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
           onSort={onSort}
@@ -26,9 +25,9 @@ const DishTableHeader = ({
         >
           Name
         </TableColumnHeader>
-        
-        <TableColumnHeader 
-          column="source" 
+
+        <TableColumnHeader
+          column="source"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
           onSort={onSort}
@@ -36,18 +35,18 @@ const DishTableHeader = ({
         >
           Source
         </TableColumnHeader>
-        
-        <TableColumnHeader 
-          column="cuisine" 
+
+        <TableColumnHeader
+          column="cuisine"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
           onSort={onSort}
         >
           Cuisine & Tags
         </TableColumnHeader>
-        
-        <TableColumnHeader 
-          column="timesCooked" 
+
+        <TableColumnHeader
+          column="timesCooked"
           className="text-right"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
@@ -55,18 +54,18 @@ const DishTableHeader = ({
         >
           Times Made
         </TableColumnHeader>
-        
-        <TableColumnHeader 
-          column="lastMade" 
+
+        <TableColumnHeader
+          column="lastMade"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
           onSort={onSort}
         >
           Last Made
         </TableColumnHeader>
-        
-        <TableColumnHeader 
-          column="comment" 
+
+        <TableColumnHeader
+          column="comment"
           currentSort={currentSortColumn}
           sortDirection={sortDirection}
           onSort={onSort}

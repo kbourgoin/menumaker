@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Column, SortDirection } from "./types";
 
@@ -8,34 +7,40 @@ const columnToSortMap: Record<Column, string> = {
   cuisine: "cuisine",
   timesCooked: "timesCooked",
   lastMade: "lastCooked",
-  comment: "lastComment"
+  comment: "lastComment",
 };
 
-export const useTableSort = (sortOption: string, setSortOption: (option: string) => void) => {
+export const useTableSort = (
+  sortOption: string,
+  setSortOption: (option: string) => void
+) => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  
+
   // Determine current sort column from sortOption
   const getCurrentSortColumn = (): Column => {
     const baseSort = sortOption.replace(/^asc_/, "");
     // Find the column key that maps to this sort option
-    return (Object.entries(columnToSortMap) as [Column, string][])
-      .find(([, value]) => value === baseSort)?.[0] || "name";
+    return (
+      (Object.entries(columnToSortMap) as [Column, string][]).find(
+        ([, value]) => value === baseSort
+      )?.[0] || "name"
+    );
   };
-  
+
   // Handle the sort when a column header is clicked
   const handleSort = (column: Column) => {
     const sortKey = columnToSortMap[column];
-    
+
     if (sortOption === sortKey) {
       // If already sorting by this column, toggle direction
-      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+      setSortDirection(prev => (prev === "asc" ? "desc" : "asc"));
     } else {
       // If sorting by a new column, set it and reset direction to desc
       setSortOption(sortKey);
       setSortDirection("desc");
     }
   };
-  
+
   // Update external sort when direction changes
   useEffect(() => {
     // This is a bit of a hack - we're using the same sortOption state from the parent
@@ -48,7 +53,7 @@ export const useTableSort = (sortOption: string, setSortOption: (option: string)
       setSortOption(sortOption.replace(/^asc_/, ""));
     }
   }, [sortDirection, sortOption, setSortOption]);
-  
+
   // Determine current sort direction
   useEffect(() => {
     if (sortOption.startsWith("asc_")) {
@@ -57,10 +62,10 @@ export const useTableSort = (sortOption: string, setSortOption: (option: string)
       setSortDirection("desc");
     }
   }, [sortOption]);
-  
+
   return {
     sortDirection,
     currentSortColumn: getCurrentSortColumn(),
-    handleSort
+    handleSort,
   };
 };

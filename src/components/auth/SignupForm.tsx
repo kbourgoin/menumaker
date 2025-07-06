@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,40 +21,42 @@ interface SignupFormProps {
   setActiveTab: (tab: "login" | "signup") => void;
 }
 
-const SignupForm = ({ 
-  loading, 
-  setLoading, 
-  showPassword, 
-  setShowPassword, 
-  formData, 
+const SignupForm = ({
+  loading,
+  setLoading,
+  showPassword,
+  setShowPassword,
+  formData,
   handleInputChange,
-  setActiveTab
+  setActiveTab,
 }: SignupFormProps) => {
-  
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    
+
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       if (error) throw error;
-      
-      toast.success("Account created successfully! Check your email for confirmation.");
+
+      toast.success(
+        "Account created successfully! Check your email for confirmation."
+      );
       setActiveTab("login");
     } catch (error: unknown) {
       console.error("Signup error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create account";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create account";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -81,7 +82,7 @@ const SignupForm = ({
             />
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="signup-password">Password</Label>
           <div className="relative">
@@ -111,7 +112,7 @@ const SignupForm = ({
             </Button>
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="confirm-password">Confirm Password</Label>
           <div className="relative">
@@ -129,16 +130,16 @@ const SignupForm = ({
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="flex flex-col">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full bg-terracotta-500 hover:bg-terracotta-600"
           disabled={loading}
         >
           {loading ? "Creating Account..." : "Create Account"}
         </Button>
-        
+
         <div className="mt-4 text-center text-sm text-muted-foreground">
           By signing up, you agree to our Terms of Service and Privacy Policy.
         </div>

@@ -1,10 +1,10 @@
 // Error message component for displaying hook errors in UI
-import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw, X } from 'lucide-react';
-import { AppError } from '@/types/errors';
-import { getErrorTitle, getErrorActions } from '@/utils/errorMessages';
+import React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, RefreshCw, X } from "lucide-react";
+import { AppError } from "@/types/errors";
+import { getErrorTitle, getErrorActions } from "@/utils/errorMessages";
 
 interface ErrorMessageProps {
   error: AppError;
@@ -14,12 +14,12 @@ interface ErrorMessageProps {
   compact?: boolean;
 }
 
-export function ErrorMessage({ 
-  error, 
-  onRetry, 
-  onDismiss, 
-  className = '',
-  compact = false 
+export function ErrorMessage({
+  error,
+  onRetry,
+  onDismiss,
+  className = "",
+  compact = false,
 }: ErrorMessageProps) {
   const errorTitle = getErrorTitle(error.type);
   const suggestedActions = getErrorActions(error.type);
@@ -75,7 +75,7 @@ export function ErrorMessage({
       </AlertTitle>
       <AlertDescription className="space-y-3">
         <p>{error.userMessage}</p>
-        
+
         {suggestedActions.length > 0 && (
           <div>
             <p className="text-sm font-medium mb-2">What you can do:</p>
@@ -90,7 +90,7 @@ export function ErrorMessage({
           </div>
         )}
 
-        {(error.retryable && onRetry) && (
+        {error.retryable && onRetry && (
           <div className="flex gap-2 pt-2">
             <Button
               variant="outline"
@@ -115,9 +115,15 @@ interface InlineErrorProps {
   className?: string;
 }
 
-export function InlineError({ error, onRetry, className = '' }: InlineErrorProps) {
+export function InlineError({
+  error,
+  onRetry,
+  className = "",
+}: InlineErrorProps) {
   return (
-    <div className={`flex items-center gap-2 text-sm text-destructive ${className}`}>
+    <div
+      className={`flex items-center gap-2 text-sm text-destructive ${className}`}
+    >
       <AlertTriangle className="h-4 w-4 flex-shrink-0" />
       <span className="flex-1">{error.userMessage}</span>
       {error.retryable && onRetry && (
@@ -142,11 +148,11 @@ interface ErrorFallbackProps {
   context?: string;
 }
 
-export function ErrorFallback({ 
-  error, 
-  onRetry, 
+export function ErrorFallback({
+  error,
+  onRetry,
   onGoHome,
-  context = 'page'
+  context = "page",
 }: ErrorFallbackProps) {
   const errorTitle = getErrorTitle(error.type);
   const suggestedActions = getErrorActions(error.type);
@@ -157,15 +163,19 @@ export function ErrorFallback({
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
           <AlertTriangle className="h-8 w-8 text-destructive" />
         </div>
-        
+
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-foreground">{errorTitle}</h2>
+          <h2 className="text-2xl font-semibold text-foreground">
+            {errorTitle}
+          </h2>
           <p className="text-muted-foreground">{error.userMessage}</p>
         </div>
 
         {suggestedActions.length > 0 && (
           <div className="text-left">
-            <p className="text-sm font-medium text-muted-foreground mb-2">What you can do:</p>
+            <p className="text-sm font-medium text-muted-foreground mb-2">
+              What you can do:
+            </p>
             <ul className="text-sm text-muted-foreground space-y-1">
               {suggestedActions.map((action, index) => (
                 <li key={index} className="flex items-center">
@@ -185,21 +195,35 @@ export function ErrorFallback({
             </Button>
           )}
           {onGoHome && (
-            <Button variant="outline" onClick={onGoHome} className="min-w-[120px]">
+            <Button
+              variant="outline"
+              onClick={onGoHome}
+              className="min-w-[120px]"
+            >
               Go Home
             </Button>
           )}
         </div>
 
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <details className="text-left text-xs text-muted-foreground">
             <summary className="cursor-pointer font-medium">Debug Info</summary>
             <div className="mt-2 space-y-1">
-              <p><strong>Context:</strong> {context}</p>
-              <p><strong>Type:</strong> {error.type}</p>
-              <p><strong>Severity:</strong> {error.severity}</p>
-              <p><strong>Retryable:</strong> {error.retryable ? 'Yes' : 'No'}</p>
-              <p><strong>Time:</strong> {error.timestamp.toLocaleString()}</p>
+              <p>
+                <strong>Context:</strong> {context}
+              </p>
+              <p>
+                <strong>Type:</strong> {error.type}
+              </p>
+              <p>
+                <strong>Severity:</strong> {error.severity}
+              </p>
+              <p>
+                <strong>Retryable:</strong> {error.retryable ? "Yes" : "No"}
+              </p>
+              <p>
+                <strong>Time:</strong> {error.timestamp.toLocaleString()}
+              </p>
             </div>
           </details>
         )}

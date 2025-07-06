@@ -1,8 +1,25 @@
 import { useState } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
@@ -42,7 +59,10 @@ const cuisineColors: Record<string, string> = {
   Other: "bg-stone-50 text-stone-700 border-stone-200",
 };
 
-const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelectorProps) => {
+const CuisineTagSelector = ({
+  form,
+  fieldName = "cuisines",
+}: CuisineTagSelectorProps) => {
   const { useCuisineTags } = useTagQueries();
   const { createTag } = useTagMutations();
   const [open, setOpen] = useState(false);
@@ -60,14 +80,16 @@ const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelector
 
   const handleCreateCuisine = async () => {
     if (!newCuisineName.trim()) return;
-    
+
     try {
       await createTag.mutateAsync({
         name: newCuisineName.trim(),
-        category: 'cuisine',
-        color: cuisineColors[newCuisineName.trim()] || "bg-gray-100 text-gray-800 border-gray-200",
+        category: "cuisine",
+        color:
+          cuisineColors[newCuisineName.trim()] ||
+          "bg-gray-100 text-gray-800 border-gray-200",
       });
-      
+
       // Set the new cuisine as selected
       form.setValue(fieldName, [newCuisineName.trim()]);
       setNewCuisineName("");
@@ -107,7 +129,9 @@ const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelector
                 <CommandInput placeholder="Search cuisine..." />
                 <CommandEmpty>
                   <div className="p-2">
-                    <p className="text-sm text-muted-foreground mb-2">No cuisine found.</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      No cuisine found.
+                    </p>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -127,8 +151,8 @@ const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelector
                         <Input
                           placeholder="New cuisine name..."
                           value={newCuisineName}
-                          onChange={(e) => setNewCuisineName(e.target.value)}
-                          onKeyDown={(e) => {
+                          onChange={e => setNewCuisineName(e.target.value)}
+                          onKeyDown={e => {
                             if (e.key === "Enter") {
                               e.preventDefault();
                               handleCreateCuisine();
@@ -143,7 +167,9 @@ const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelector
                         <Button
                           size="sm"
                           onClick={handleCreateCuisine}
-                          disabled={!newCuisineName.trim() || createTag.isPending}
+                          disabled={
+                            !newCuisineName.trim() || createTag.isPending
+                          }
                         >
                           Add
                         </Button>
@@ -155,7 +181,7 @@ const CuisineTagSelector = ({ form, fieldName = "cuisines" }: CuisineTagSelector
                     {isLoading ? (
                       <CommandItem disabled>Loading cuisines...</CommandItem>
                     ) : (
-                      sortedCuisines.map((cuisineTag) => (
+                      sortedCuisines.map(cuisineTag => (
                         <CommandItem
                           key={cuisineTag.id}
                           value={cuisineTag.name}

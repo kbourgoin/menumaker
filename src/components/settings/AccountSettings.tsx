@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/components/auth";
@@ -28,7 +27,7 @@ type FormValues = {
 const AccountSettings = () => {
   const { session, signOut } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   const form = useForm<FormValues>({
     defaultValues: {
       email: session?.user?.email || "",
@@ -39,53 +38,58 @@ const AccountSettings = () => {
 
   const handleUpdateEmail = async (email: string) => {
     if (!email || email === session?.user?.email) return;
-    
+
     try {
       setIsUpdating(true);
-      
+
       const { error } = await supabase.auth.updateUser({
-        email: email,
+        email,
       });
-      
+
       if (error) throw error;
-      
+
       toast.success("Verification email sent. Please check your inbox.");
     } catch (error: unknown) {
       console.error("Error updating email:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to update email";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update email";
       toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleUpdatePassword = async (password: string, confirmPassword: string) => {
+  const handleUpdatePassword = async (
+    password: string,
+    confirmPassword: string
+  ) => {
     if (!password) return;
-    
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    
+
     try {
       setIsUpdating(true);
-      
+
       const { error } = await supabase.auth.updateUser({
-        password: password,
+        password,
       });
-      
+
       if (error) throw error;
-      
+
       form.reset({
         email: form.getValues("email"),
         password: "",
         confirmPassword: "",
       });
-      
+
       toast.success("Password updated successfully");
     } catch (error: unknown) {
       console.error("Error updating password:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to update password";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update password";
       toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
@@ -94,12 +98,12 @@ const AccountSettings = () => {
 
   const onSubmit = (data: FormValues) => {
     const { email, password, confirmPassword } = data;
-    
+
     // Check if email has changed
     if (email !== session?.user?.email) {
       handleUpdateEmail(email);
     }
-    
+
     // Check if password has been set
     if (password) {
       handleUpdatePassword(password, confirmPassword);
@@ -116,11 +120,14 @@ const AccountSettings = () => {
         <p className="text-sm text-muted-foreground mt-2 mb-4">
           Manage your account details and credentials
         </p>
-        
+
         <Card>
           <CardContent className="pt-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -140,15 +147,15 @@ const AccountSettings = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <Separator />
-                
+
                 <div>
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                     <Key className="h-4 w-4" />
                     Change Password
                   </h4>
-                  
+
                   <div className="grid gap-4">
                     <FormField
                       control={form.control}
@@ -157,17 +164,17 @@ const AccountSettings = () => {
                         <FormItem>
                           <FormLabel>New Password</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="••••••••" 
-                              {...field} 
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="confirmPassword"
@@ -175,10 +182,10 @@ const AccountSettings = () => {
                         <FormItem>
                           <FormLabel>Confirm Password</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="••••••••" 
-                              {...field} 
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -187,7 +194,7 @@ const AccountSettings = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <Button type="submit" disabled={isUpdating}>
                     {isUpdating ? "Updating..." : "Save Changes"}
@@ -198,9 +205,9 @@ const AccountSettings = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <Separator />
-      
+
       <div>
         <div className="flex items-center gap-2">
           <LogOut className="h-5 w-5 text-terracotta-500" />
@@ -209,9 +216,9 @@ const AccountSettings = () => {
         <p className="text-sm text-muted-foreground mt-2 mb-4">
           Sign out from your account
         </p>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
           onClick={signOut}
         >

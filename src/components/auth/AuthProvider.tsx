@@ -1,5 +1,10 @@
-
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -36,7 +41,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
-        
+
         // If user is not authenticated and not on the auth page, redirect to auth
         if (!data.session && location.pathname !== "/auth") {
           navigate("/auth", { replace: true });
@@ -51,16 +56,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     getInitialSession();
 
     // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        
-        // If session ends and user isn't on auth page, redirect to auth
-        if (!session && location.pathname !== "/auth") {
-          navigate("/auth", { replace: true });
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+
+      // If session ends and user isn't on auth page, redirect to auth
+      if (!session && location.pathname !== "/auth") {
+        navigate("/auth", { replace: true });
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();

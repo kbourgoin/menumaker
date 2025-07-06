@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { Header } from "@/components/layout";
 import { motion } from "framer-motion";
@@ -13,7 +12,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   // If not loading and not authenticated, redirect to auth page
   if (!isLoading && !isAuthenticated) {
     return <Navigate to="/auth" replace />;
@@ -22,8 +21,8 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream-50 to-sage-50">
       {/* Skip navigation link for accessibility */}
-      <a 
-        href="#main-content" 
+      <a
+        href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
       >
         Skip to main content
@@ -34,7 +33,7 @@ const Layout = ({ children }: LayoutProps) => {
           <Progress className="h-1 bg-terracotta-100" value={100} />
         </div>
       )}
-      <motion.main 
+      <motion.main
         id="main-content"
         className="flex-1 container mx-auto px-4 py-6"
         initial={{ opacity: 0, y: 10 }}
@@ -55,10 +54,12 @@ const Layout = ({ children }: LayoutProps) => {
       </motion.main>
       <footer className="py-6 border-t border-terracotta-100 bg-cream-50">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p className="text-sm">Keith Bourgoin © {new Date().getFullYear()}</p>
+          <p className="text-sm">
+            Keith Bourgoin © {new Date().getFullYear()}
+          </p>
         </div>
       </footer>
-      
+
       {/* Development performance monitor */}
       <PerformanceMonitor />
     </div>
