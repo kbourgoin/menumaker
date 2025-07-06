@@ -3,9 +3,38 @@ import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
 import { measureAsync, trackQuery } from "@/utils/performance";
+import { useOptimizedStats } from "./useOptimizedStats";
 
 export function useStats() {
-  // Get dish stats with React Query
+  // Check if we should use optimized stats for large datasets
+  const { data: dishCount } = useQuery({
+    queryKey: ['dish-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('dishes')
+        .select('*', { count: 'exact', head: true });
+      return count || 0;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const { data: historyCount } = useQuery({
+    queryKey: ['history-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('meal_history')
+        .select('*', { count: 'exact', head: true });
+      return count || 0;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Use optimized stats for users with extensive data
+  const shouldUseOptimized = (dishCount && dishCount > 100) || (historyCount && historyCount > 500);
+  
+  const optimizedStats = useOptimizedStats();
+  
+  // Get dish stats with React Query (legacy method)
   const { data: stats, isLoading } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
@@ -156,8 +185,25 @@ export function useStats() {
           throw error;
         }
       });
-    }
+    },
+    enabled: !shouldUseOptimized, // Only run legacy query if not using optimized
   });
+
+  // Return optimized stats if applicable, otherwise legacy stats
+  if (shouldUseOptimized) {
+    return {
+      getStats: async () => optimizedStats.stats || {
+        totalDishes: 0,
+        totalTimesCooked: 0,
+        mostCooked: null,
+        topDishes: [],
+        cuisineBreakdown: {},
+        recentlyCooked: []
+      },
+      stats: optimizedStats.stats,
+      isLoading: optimizedStats.isLoading
+    };
+  }
 
   return {
     getStats: async () => stats || {

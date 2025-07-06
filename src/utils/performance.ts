@@ -136,3 +136,70 @@ export const logPerformanceStats = (): void => {
     console.groupEnd();
   }
 };
+
+/**
+ * Get detailed performance metrics for dashboard
+ */
+export const getDetailedPerformanceMetrics = () => {
+  if (queryMetrics.length === 0) return null;
+  
+  const successfulQueries = queryMetrics.filter(m => m.success);
+  const fallbackQueries = queryMetrics.filter(m => m.fallbackUsed);
+  
+  const avgDuration = successfulQueries.reduce((sum, m) => sum + m.duration, 0) / successfulQueries.length;
+  const maxDuration = Math.max(...successfulQueries.map(m => m.duration));
+  const fallbackRate = (fallbackQueries.length / queryMetrics.length) * 100;
+  
+  // Query type breakdown
+  const queryTypes: Record<string, {
+    count: number;
+    avgDuration: number;
+    successRate: number;
+    fallbackRate: number;
+  }> = {};
+  
+  queryMetrics.forEach(metric => {
+    if (!queryTypes[metric.queryType]) {
+      queryTypes[metric.queryType] = {
+        count: 0,
+        avgDuration: 0,
+        successRate: 0,
+        fallbackRate: 0
+      };
+    }
+    queryTypes[metric.queryType].count++;
+  });
+  
+  // Calculate averages for each query type
+  Object.keys(queryTypes).forEach(type => {
+    const typeMetrics = queryMetrics.filter(m => m.queryType === type);
+    const successfulTypeQueries = typeMetrics.filter(m => m.success);
+    const fallbackTypeQueries = typeMetrics.filter(m => m.fallbackUsed);
+    
+    queryTypes[type].avgDuration = successfulTypeQueries.reduce((sum, m) => sum + m.duration, 0) / successfulTypeQueries.length || 0;
+    queryTypes[type].successRate = (successfulTypeQueries.length / typeMetrics.length) * 100;
+    queryTypes[type].fallbackRate = (fallbackTypeQueries.length / typeMetrics.length) * 100;
+  });
+  
+  // Performance targets
+  const targets = {
+    avgDurationTarget: 500, // 500ms average
+    fallbackRateTarget: 5,  // 5% fallback rate
+    successRateTarget: 95   // 95% success rate
+  };
+  
+  return {
+    totalQueries: queryMetrics.length,
+    successRate: (successfulQueries.length / queryMetrics.length) * 100,
+    fallbackRate,
+    averageDuration: avgDuration,
+    maxDuration,
+    slowQueries: queryMetrics.filter(m => m.duration > 1000).length,
+    queryTypes,
+    trends: {
+      last5min: [], // Could be implemented later
+      last30min: [] // Could be implemented later
+    },
+    targets
+  };
+};
