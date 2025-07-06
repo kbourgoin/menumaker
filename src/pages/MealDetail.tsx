@@ -36,7 +36,6 @@ const MealDetail = () => {
     
     try {
       const historyData = await getMealHistoryForDish(id);
-      console.log("History data loaded:", historyData);
       setHistory(historyData);
     } catch (historyError) {
       console.error("Error fetching meal history:", historyError);
@@ -54,19 +53,15 @@ const MealDetail = () => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log("Fetching dish with ID:", id);
-      
       const dishData = await getDish(id);
       
       if (!dishData) {
-        console.log("No dish found for ID:", id);
         setDish(null);
         setError("Dish not found");
         setIsLoading(false);
         return;
       }
       
-      console.log("Dish loaded successfully:", dishData);
       setDish(dishData);
 
       // Only fetch history if we're on the history tab

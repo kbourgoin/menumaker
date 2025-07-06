@@ -24,6 +24,21 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      "no-console": ["error", { allow: ["warn", "error"] }],
+    },
+  },
+  {
+    // Allow console statements in test files
+    files: ["**/*.test.{ts,tsx}", "**/test/**/*.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+  {
+    // Allow console statements in logger utility and migration files
+    files: ["**/utils/logger.ts", "**/utils/performance.ts", "**/utils/cuisineToTagMigration.ts", "**/utils/errorHandling.ts"],
+    rules: {
+      "no-console": "off",
     },
   }
 );
