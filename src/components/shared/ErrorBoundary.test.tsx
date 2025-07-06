@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 import { render, screen, fireEvent } from '@/test/test-utils'
-import { ErrorBoundary } from '../ErrorBoundary'
+import { ErrorBoundary } from './ErrorBoundary'
 
 // Mock console.error to avoid noise in test output
 const originalError = console.error

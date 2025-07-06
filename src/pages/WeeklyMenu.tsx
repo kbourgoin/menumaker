@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Shuffle, Plus, RefreshCw } from "lucide-react";

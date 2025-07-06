@@ -2,7 +2,7 @@
 import { Separator } from "@/components/ui/separator";
 import { JSONExport } from "./JSONExport";
 import { JSONImport } from "./JSONImport";
-import { ClearDataDialog } from "@/components/ClearDataDialog";
+import { ClearDataDialog } from "@/components/dialogs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export function DataManagement() {

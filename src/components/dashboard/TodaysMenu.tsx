@@ -2,7 +2,7 @@ import React from "react";
 import { Calendar, ChefHat } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DishCard from "@/components/dish-card";
-import AddCookedDishDialog from "@/components/AddCookedDishDialog";
+import { AddCookedDishDialog } from "@/components/dialogs";
 import { Dish } from "@/types";
 
 interface TodaysMenuProps {

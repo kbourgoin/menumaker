@@ -10,11 +10,11 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
-import SourceInfo from "../dish-card/SourceInfo";
+import { SourceInfo } from "@/components/dish-card";
 import { TagBadge } from "@/components/tags";
 import { useTagNavigation } from "@/hooks/useTagNavigation";
 import { CUISINES } from "@/components/dish-form/constants";
-import CuisineTag from "../CuisineTag";
+import { CuisineTag } from "@/components/shared";
 
 interface DishTableRowProps {
   dish: Dish;

@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, beforeEach, afterEach, describe, test, expect } from 'vitest';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { ErrorMessage, ErrorFallback, InlineError } from '@/components/ErrorMessage';
+import { ErrorBoundary } from '@/components/shared';
+import { ErrorMessage, ErrorFallback, InlineError } from '@/components/shared';
 import { classifyError } from '@/utils/errorHandling';
 import { ErrorType, ErrorSeverity } from '@/types/errors';
 

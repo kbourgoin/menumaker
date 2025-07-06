@@ -1,5 +1,5 @@
 
-import SourceLink from "../SourceLink";
+import { SourceLink } from "@/components/shared";
 import LocationDisplay from "./LocationDisplay";
 import { cn } from "@/lib/utils";
 

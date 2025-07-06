@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import CookDishDialog from "@/components/CookDishDialog";
+import { CookDishDialog } from "@/components/dialogs";
 import { useState } from "react";
 import { useMeals } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";

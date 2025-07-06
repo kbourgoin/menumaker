@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw } from "lucide-react";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/layout";
 
 interface ErrorStateProps {
   error: string;

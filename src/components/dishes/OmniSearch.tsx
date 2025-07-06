@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { useTagQueries } from "@/hooks/tags";
 import { TagBadge } from "@/components/tags";
 import { CUISINES } from "@/components/dish-form/constants";
-import CuisineTag from "@/components/CuisineTag";
+import { CuisineTag } from "@/components/shared";
 
 interface OmniSearchProps {
   searchQuery: string;

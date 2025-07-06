@@ -1,5 +1,5 @@
 
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/layout";
 import DishForm from "@/components/dish-form";
 import { Card } from "@/components/ui/card";
 

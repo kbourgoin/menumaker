@@ -8,7 +8,7 @@ import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { useTagQueries, useTagMutations } from "@/hooks/tags";
 import { Input } from "@/components/ui/input";
-import CuisineTag from "@/components/CuisineTag";
+import { CuisineTag } from "@/components/shared";
 
 // Import the constants for default colors
 import { CUISINES } from "@/components/dish-form/constants";

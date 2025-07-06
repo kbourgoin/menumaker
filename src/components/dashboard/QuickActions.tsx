@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Edit, Plus, Shuffle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import AddCookedDishDialog from "@/components/AddCookedDishDialog";
+import { AddCookedDishDialog } from "@/components/dialogs";
 
 const QuickActions = () => {
   return (

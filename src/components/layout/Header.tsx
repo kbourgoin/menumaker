@@ -8,8 +8,8 @@ import {
   Settings,
   Utensils 
 } from "lucide-react";
-import AddCookedDishDialog from "./AddCookedDishDialog";
-import { PWAInstallButton } from "./PWAInstallButton";
+import { AddCookedDishDialog } from "@/components/dialogs";
+import { PWAInstallButton } from "@/components/shared";
 
 const Header = () => {
   const location = useLocation();

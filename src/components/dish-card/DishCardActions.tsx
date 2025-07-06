@@ -4,7 +4,7 @@ import { Trash, Pencil } from "lucide-react";
 import { CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import CookDishDialog from "../CookDishDialog";
+import { CookDishDialog } from "@/components/dialogs";
 import { Dish } from "@/types";
 import { useMeals } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";

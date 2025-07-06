@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useSources } from "@/hooks/sources";
-import { useAuth } from "@/components/AuthProvider";
-import MergeSourceDialog from "./MergeSourceDialog";
-import LinkedDishesSection from "./LinkedDishesSection";
-import SourceFormFields from "./SourceFormFields";
+import { useAuth } from "@/components/auth";
+import { MergeSourceDialog } from "@/components/dialogs";
+import { LinkedDishesSection } from "@/components/source";
+import { SourceFormFields } from "@/components/source";
 import { useSourceEdit, SourceFormData } from "@/hooks/source";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle } from "lucide-react";
