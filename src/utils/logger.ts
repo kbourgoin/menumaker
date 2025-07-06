@@ -109,7 +109,6 @@ class Logger {
     context?: string,
     data?: unknown
   ): void {
-    const _timestamp = new Date().toISOString();
     const contextInfo = context ? ` [${context}]` : "";
     const fullMessage = `${message}${contextInfo}`;
 

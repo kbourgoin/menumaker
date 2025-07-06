@@ -14,11 +14,7 @@ import ComingUp from "@/components/dashboard/ComingUp";
 import StatsCard from "@/components/dashboard/StatsCard";
 
 const Home = () => {
-  const {
-    dishes: _dishes,
-    isLoading: dishesLoading,
-    error: dishesError,
-  } = useDishes();
+  const { isLoading: dishesLoading, error: dishesError } = useDishes();
   const {
     getTodaysMeals,
     getUpcomingMeals,

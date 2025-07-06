@@ -42,7 +42,7 @@ export const TagManager = ({ className }: TagManagerProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const { useAllTags, useTagUsageCount: _useTagUsageCount } = useTagQueries();
+  const { useAllTags } = useTagQueries();
   const { createTag, updateTag, deleteTag } = useTagMutations();
 
   const { data: tags = [], isLoading } = useAllTags();

@@ -5,27 +5,6 @@ import { measureAsync, trackQuery } from "@/utils/performance";
 
 export function useStats() {
   // Check if we should use optimized stats for large datasets
-  const { data: _dishCount } = useQuery({
-    queryKey: ["dish-count"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("dishes")
-        .select("*", { count: "exact", head: true });
-      return count || 0;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-
-  const { data: _historyCount } = useQuery({
-    queryKey: ["history-count"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("meal_history")
-        .select("*", { count: "exact", head: true });
-      return count || 0;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
 
   // Temporarily disable optimized stats until database functions are created
 

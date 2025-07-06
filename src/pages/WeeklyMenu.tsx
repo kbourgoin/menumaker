@@ -14,7 +14,7 @@ const WeeklyMenu = () => {
   const { allDishes, isLoading, getWeeklyDishSuggestions } = useWeeklyMenu();
   const { toast } = useToast();
   const [weeklyDishes, setWeeklyDishes] = useState<Dish[]>([]);
-  const [weekStart, _setWeekStart] = useState(startOfWeek(new Date()));
+  const weekStart = startOfWeek(new Date());
   const [isGenerating, setIsGenerating] = useState(false);
   const [refreshingDayIndex, setRefreshingDayIndex] = useState<number | null>(
     null

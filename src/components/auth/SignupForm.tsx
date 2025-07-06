@@ -41,7 +41,7 @@ const SignupForm = ({
     try {
       setLoading(true);
 
-      const { data: _data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
       });

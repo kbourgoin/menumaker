@@ -45,8 +45,7 @@ export const TagSelector = ({
   const { useTagsByCategory } = useTagQueries();
   const { createTag } = useTagMutations();
 
-  const { data: availableTags = [], isLoading: _isLoading } =
-    useTagsByCategory(category);
+  const { data: availableTags = [] } = useTagsByCategory(category);
 
   const handleTagSelect = (tagName: string) => {
     if (selectedTags.includes(tagName)) {

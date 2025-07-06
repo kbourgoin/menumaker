@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useSources } from "@/hooks/sources";
-import { useAuth } from "@/components/auth";
 import { MergeSourceDialog } from "@/components/dialogs";
 import { LinkedDishesSection } from "@/components/source";
 import { SourceFormFields } from "@/components/source";
@@ -40,7 +39,6 @@ const EditSourceDialog = ({
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
 
-  const { session: _session } = useAuth();
   const { getDishesBySource, findSourceByName } = useSources();
   const { toast } = useToast();
 
