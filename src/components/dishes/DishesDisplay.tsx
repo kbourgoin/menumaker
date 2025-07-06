@@ -2,6 +2,7 @@
 import { Dish } from "@/types";
 import DishCard from "@/components/dish-card";
 import DishTable from "@/components/dish-table/DishTable";
+import { VirtualDishTable } from "@/components/virtual-list";
 import DishesEmptyState from "./DishesEmptyState";
 
 interface DishesDisplayProps {

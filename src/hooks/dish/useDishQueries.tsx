@@ -6,6 +6,7 @@ import { fetchDishesOriginalMethod, fetchDishById, fetchMealHistoryForDish } fro
 import { classifyError, logError } from "@/utils/errorHandling";
 import { ErrorType } from "@/types/errors";
 import { measureAsync, trackQuery } from "@/utils/performance";
+import { useDynamicCacheInvalidation } from "@/hooks/useDynamicCacheInvalidation";
 
 /**
  * Hook that provides query functions for dishes
@@ -13,6 +14,11 @@ import { measureAsync, trackQuery } from "@/utils/performance";
 export function useDishQueries() {
   // Remove this local state as it conflicts with React Query's built-in loading state
   // const [isLoading, setIsLoading] = useState(true);
+  
+  const { isUserActive } = useDynamicCacheInvalidation({
+    idleThreshold: 3 * 60 * 1000, // 3 minutes for dishes
+    activityWindow: 15 * 60 * 1000, // 15 minutes tracking window
+  });
 
   // Query to fetch dishes with optimized performance monitoring
   const { data: dishes = [], isLoading, error: queryError } = useQuery({
@@ -95,8 +101,8 @@ export function useDishQueries() {
         }
       });
     },
-    // Optimized caching for better performance
-    staleTime: 2 * 60 * 1000, // 2 minutes (reduced for more responsive data)
+    // Dynamic caching based on user activity
+    staleTime: isUserActive() ? 1 * 60 * 1000 : 5 * 60 * 1000, // 1 min active, 5 min idle
     gcTime: 10 * 60 * 1000, // 10 minutes
     // Simplified retry logic - let our internal fallback handle failures
     retry: (failureCount, error) => {
