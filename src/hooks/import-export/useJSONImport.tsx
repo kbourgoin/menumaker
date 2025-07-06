@@ -87,7 +87,6 @@ export function useJSONImport() {
       operationLog(`Importing ${jsonData.sources.length} sources...`, "Import");
       let successCount = 0;
       let errorCount = 0;
-      let sourceImportSuccess = 0;
       let dishImportSuccess = 0;
 
       // Process sources in batches
@@ -131,7 +130,6 @@ export function useJSONImport() {
               });
 
             if (error) throw error;
-            sourceImportSuccess += count || 0;
             successCount += count || 0;
           } catch (error) {
             errorLog("Error importing sources batch", "Import", error);

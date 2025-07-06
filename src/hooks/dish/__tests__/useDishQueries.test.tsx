@@ -48,7 +48,7 @@ vi.mock("@/utils/performance", () => ({
 }));
 
 // Import mocked modules
-import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { fetchDishesOriginalMethod } from "../utils/dishFetchUtils";
 import { classifyError, logError } from "@/utils/errorHandling";
 import { measureAsync, trackQuery } from "@/utils/performance";

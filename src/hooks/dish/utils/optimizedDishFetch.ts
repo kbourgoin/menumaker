@@ -1,4 +1,4 @@
-import { Dish, MealHistory } from "@/types";
+import { Dish } from "@/types";
 import {
   supabase,
   mapDishFromDB,

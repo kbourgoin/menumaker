@@ -1,4 +1,3 @@
-import { CuisineType } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface CuisineTagProps {

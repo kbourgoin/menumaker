@@ -4,10 +4,7 @@
  */
 
 import { useEffect, useState } from "react";
-import {
-  getPerformanceStats,
-  getDetailedPerformanceMetrics,
-} from "@/utils/performance";
+import { getDetailedPerformanceMetrics } from "@/utils/performance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 

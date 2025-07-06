@@ -1,9 +1,5 @@
 import { Dish, MealHistory } from "@/types";
-import {
-  supabase,
-  mapDishFromDB,
-  mapDishFromSummary,
-} from "@/integrations/supabase/client";
+import { supabase, mapDishFromDB } from "@/integrations/supabase/client";
 import { measureAsync } from "@/utils/performance";
 
 /**

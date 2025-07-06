@@ -1,4 +1,4 @@
-import { Source, Dish, MealHistory } from "@/types";
+import { Source, Dish } from "@/types";
 import { Tables } from "@/integrations/supabase/types";
 import {
   supabase,

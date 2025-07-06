@@ -10,8 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSources } from "@/hooks/sources";
 import { AlertCircle } from "lucide-react";
 
 interface MergeSourceDialogProps {
@@ -39,7 +37,7 @@ const MergeSourceDialog = ({
       setIsProcessing(true);
       await onConfirm();
       onOpenChange(false);
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error merging sources",
         description: "There was a problem merging the sources.",

@@ -94,48 +94,6 @@ const mockRecentHistory = [
   },
 ];
 
-const expectedMappedDishes = [
-  {
-    id: "dish-1",
-    name: "Pizza",
-    createdAt: "2024-01-01T00:00:00Z",
-    cuisines: ["Italian"],
-    sourceId: null,
-    location: null,
-    userId: "user-1",
-    lastMade: "2024-01-15T00:00:00Z",
-    timesCooked: 3,
-    lastComment: "Delicious!",
-    tags: [],
-  },
-  {
-    id: "dish-2",
-    name: "Burger",
-    createdAt: "2024-01-02T00:00:00Z",
-    cuisines: ["American"],
-    sourceId: null,
-    location: null,
-    userId: "user-1",
-    lastMade: "2024-01-12T00:00:00Z",
-    timesCooked: 1,
-    lastComment: "Tasty",
-    tags: [],
-  },
-  {
-    id: "dish-3",
-    name: "Sushi",
-    createdAt: "2024-01-03T00:00:00Z",
-    cuisines: ["Japanese"],
-    sourceId: null,
-    location: null,
-    userId: "user-1",
-    lastMade: undefined,
-    timesCooked: 0,
-    lastComment: undefined,
-    tags: [],
-  },
-];
-
 describe.skip("useStats", () => {
   let queryClient: QueryClient;
 

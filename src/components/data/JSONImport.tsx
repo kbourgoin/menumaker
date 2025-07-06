@@ -52,7 +52,7 @@ export function JSONImport() {
 
       try {
         data = JSON.parse(text);
-      } catch (e) {
+      } catch (_e) {
         setError("Invalid JSON file format");
         return;
       }

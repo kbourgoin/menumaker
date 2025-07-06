@@ -13,7 +13,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, Filter, X } from "lucide-react";
+import { Check, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries } from "@/hooks/tags";
 import { TagBadge } from "@/components/tags";

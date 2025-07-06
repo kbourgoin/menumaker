@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import { JSONExport } from "./JSONExport";
 import { JSONImport } from "./JSONImport";
 import { ClearDataDialog } from "@/components/dialogs";

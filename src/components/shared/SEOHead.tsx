@@ -84,6 +84,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
 export default SEOHead;
 
 // Helper function to generate page-specific SEO data
+// eslint-disable-next-line react-refresh/only-export-components
 export const getPageSEO = (page: string, data?: { dishName?: string }) => {
   const seoData: SEOHeadProps = {};
 

@@ -8,14 +8,6 @@
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
-interface LogEntry {
-  level: LogLevel;
-  message: string;
-  context?: string;
-  data?: unknown;
-  timestamp?: string;
-}
-
 class Logger {
   // Check environment dynamically instead of caching at instantiation
   private get isDevelopment() {
@@ -117,7 +109,6 @@ class Logger {
     context?: string,
     data?: unknown
   ): void {
-    const timestamp = new Date().toISOString();
     const contextInfo = context ? ` [${context}]` : "";
     const fullMessage = `${message}${contextInfo}`;
 

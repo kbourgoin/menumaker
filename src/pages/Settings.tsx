@@ -15,7 +15,6 @@ import { Separator } from "@/components/ui/separator";
 import {
   Settings as SettingsIcon,
   BookOpen,
-  UserCog,
   UtensilsCrossed,
   Tag,
 } from "lucide-react";

@@ -11,14 +11,7 @@
  * - Validation: Ensure required fields, type safety, data integrity
  */
 
-import {
-  Dish,
-  DishEntity,
-  MealHistory,
-  Source,
-  Tag,
-  Profile,
-} from "@/types/entities";
+import { Dish, MealHistory, Source, Tag, Profile } from "@/types/entities";
 
 import {
   DBDish,
@@ -35,7 +28,7 @@ import {
   DBSourceExtended,
 } from "@/types/database";
 
-import { validateEntity, ValidationError } from "./validation";
+import { ValidationError } from "./validation";
 
 /**
  * DISH MAPPING FUNCTIONS

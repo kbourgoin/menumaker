@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, ChefHat } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import {
   Card,
   CardContent,

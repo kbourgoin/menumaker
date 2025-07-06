@@ -30,7 +30,7 @@ interface DishFormProps {
 }
 
 const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
-  const { dishes, addDish, updateDish } = useDishes();
+  const { addDish, updateDish } = useDishes();
   const { getSources } = useSources();
   const { createTag, addMultipleTagsToDish, removeTagFromDish } =
     useTagMutations();

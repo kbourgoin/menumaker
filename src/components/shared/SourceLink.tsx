@@ -1,4 +1,4 @@
-import { Link, Globe, Book, ExternalLink } from "lucide-react";
+import { Globe, Book, ExternalLink } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,

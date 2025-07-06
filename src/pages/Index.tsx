@@ -5,7 +5,6 @@ import { useMealHistoryByDate } from "@/hooks/meal-history/useMealHistoryByDate"
 import { useStats } from "@/hooks/stats/useStats";
 import { Layout } from "@/components/layout";
 import { SEOHead, getPageSEO } from "@/components/shared";
-import { Dish } from "@/types";
 import { ErrorMessage, ErrorFallback } from "@/components/shared";
 import { isNetworkError } from "@/utils/errorHandling";
 
@@ -15,7 +14,7 @@ import ComingUp from "@/components/dashboard/ComingUp";
 import StatsCard from "@/components/dashboard/StatsCard";
 
 const Home = () => {
-  const { dishes, isLoading: dishesLoading, error: dishesError } = useDishes();
+  const { isLoading: dishesLoading, error: dishesError } = useDishes();
   const {
     getTodaysMeals,
     getUpcomingMeals,

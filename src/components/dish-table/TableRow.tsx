@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Dish } from "@/types";
 import { TableCell, TableRow as UITableRow } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
 import { formatDistance, parseISO, format } from "date-fns";
 import {
   Tooltip,
@@ -10,7 +9,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SourceInfo } from "@/components/dish-card";
-import { TagBadge } from "@/components/tags";
 import { useTagNavigation } from "@/hooks/useTagNavigation";
 import { CUISINES } from "@/components/dish-form/constants";
 import { CuisineTag } from "@/components/shared";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -91,7 +91,7 @@ const StatsCard = React.memo<StatsCardProps>(({ stats, isLoading }) => {
                   Top 5 Most Cooked:
                 </span>
                 <div className="space-y-1">
-                  {topDishes.map((dish, index) => (
+                  {topDishes.map((dish, _index) => (
                     <div
                       key={dish.id}
                       className="flex justify-between items-center text-sm"
