@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ExportData } from "@/hooks/import-export/useDataExport";
+import { logger } from "@/utils/logger";
 
 export function JSONImport() {
   const { importFromJSON, validateJSONData, isImporting, progress: importProgress } = useJSONImport();
@@ -57,7 +58,7 @@ export function JSONImport() {
       
       // Import the data
       const result = await importFromJSON(data as ExportData, (processed, total) => {
-        console.log(`Import progress: ${processed}/${total}`);
+        logger.operation(`Import progress: ${processed}/${total}`, 'json-import');
       });
       
       setImportStats(result);

@@ -1,6 +1,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/utils/logger";
 
 // Error types for better error handling
 export interface SourceMergeError extends Error {
@@ -148,7 +149,7 @@ export function useSourceMerge() {
       }
     },
     onSuccess: (data) => {
-      console.log(`Successfully merged "${data.sourceToMergeName}" into "${data.targetSourceName}", affecting ${data.affectedDishesCount} dishes`);
+      logger.operation(`Successfully merged "${data.sourceToMergeName}" into "${data.targetSourceName}", affecting ${data.affectedDishesCount} dishes`, 'source-merge');
       queryClient.invalidateQueries({ queryKey: ['sources'] });
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
     },

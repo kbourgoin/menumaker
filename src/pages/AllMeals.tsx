@@ -51,7 +51,6 @@ const AllDishes = () => {
   // Memoized unique dishes to avoid recalculating on every render
   const uniqueDishes = useMemo(() => {
     if (!dishes || !Array.isArray(dishes)) {
-      console.log("No dishes array available:", dishes);
       return [];
     }
     
@@ -68,7 +67,6 @@ const AllDishes = () => {
   const filteredDishes = useMemo(() => {
     const filtered = uniqueDishes.filter(dish => {
       if (!dish || typeof dish !== 'object') {
-        console.log("Invalid dish object:", dish);
         return false;
       }
       

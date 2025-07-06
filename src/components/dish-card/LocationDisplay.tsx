@@ -5,8 +5,6 @@ interface LocationDisplayProps {
 }
 
 const LocationDisplay = ({ location, inline = false }: LocationDisplayProps) => {
-  console.log("LocationDisplay received location:", location);
-  
   // Function to check if a string is a URL
   const isUrl = (str: string): boolean => {
     return /^(https?:\/\/|www\.)[^\s]+\.[^\s]+/i.test(str);

@@ -75,8 +75,6 @@ export const fetchDishesOptimized = async (user_id: string): Promise<Dish[]> => 
     const mappedDishes = dishesData.map(dish => 
       mapDishFromDB(dish, historyByDishId[dish.id] || [])
     );
-
-    console.log(`Optimized fetch: ${dishesData.length} dishes with ${allMealHistory.length} total history entries`);
     
     return mappedDishes;
   } catch (error) {
