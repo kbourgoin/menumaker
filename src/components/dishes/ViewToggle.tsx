@@ -1,4 +1,3 @@
-
 import { LayoutGrid, Table as TableIcon } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
@@ -10,9 +9,9 @@ interface ViewToggleProps {
 const ViewToggle = ({ viewMode, setViewMode }: ViewToggleProps) => {
   return (
     <div className="flex justify-end mb-4">
-      <div 
-        className="bg-muted rounded-md p-1" 
-        role="group" 
+      <div
+        className="bg-muted rounded-md p-1"
+        role="group"
         aria-label="View mode selection"
       >
         <Toggle

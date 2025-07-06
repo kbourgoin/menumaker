@@ -1,4 +1,3 @@
-
 import { CuisineType } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -33,16 +32,17 @@ const cuisineColors: Record<string, string> = {
 };
 
 const CuisineTag = ({ cuisine, size = "md", onClick }: CuisineTagProps) => {
-  const colors = cuisineColors[cuisine] || "bg-gray-100 text-gray-800 border-gray-200";
-  
+  const colors =
+    cuisineColors[cuisine] || "bg-gray-100 text-gray-800 border-gray-200";
+
   const sizeClasses = {
     sm: "text-xs px-2 py-0.5",
     md: "text-sm px-2.5 py-1",
     lg: "text-base px-3 py-1.5",
   };
-  
+
   return (
-    <span 
+    <span
       className={cn(
         "inline-flex items-center rounded-full border font-medium transition-colors",
         colors,

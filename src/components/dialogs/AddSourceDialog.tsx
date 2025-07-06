@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
     type: "book", // Default type
     description: "",
   });
-  
+
   const { toast } = useToast();
   const { session } = useAuth();
   const { addSource } = useSources();
@@ -45,44 +44,48 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
 
   // Mutation for adding a source
   const addSourceMutation = useMutation({
-    mutationFn: async (source: Omit<Source, "id" | "createdAt" | "user_id">) => {
+    mutationFn: async (
+      source: Omit<Source, "id" | "createdAt" | "user_id">
+    ) => {
       if (!session?.user?.id) {
         throw new Error("User not authenticated");
       }
-      
+
       return addSource(source);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sources'] });
+      queryClient.invalidateQueries({ queryKey: ["sources"] });
       setIsOpen(false);
       setFormData({ name: "", type: "book", description: "" });
-      
+
       toast({
         title: "Source added",
         description: `${formData.name} has been added to your sources.`,
       });
     },
-    onError: (error) => {
+    onError: error => {
       toast({
         title: "Error adding source",
         description: error.message,
         variant: "destructive",
       });
-    }
+    },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
   const handleTypeChange = (value: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      type: value as 'book' | 'website',
+      type: value as "book" | "website",
     }));
   };
 
@@ -98,7 +101,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
 
     addSourceMutation.mutate({
       name: formData.name,
-      type: formData.type as 'book' | 'website',
+      type: formData.type as "book" | "website",
       description: formData.description || undefined,
     });
   };
@@ -106,7 +109,11 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className={`flex items-center gap-1 ${className}`}>
+        <Button
+          size="sm"
+          variant="outline"
+          className={`flex items-center gap-1 ${className}`}
+        >
           <PlusIcon className="h-4 w-4" /> Add Source
         </Button>
       </DialogTrigger>
@@ -130,15 +137,12 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
               placeholder="e.g., The Joy of Cooking"
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="type" className="text-sm font-medium">
               Type <span className="text-red-500">*</span>
             </label>
-            <Select
-              value={formData.type}
-              onValueChange={handleTypeChange}
-            >
+            <Select value={formData.type} onValueChange={handleTypeChange}>
               <SelectTrigger id="type">
                 <SelectValue placeholder="Select source type" />
               </SelectTrigger>
@@ -148,11 +152,12 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              {formData.type === 'book' ? "Book or cookbook" : 
-               "Online recipe source"}
+              {formData.type === "book"
+                ? "Book or cookbook"
+                : "Online recipe source"}
             </p>
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="description" className="text-sm font-medium">
               Description
@@ -171,10 +176,7 @@ const AddSourceDialog = ({ className = "" }: AddSourceDialogProps) => {
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={addSourceMutation.isPending}
-          >
+          <Button onClick={handleSubmit} disabled={addSourceMutation.isPending}>
             {addSourceMutation.isPending ? "Adding..." : "Add Source"}
           </Button>
         </DialogFooter>

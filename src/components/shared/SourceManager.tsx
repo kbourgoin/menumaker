@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Source } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -6,22 +5,30 @@ import { useAuth } from "@/components/auth";
 import { useSources } from "@/hooks/sources";
 
 // Import our new components
-import { AddSourceDialog, EditSourceDialog, DeleteSourceDialog } from "@/components/dialogs";
-import { SourceTable, SourceEmptyState, SourceLoading } from "@/components/source";
+import {
+  AddSourceDialog,
+  EditSourceDialog,
+  DeleteSourceDialog,
+} from "@/components/dialogs";
+import {
+  SourceTable,
+  SourceEmptyState,
+  SourceLoading,
+} from "@/components/source";
 
 const SourceManager = () => {
   const [currentSource, setCurrentSource] = useState<Source | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
+
   const { session } = useAuth();
   const { getSources } = useSources();
 
   // Use React Query to fetch sources
   const { data: sources = [], isLoading } = useQuery({
-    queryKey: ['sources'],
+    queryKey: ["sources"],
     queryFn: getSources,
-    enabled: !!session
+    enabled: !!session,
   });
 
   const openEditDialog = (source: Source) => {
@@ -46,7 +53,7 @@ const SourceManager = () => {
       ) : sources && sources.length === 0 ? (
         <SourceEmptyState />
       ) : (
-        <SourceTable 
+        <SourceTable
           sources={sources}
           onEdit={openEditDialog}
           onDelete={openDeleteDialog}
@@ -54,14 +61,14 @@ const SourceManager = () => {
       )}
 
       {/* Edit Dialog */}
-      <EditSourceDialog 
+      <EditSourceDialog
         source={currentSource}
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
       />
 
       {/* Delete Confirmation Dialog */}
-      <DeleteSourceDialog 
+      <DeleteSourceDialog
         source={currentSource}
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

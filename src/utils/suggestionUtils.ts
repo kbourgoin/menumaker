@@ -1,4 +1,3 @@
-
 import { Dish } from "@/types";
 
 // Mock function that was previously imported from dishUtils
@@ -14,48 +13,56 @@ export const getRandomDishSuggestions = (count: number = 7): Dish[] => {
   // 1. How often it's been cooked (less is better)
   // 2. How recently it's been cooked (longer ago is better)
   const today = new Date();
-  
+
   // Calculate weights
   const dishesWithWeights = dishes.map(dish => {
     // Frequency weight (inverse of timesCooked)
-    const frequencyWeight = dish.timesCooked === 0 ? 5 : (10 / (dish.timesCooked + 1));
-    
+    const frequencyWeight =
+      dish.timesCooked === 0 ? 5 : 10 / (dish.timesCooked + 1);
+
     // Recency weight (more days since last made = higher weight)
     let recencyWeight = 5; // Default for never made
     if (dish.lastMade) {
       const daysSinceLastMade = Math.max(
-        1, 
-        Math.floor((today.getTime() - new Date(dish.lastMade).getTime()) / (1000 * 60 * 60 * 24))
+        1,
+        Math.floor(
+          (today.getTime() - new Date(dish.lastMade).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
       );
       recencyWeight = Math.min(10, daysSinceLastMade / 7); // Cap at 10 (about 10 weeks)
     }
-    
+
     // Surface old favorites (high times cooked but not recent)
-    const oldFavoriteBonus = 
-      dish.timesCooked > 3 && 
-      dish.lastMade && 
-      (today.getTime() - new Date(dish.lastMade).getTime()) > (90 * 24 * 60 * 60 * 1000) // > 90 days
-        ? 5 
+    const oldFavoriteBonus =
+      dish.timesCooked > 3 &&
+      dish.lastMade &&
+      today.getTime() - new Date(dish.lastMade).getTime() >
+        90 * 24 * 60 * 60 * 1000 // > 90 days
+        ? 5
         : 0;
-    
+
     const totalWeight = frequencyWeight + recencyWeight + oldFavoriteBonus;
-    
+
     return {
       dish,
-      weight: totalWeight
+      weight: totalWeight,
     };
   });
-  
+
   // Sort by weight (higher weights first)
   dishesWithWeights.sort((a, b) => b.weight - a.weight);
-  
+
   // Get the top dishes by weight, but add some randomness by selecting from the top 60%
-  const topDishes = dishesWithWeights.slice(0, Math.max(count * 2, Math.floor(dishes.length * 0.6)));
-  
+  const topDishes = dishesWithWeights.slice(
+    0,
+    Math.max(count * 2, Math.floor(dishes.length * 0.6))
+  );
+
   // Randomly select from top-weighted dishes
   const suggestions: Dish[] = [];
   const selectedIndexes = new Set<number>();
-  
+
   while (suggestions.length < count && suggestions.length < topDishes.length) {
     const randomIndex = Math.floor(Math.random() * topDishes.length);
     if (!selectedIndexes.has(randomIndex)) {
@@ -63,6 +70,6 @@ export const getRandomDishSuggestions = (count: number = 7): Dish[] => {
       suggestions.push(topDishes[randomIndex].dish);
     }
   }
-  
+
   return suggestions;
 };

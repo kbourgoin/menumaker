@@ -1,10 +1,7 @@
+import DishTable from "./DishTable";
 
-import DishTable from './DishTable';
+export { DishTable as default };
 
-export {
-  DishTable as default,
-};
-
-export * from './types';
-export * from './useTableSort';
-export * from './useSourceInfo';
+export * from "./types";
+export * from "./useTableSort";
+export * from "./useSourceInfo";

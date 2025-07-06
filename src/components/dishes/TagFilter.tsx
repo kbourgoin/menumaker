@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Check, Filter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries } from "@/hooks/tags";
@@ -44,7 +55,7 @@ export const TagFilter = ({
       {/* Selected Tags Display */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-1 items-center">
-          {selectedTags.map((tag) => (
+          {selectedTags.map(tag => (
             <TagBadge
               key={tag}
               tag={tag}
@@ -88,7 +99,7 @@ export const TagFilter = ({
             <CommandList>
               <CommandEmpty>No tags found.</CommandEmpty>
               <CommandGroup>
-                {availableTags.map((tag) => (
+                {availableTags.map(tag => (
                   <CommandItem
                     key={tag.id}
                     value={tag.name}
@@ -99,7 +110,9 @@ export const TagFilter = ({
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        selectedTags.includes(tag.name) ? "opacity-100" : "opacity-0"
+                        selectedTags.includes(tag.name)
+                          ? "opacity-100"
+                          : "opacity-0"
                       )}
                     />
                     {tag.name}

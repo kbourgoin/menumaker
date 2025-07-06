@@ -1,136 +1,148 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { getMealHistory, saveMealHistory, logDishCooked } from '../mealHistoryUtils'
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import {
+  getMealHistory,
+  saveMealHistory,
+  logDishCooked,
+} from "../mealHistoryUtils";
 
 // Mock storageUtils
-vi.mock('../storageUtils', () => ({
+vi.mock("../storageUtils", () => ({
   getStorageItem: vi.fn(),
-  saveStorageItem: vi.fn()
-}))
+  saveStorageItem: vi.fn(),
+}));
 
-import { getStorageItem, saveStorageItem } from '../storageUtils'
+import { getStorageItem, saveStorageItem } from "../storageUtils";
 
-describe('mealHistoryUtils', () => {
+describe("mealHistoryUtils", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
-  describe('getMealHistory', () => {
-    it('should return meal history from storage', () => {
+  describe("getMealHistory", () => {
+    it("should return meal history from storage", () => {
       const mockHistory = [
-        { date: '2024-01-01T00:00:00Z', dishId: 'dish-1', notes: 'Great meal!' },
-        { date: '2024-01-02T00:00:00Z', dishId: 'dish-2' }
-      ]
-      vi.mocked(getStorageItem).mockReturnValue(mockHistory)
+        {
+          date: "2024-01-01T00:00:00Z",
+          dishId: "dish-1",
+          notes: "Great meal!",
+        },
+        { date: "2024-01-02T00:00:00Z", dishId: "dish-2" },
+      ];
+      vi.mocked(getStorageItem).mockReturnValue(mockHistory);
 
-      const result = getMealHistory()
+      const result = getMealHistory();
 
-      expect(getStorageItem).toHaveBeenCalledWith('mealHistory', [])
-      expect(result).toEqual(mockHistory)
-    })
+      expect(getStorageItem).toHaveBeenCalledWith("mealHistory", []);
+      expect(result).toEqual(mockHistory);
+    });
 
-    it('should return empty array if no history in storage', () => {
-      vi.mocked(getStorageItem).mockReturnValue([])
+    it("should return empty array if no history in storage", () => {
+      vi.mocked(getStorageItem).mockReturnValue([]);
 
-      const result = getMealHistory()
+      const result = getMealHistory();
 
-      expect(result).toEqual([])
-    })
-  })
+      expect(result).toEqual([]);
+    });
+  });
 
-  describe('saveMealHistory', () => {
-    it('should save meal history to storage', () => {
+  describe("saveMealHistory", () => {
+    it("should save meal history to storage", () => {
       const history = [
-        { date: '2024-01-01T00:00:00Z', dishId: 'dish-1', notes: 'Great meal!' }
-      ]
+        {
+          date: "2024-01-01T00:00:00Z",
+          dishId: "dish-1",
+          notes: "Great meal!",
+        },
+      ];
 
-      saveMealHistory(history)
+      saveMealHistory(history);
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', history)
-    })
-  })
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", history);
+    });
+  });
 
-  describe('logDishCooked', () => {
+  describe("logDishCooked", () => {
     beforeEach(() => {
       // Mock getMealHistory to return empty array by default
-      vi.mocked(getStorageItem).mockReturnValue([])
-    })
+      vi.mocked(getStorageItem).mockReturnValue([]);
+    });
 
-    it('should log dish cooked with provided date and notes', () => {
-      const dishId = 'dish-1'
-      const date = '2024-01-01T12:00:00Z'
-      const notes = 'Delicious!'
+    it("should log dish cooked with provided date and notes", () => {
+      const dishId = "dish-1";
+      const date = "2024-01-01T12:00:00Z";
+      const notes = "Delicious!";
 
-      logDishCooked(dishId, date, notes)
+      logDishCooked(dishId, date, notes);
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', [
-        { date, dishId, notes }
-      ])
-    })
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", [
+        { date, dishId, notes },
+      ]);
+    });
 
-    it('should log dish cooked with current date when no date provided', () => {
-      const dishId = 'dish-1'
-      const mockDate = new Date('2024-01-01T12:00:00Z')
-      
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+    it("should log dish cooked with current date when no date provided", () => {
+      const dishId = "dish-1";
+      const mockDate = new Date("2024-01-01T12:00:00Z");
 
-      logDishCooked(dishId)
+      vi.spyOn(global, "Date").mockImplementation(() => mockDate);
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', [
-        { 
-          date: '2024-01-01T12:00:00.000Z', 
-          dishId, 
-          notes: undefined 
-        }
-      ])
+      logDishCooked(dishId);
 
-      vi.restoreAllMocks()
-    })
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", [
+        {
+          date: "2024-01-01T12:00:00.000Z",
+          dishId,
+          notes: undefined,
+        },
+      ]);
 
-    it('should log dish cooked without notes', () => {
-      const dishId = 'dish-1'
-      const date = '2024-01-01T12:00:00Z'
+      vi.restoreAllMocks();
+    });
 
-      logDishCooked(dishId, date)
+    it("should log dish cooked without notes", () => {
+      const dishId = "dish-1";
+      const date = "2024-01-01T12:00:00Z";
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', [
-        { date, dishId, notes: undefined }
-      ])
-    })
+      logDishCooked(dishId, date);
 
-    it('should append to existing meal history', () => {
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", [
+        { date, dishId, notes: undefined },
+      ]);
+    });
+
+    it("should append to existing meal history", () => {
       const existingHistory = [
-        { date: '2024-01-01T00:00:00Z', dishId: 'dish-1' }
-      ]
-      vi.mocked(getStorageItem).mockReturnValue(existingHistory)
+        { date: "2024-01-01T00:00:00Z", dishId: "dish-1" },
+      ];
+      vi.mocked(getStorageItem).mockReturnValue(existingHistory);
 
-      const dishId = 'dish-2'
-      const date = '2024-01-02T12:00:00Z'
-      const notes = 'Second meal'
+      const dishId = "dish-2";
+      const date = "2024-01-02T12:00:00Z";
+      const notes = "Second meal";
 
-      logDishCooked(dishId, date, notes)
+      logDishCooked(dishId, date, notes);
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', [
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", [
         ...existingHistory,
-        { date, dishId, notes }
-      ])
-    })
+        { date, dishId, notes },
+      ]);
+    });
 
-    it('should handle logging multiple meals for the same dish', () => {
+    it("should handle logging multiple meals for the same dish", () => {
       const existingHistory = [
-        { date: '2024-01-01T00:00:00Z', dishId: 'dish-1', notes: 'First time' }
-      ]
-      vi.mocked(getStorageItem).mockReturnValue(existingHistory)
+        { date: "2024-01-01T00:00:00Z", dishId: "dish-1", notes: "First time" },
+      ];
+      vi.mocked(getStorageItem).mockReturnValue(existingHistory);
 
-      const dishId = 'dish-1'
-      const date = '2024-01-02T12:00:00Z'
-      const notes = 'Second time'
+      const dishId = "dish-1";
+      const date = "2024-01-02T12:00:00Z";
+      const notes = "Second time";
 
-      logDishCooked(dishId, date, notes)
+      logDishCooked(dishId, date, notes);
 
-      expect(saveStorageItem).toHaveBeenCalledWith('mealHistory', [
+      expect(saveStorageItem).toHaveBeenCalledWith("mealHistory", [
         ...existingHistory,
-        { date, dishId, notes }
-      ])
-    })
-  })
-})
+        { date, dishId, notes },
+      ]);
+    });
+  });
+});

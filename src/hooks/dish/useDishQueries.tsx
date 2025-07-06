@@ -1,8 +1,11 @@
-
 import { Dish } from "@/types";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDishesOriginalMethod, fetchDishById, fetchMealHistoryForDish } from "./utils/dishFetchUtils";
+import {
+  fetchDishesOriginalMethod,
+  fetchDishById,
+  fetchMealHistoryForDish,
+} from "./utils/dishFetchUtils";
 import { classifyError, logError } from "@/utils/errorHandling";
 import { ErrorType } from "@/types/errors";
 import { measureAsync, trackQuery } from "@/utils/performance";
@@ -14,88 +17,100 @@ import { useDynamicCacheInvalidation } from "@/hooks/useDynamicCacheInvalidation
 export function useDishQueries() {
   // Remove this local state as it conflicts with React Query's built-in loading state
   // const [isLoading, setIsLoading] = useState(true);
-  
+
   const { isUserActive } = useDynamicCacheInvalidation({
     idleThreshold: 3 * 60 * 1000, // 3 minutes for dishes
     activityWindow: 15 * 60 * 1000, // 15 minutes tracking window
   });
 
   // Query to fetch dishes with optimized performance monitoring
-  const { data: dishes = [], isLoading, error: queryError } = useQuery({
-    queryKey: ['dishes'],
+  const {
+    data: dishes = [],
+    isLoading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["dishes"],
     queryFn: async (): Promise<Dish[]> => {
-      return await measureAsync('dishes-query', async () => {
+      return await measureAsync("dishes-query", async () => {
         // Simple auth check
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
         if (authError || !user?.id) {
-          const appError = classifyError(authError || new Error('User not authenticated'));
-          logError(appError, 'useDishQueries:auth');
+          const appError = classifyError(
+            authError || new Error("User not authenticated")
+          );
+          logError(appError, "useDishQueries:auth");
           trackQuery({
-            queryType: 'dishes-auth',
+            queryType: "dishes-auth",
             duration: 0,
             recordCount: 0,
-            success: false
+            success: false,
           });
           return [];
         }
-        
+
         // Try materialized view first with performance tracking
         try {
-          const result = await measureAsync('dishes-summary-view', async () => {
+          const result = await measureAsync("dishes-summary-view", async () => {
             const { data, error } = await supabase
-              .from('dish_summary_secure')
-              .select('*')
-              .order('name');
-            
+              .from("dish_summary_secure")
+              .select("*")
+              .order("name");
+
             if (error) throw error;
             return data || [];
           });
-          
-          const mappedDishes = result.map(summary => mapDishFromSummary(summary));
-          
+
+          const mappedDishes = result.map(summary =>
+            mapDishFromSummary(summary)
+          );
+
           trackQuery({
-            queryType: 'dishes-summary-view',
+            queryType: "dishes-summary-view",
             duration: performance.now(), // Will be updated by measureAsync
             recordCount: mappedDishes.length,
             success: true,
-            fallbackUsed: false
+            fallbackUsed: false,
           });
-          
+
           return mappedDishes;
-          
         } catch (viewError) {
           const appError = classifyError(viewError);
-          logError(appError, 'useDishQueries:view-failed');
-          
+          logError(appError, "useDishQueries:view-failed");
+
           // Simple fallback without nested retries
           try {
-            const fallbackResult = await measureAsync('dishes-fallback', async () => {
-              return await fetchDishesOriginalMethod(user.id);
-            });
-            
+            const fallbackResult = await measureAsync(
+              "dishes-fallback",
+              async () => {
+                return await fetchDishesOriginalMethod(user.id);
+              }
+            );
+
             trackQuery({
-              queryType: 'dishes-fallback',
+              queryType: "dishes-fallback",
               duration: performance.now(),
               recordCount: fallbackResult.length,
               success: true,
-              fallbackUsed: true
+              fallbackUsed: true,
             });
-            
+
             return fallbackResult;
-            
           } catch (fallbackError) {
             const fallbackAppError = classifyError(fallbackError);
-            logError(fallbackAppError, 'useDishQueries:fallback-failed');
-            
+            logError(fallbackAppError, "useDishQueries:fallback-failed");
+
             trackQuery({
-              queryType: 'dishes-fallback',
+              queryType: "dishes-fallback",
               duration: performance.now(),
               recordCount: 0,
               success: false,
-              fallbackUsed: true
+              fallbackUsed: true,
             });
-            
+
             return [];
           }
         }
@@ -118,7 +133,7 @@ export function useDishQueries() {
     isLoading,
     error: queryError ? classifyError(queryError) : null,
     getDish: fetchDishById,
-    getMealHistoryForDish: fetchMealHistoryForDish
+    getMealHistoryForDish: fetchMealHistoryForDish,
   };
 }
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,9 +21,9 @@ export const useUserCuisines = () => {
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from('profiles')
-          .select('cuisines')
-          .eq('id', session.user.id)
+          .from("profiles")
+          .select("cuisines")
+          .eq("id", session.user.id)
           .single();
 
         if (error) {
@@ -35,7 +34,7 @@ export const useUserCuisines = () => {
           setCuisines(data.cuisines as CuisineType[]);
         }
       } catch (error) {
-        console.error('Error fetching user cuisines:', error);
+        console.error("Error fetching user cuisines:", error);
       } finally {
         setIsLoading(false);
       }
@@ -53,9 +52,9 @@ export const useUserCuisines = () => {
 
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update({ cuisines: newCuisines })
-        .eq('id', session.user.id);
+        .eq("id", session.user.id);
 
       if (error) {
         throw error;
@@ -65,8 +64,9 @@ export const useUserCuisines = () => {
       toast.success("Cuisines updated successfully");
       return true;
     } catch (error: unknown) {
-      console.error('Error updating cuisines:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to update cuisines";
+      console.error("Error updating cuisines:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update cuisines";
       toast.error(errorMessage);
       return false;
     }
@@ -75,17 +75,17 @@ export const useUserCuisines = () => {
   // Add a new cuisine to the user's list
   const addCuisine = async (cuisine: string) => {
     if (!cuisine.trim()) return false;
-    
+
     // Check if cuisine already exists (case insensitive)
     const cuisineExists = cuisines.some(
       c => c.toLowerCase() === cuisine.trim().toLowerCase()
     );
-    
+
     if (cuisineExists) {
       toast.error("This cuisine already exists");
       return false;
     }
-    
+
     const newCuisines = [...cuisines, cuisine.trim() as CuisineType];
     return await updateUserCuisines(newCuisines);
   };
@@ -97,7 +97,7 @@ export const useUserCuisines = () => {
       toast.error("The 'Other' cuisine cannot be removed");
       return false;
     }
-    
+
     const newCuisines = cuisines.filter(c => c !== cuisine);
     return await updateUserCuisines(newCuisines);
   };
@@ -113,6 +113,6 @@ export const useUserCuisines = () => {
     updateUserCuisines,
     addCuisine,
     removeCuisine,
-    resetToDefaults
+    resetToDefaults,
   };
 };

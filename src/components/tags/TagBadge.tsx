@@ -30,16 +30,20 @@ export const TagBadge = ({
         clickable && "cursor-pointer hover:opacity-80 transition-opacity",
         className
       )}
-      onClick={clickable && onClick ? (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick();
-      } : undefined}
+      onClick={
+        clickable && onClick
+          ? e => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClick();
+            }
+          : undefined
+      }
     >
       {tag}
       {removable && onRemove && (
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             e.stopPropagation();
             onRemove();

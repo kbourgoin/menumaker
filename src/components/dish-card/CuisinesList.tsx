@@ -1,4 +1,3 @@
-
 import { CuisineTag } from "@/components/shared";
 
 interface CuisinesListProps {
@@ -17,8 +16,12 @@ const CuisinesList = ({ cuisines, compact = false }: CuisinesListProps) => {
 
   return (
     <div className="flex flex-wrap gap-1.5">
-      {cuisines.map((cuisine) => (
-        <CuisineTag key={cuisine} cuisine={cuisine} size={compact ? "sm" : "md"} />
+      {cuisines.map(cuisine => (
+        <CuisineTag
+          key={cuisine}
+          cuisine={cuisine}
+          size={compact ? "sm" : "md"}
+        />
       ))}
     </div>
   );

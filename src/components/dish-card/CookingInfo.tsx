@@ -1,11 +1,10 @@
-
 import { Calendar, UtensilsCrossed } from "lucide-react";
 import { format, formatDistance, parseISO } from "date-fns";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 
 interface CookingInfoProps {
@@ -14,7 +13,11 @@ interface CookingInfoProps {
   compact?: boolean;
 }
 
-const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProps) => {
+const CookingInfo = ({
+  lastMade,
+  timesCooked,
+  compact = false,
+}: CookingInfoProps) => {
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Never";
     try {
@@ -30,11 +33,19 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
     try {
       // Parse the date and truncate to just the date (no time)
       const date = parseISO(dateString);
-      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const dateOnly = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
 
       // Calculate the difference in days and format accordingly
       const now = new Date();
-      const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const nowDateOnly = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      );
 
       const diffInMs = nowDateOnly.getTime() - dateOnly.getTime();
       const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
@@ -56,10 +67,14 @@ const CookingInfo = ({ lastMade, timesCooked, compact = false }: CookingInfoProp
   };
 
   return (
-    <div className={`text-sm text-muted-foreground ${compact ? "text-xs" : ""}`}>
+    <div
+      className={`text-sm text-muted-foreground ${compact ? "text-xs" : ""}`}
+    >
       <div className="flex items-center space-x-1">
         <UtensilsCrossed className="w-3.5 h-3.5 mr-1" />
-        <span>Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}</span>
+        <span>
+          Made {timesCooked || 0} {timesCooked === 1 ? "time" : "times"}
+        </span>
       </div>
 
       <div className="flex items-center space-x-1 mt-1">

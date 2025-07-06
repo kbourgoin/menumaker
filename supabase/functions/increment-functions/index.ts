@@ -1,21 +1,21 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
+serve(async req => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { dish_id, increment_by = 1 } = await req.json();
-    
+
     if (!dish_id) {
       throw new Error("dish_id is required");
     }
@@ -27,9 +27,9 @@ serve(async (req) => {
 
     // Get current count
     const { data: dish, error: fetchError } = await supabase
-      .from('dishes')
-      .select('timesCooked')
-      .eq('id', dish_id)
+      .from("dishes")
+      .select("timesCooked")
+      .eq("id", dish_id)
       .single();
 
     if (fetchError) {
@@ -43,10 +43,10 @@ serve(async (req) => {
     // Update the count
     const newCount = dish.timesCooked + increment_by;
     const { data, error: updateError } = await supabase
-      .from('dishes')
+      .from("dishes")
       .update({ timesCooked: newCount })
-      .eq('id', dish_id)
-      .select('timesCooked')
+      .eq("id", dish_id)
+      .select("timesCooked")
       .single();
 
     if (updateError) {
@@ -59,9 +59,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error:", error.message);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

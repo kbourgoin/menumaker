@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -8,7 +7,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Dish, Source } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
 import { formSchema, FormValues } from "./FormSchema";
 import SourceSelector from "./SourceSelector";
@@ -26,7 +32,8 @@ interface DishFormProps {
 const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const { dishes, addDish, updateDish } = useDishes();
   const { getSources } = useSources();
-  const { createTag, addMultipleTagsToDish, removeTagFromDish } = useTagMutations();
+  const { createTag, addMultipleTagsToDish, removeTagFromDish } =
+    useTagMutations();
   const { useAllTags, useTagsByDishId } = useTagQueries();
   const { data: allTags = [] } = useAllTags();
   const { data: currentTags = [] } = useTagsByDishId(existingDish?.id);
@@ -35,15 +42,16 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: sources = [] } = useQuery<Source[]>({
-    queryKey: ['sources'],
+    queryKey: ["sources"],
     queryFn: getSources,
     enabled: true,
   });
 
   // Format the existing dish cuisine as an array to match the form schema
-  const defaultCuisine = existingDish?.cuisines && existingDish.cuisines.length > 0 
-    ? [existingDish.cuisines[0]] 
-    : ["Other"];
+  const defaultCuisine =
+    existingDish?.cuisines && existingDish.cuisines.length > 0
+      ? [existingDish.cuisines[0]]
+      : ["Other"];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -60,7 +68,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const manageTags = async (dishId: string, selectedTagNames: string[]) => {
     const tagNameToId = new Map(allTags.map(tag => [tag.name, tag.id]));
     const selectedTagIds: string[] = [];
-    
+
     // Process each selected tag
     for (const tagName of selectedTagNames) {
       if (tagNameToId.has(tagName)) {
@@ -77,7 +85,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         }
       }
     }
-    
+
     // Remove old tag associations for existing dish
     if (existingDish) {
       const currentTagIds = currentTags.map(tag => tag.id);
@@ -85,26 +93,26 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         const tagName = allTags.find(tag => tag.id === id)?.name;
         return tagName && !selectedTagNames.includes(tagName);
       });
-      
+
       for (const tagId of tagsToRemove) {
         try {
           await removeTagFromDish.mutateAsync({ dishId, tagId });
         } catch (error) {
-          console.error('Failed to remove tag:', error);
+          console.error("Failed to remove tag:", error);
         }
       }
     }
-    
+
     // Add new tag associations
     const tagsToAdd = selectedTagIds.filter(tagId => {
       return !currentTags.some(currentTag => currentTag.id === tagId);
     });
-    
+
     if (tagsToAdd.length > 0) {
       try {
         await addMultipleTagsToDish.mutateAsync({ dishId, tagIds: tagsToAdd });
       } catch (error) {
-        console.error('Failed to add tags:', error);
+        console.error("Failed to add tags:", error);
       }
     }
   };
@@ -112,7 +120,7 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      
+
       if (existingDish) {
         await updateDish(existingDish.id, {
           name: data.name,
@@ -120,10 +128,10 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           sourceId: data.sourceId || undefined,
           location: data.location,
         });
-        
+
         // Manage tags
         await manageTags(existingDish.id, data.tags || []);
-        
+
         if (onSuccess) {
           onSuccess(existingDish);
         } else {
@@ -140,12 +148,12 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
           sourceId: data.sourceId || undefined,
           location: data.location,
         });
-        
+
         // Manage tags for new dish
         if (newDish && data.tags && data.tags.length > 0) {
           await manageTags(newDish.id, data.tags);
         }
-        
+
         if (onSuccess && newDish) {
           onSuccess(newDish);
         } else {
@@ -178,9 +186,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
             <FormItem>
               <FormLabel>Dish Name</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
-                  placeholder="Enter dish name" 
+                <Input
+                  {...field}
+                  placeholder="Enter dish name"
                   className="w-full"
                 />
               </FormControl>
@@ -190,9 +198,9 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
         />
 
         <CuisineTagSelector form={form} />
-        
+
         <SourceSelector form={form} sources={sources} />
-        
+
         <LocationField form={form} sources={sources} />
 
         <FormField
@@ -226,7 +234,11 @@ const DishForm = ({ existingDish, onSuccess }: DishFormProps) => {
             disabled={isSubmitting}
             className="bg-terracotta-500 hover:bg-terracotta-600"
           >
-            {isSubmitting ? "Saving..." : existingDish ? "Update Dish" : "Add Dish"}
+            {isSubmitting
+              ? "Saving..."
+              : existingDish
+                ? "Update Dish"
+                : "Add Dish"}
           </Button>
         </div>
       </form>

@@ -1,15 +1,15 @@
 /**
  * Main Types Export
- * 
+ *
  * This file re-exports all entity types from the unified type system.
  * Use this file as the main import point for all application types.
  */
 
 // Re-export all entity types from the new unified system
-export * from './entities';
+export * from "./entities";
 
 // Re-export database types for convenience
-export * from './database';
+export * from "./database";
 
 // DEPRECATED: Legacy type definitions below
 // These are kept for backward compatibility only
@@ -49,7 +49,7 @@ export interface MealHistoryLegacy {
 export interface SourceLegacy {
   id: string;
   name: string;
-  type: 'book' | 'website';  // Removed 'document' from the type options
+  type: "book" | "website"; // Removed 'document' from the type options
   description?: string;
   url?: string;
   createdAt: string;

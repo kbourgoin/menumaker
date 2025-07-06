@@ -1,2 +1,2 @@
 // UI-related hooks
-export { usePWAInstall } from './usePWAInstall';
+export { usePWAInstall } from "./usePWAInstall";

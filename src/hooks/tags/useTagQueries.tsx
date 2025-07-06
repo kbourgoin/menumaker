@@ -56,14 +56,16 @@ export const useTagQueries = () => {
 
         const { data, error } = await supabase
           .from("dish_tags")
-          .select(`
+          .select(
+            `
             tags (*)
-          `)
+          `
+          )
           .eq("dish_id", dishId);
 
         if (error) throw error;
-        
-        return data?.map(item => item.tags).filter(Boolean) as Tag[] || [];
+
+        return (data?.map(item => item.tags).filter(Boolean) as Tag[]) || [];
       },
       enabled: !!dishId && !!session?.user?.id,
     });
@@ -107,8 +109,8 @@ export const useTagQueries = () => {
     });
   };
 
-  const useCuisineTags = () => useTagsByCategory('cuisine');
-  const useGeneralTags = () => useTagsByCategory('general');
+  const useCuisineTags = () => useTagsByCategory("cuisine");
+  const useGeneralTags = () => useTagsByCategory("general");
 
   return {
     useAllTags,

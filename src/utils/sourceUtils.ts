@@ -1,4 +1,3 @@
-
 import { Source, Dish } from "@/types";
 import { getStorageItem, saveStorageItem, generateId } from "./storageUtils";
 
@@ -13,7 +12,9 @@ export const saveSources = (sources: Source[]): void => {
 };
 
 // Add a new source and return the updated list
-export const addSource = (source: Omit<Source, "id" | "createdAt">): Source[] => {
+export const addSource = (
+  source: Omit<Source, "id" | "createdAt">
+): Source[] => {
   const sources = getSources();
   const newSource: Source = {
     id: generateId(),
@@ -28,13 +29,16 @@ export const addSource = (source: Omit<Source, "id" | "createdAt">): Source[] =>
 // Get source by ID
 export const getSourceById = (id: string): Source | undefined => {
   const sources = getSources();
-  return sources.find((source) => source.id === id);
+  return sources.find(source => source.id === id);
 };
 
 // Update source by ID
-export const updateSource = (id: string, updates: Partial<Source>): Source[] => {
+export const updateSource = (
+  id: string,
+  updates: Partial<Source>
+): Source[] => {
   const sources = getSources();
-  const updatedSources = sources.map((source) => {
+  const updatedSources = sources.map(source => {
     if (source.id === id) {
       return {
         ...source,
@@ -50,7 +54,7 @@ export const updateSource = (id: string, updates: Partial<Source>): Source[] => 
 // Delete source by ID
 export const deleteSource = (id: string): Source[] => {
   const sources = getSources();
-  const updatedSources = sources.filter((source) => source.id !== id);
+  const updatedSources = sources.filter(source => source.id !== id);
   saveSources(updatedSources);
   return updatedSources;
 };

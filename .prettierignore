@@ -1,0 +1,9 @@
+dist/
+coverage/
+node_modules/
+*.min.js
+*.bundle.js
+.husky/
+bun.lockb
+*.lock
+*.log

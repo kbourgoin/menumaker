@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
@@ -13,13 +12,16 @@ const SearchInput = ({ searchQuery, setSearchQuery }: SearchInputProps) => {
       <label htmlFor="dish-search" className="sr-only">
         Search dishes by name or cuisine
       </label>
-      <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+      <Search
+        className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"
+        aria-hidden="true"
+      />
       <Input
         id="dish-search"
         type="search"
         placeholder="Search by dish name or cuisine..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={e => setSearchQuery(e.target.value)}
         className="pl-9"
         aria-describedby="search-help"
         autoComplete="off"

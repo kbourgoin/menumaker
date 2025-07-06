@@ -1,4 +1,3 @@
-
 import { useDishQueries, useDishMutations } from "./dish";
 import { useMealHistory } from "./meal-history";
 import { useWeeklyMenu } from "./useWeeklyMenu";
@@ -10,14 +9,12 @@ import { useStats } from "./stats";
  * It imports from individual hook files and provides a unified API.
  */
 export function useMeals() {
-  const { dishes, isLoading, getDish, getMealHistoryForDish } = useDishQueries();
+  const { dishes, isLoading, getDish, getMealHistoryForDish } =
+    useDishQueries();
   const { addDish, updateDish, deleteDish } = useDishMutations();
-  const { 
-    recordDishCooked, 
-    deleteMealHistory, 
-    updateMealHistory 
-  } = useMealHistory();
-  
+  const { recordDishCooked, deleteMealHistory, updateMealHistory } =
+    useMealHistory();
+
   const weeklyMenuHook = useWeeklyMenu();
   const sourcesHook = useSources();
   const statsHook = useStats();
@@ -30,26 +27,26 @@ export function useMeals() {
     updateDish,
     deleteDish,
     getDish,
-    
+
     // Meal History
     recordDishCooked,
     getMealHistoryForDish,
     deleteMealHistory,
     updateMealHistory,
-    
+
     // Weekly Menu
     getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,
     allDishes: weeklyMenuHook.allDishes,
-    
+
     // Sources
     getSources: sourcesHook.getSources,
     getSource: sourcesHook.getSource,
     getDishesBySource: sourcesHook.getDishesBySource,
-    
+
     // Stats
     getStats: statsHook.getStats,
     stats: statsHook.stats,
-    statsLoading: statsHook.isLoading
+    statsLoading: statsHook.isLoading,
   };
 }
 

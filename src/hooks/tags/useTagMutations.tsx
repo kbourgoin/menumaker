@@ -16,12 +16,10 @@ export const useTagMutations = () => {
     mutationFn: async (tagData: Omit<TagInsert, "user_id">): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
-      const { error } = await supabase
-        .from("tags")
-        .insert({
-          ...tagData,
-          user_id: session.user.id,
-        });
+      const { error } = await supabase.from("tags").insert({
+        ...tagData,
+        user_id: session.user.id,
+      });
 
       if (error) throw error;
     },
@@ -29,19 +27,19 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["tags", session?.user?.id] });
       toast.success("Tag created successfully");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error creating tag:", error);
       toast.error("Failed to create tag");
     },
   });
 
   const updateTag = useMutation({
-    mutationFn: async ({ 
-      tagId, 
-      updates 
-    }: { 
-      tagId: string; 
-      updates: TagUpdate 
+    mutationFn: async ({
+      tagId,
+      updates,
+    }: {
+      tagId: string;
+      updates: TagUpdate;
     }): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
@@ -58,7 +56,7 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["tag", tagId] });
       toast.success("Tag updated successfully");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error updating tag:", error);
       toast.error("Failed to update tag");
     },
@@ -81,28 +79,26 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag deleted successfully");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error deleting tag:", error);
       toast.error("Failed to delete tag");
     },
   });
 
   const addTagToDish = useMutation({
-    mutationFn: async ({ 
-      dishId, 
-      tagId 
-    }: { 
-      dishId: string; 
-      tagId: string 
+    mutationFn: async ({
+      dishId,
+      tagId,
+    }: {
+      dishId: string;
+      tagId: string;
     }): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
-      const { error } = await supabase
-        .from("dish_tags")
-        .insert({
-          dish_id: dishId,
-          tag_id: tagId,
-        });
+      const { error } = await supabase.from("dish_tags").insert({
+        dish_id: dishId,
+        tag_id: tagId,
+      });
 
       if (error) throw error;
     },
@@ -111,19 +107,19 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag added to dish");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error adding tag to dish:", error);
       toast.error("Failed to add tag to dish");
     },
   });
 
   const removeTagFromDish = useMutation({
-    mutationFn: async ({ 
-      dishId, 
-      tagId 
-    }: { 
-      dishId: string; 
-      tagId: string 
+    mutationFn: async ({
+      dishId,
+      tagId,
+    }: {
+      dishId: string;
+      tagId: string;
     }): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
@@ -140,19 +136,19 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tag removed from dish");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error removing tag from dish:", error);
       toast.error("Failed to remove tag from dish");
     },
   });
 
   const addMultipleTagsToDish = useMutation({
-    mutationFn: async ({ 
-      dishId, 
-      tagIds 
-    }: { 
-      dishId: string; 
-      tagIds: string[] 
+    mutationFn: async ({
+      dishId,
+      tagIds,
+    }: {
+      dishId: string;
+      tagIds: string[];
     }): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
@@ -161,9 +157,7 @@ export const useTagMutations = () => {
         tag_id: tagId,
       }));
 
-      const { error } = await supabase
-        .from("dish_tags")
-        .insert(inserts);
+      const { error } = await supabase.from("dish_tags").insert(inserts);
 
       if (error) throw error;
     },
@@ -172,7 +166,7 @@ export const useTagMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       toast.success("Tags added to dish");
     },
-    onError: (error) => {
+    onError: error => {
       console.error("Error adding tags to dish:", error);
       toast.error("Failed to add tags to dish");
     },

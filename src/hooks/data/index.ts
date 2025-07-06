@@ -1,2 +1,2 @@
 // Data management hooks
-export { useClearData } from './useClearData';
+export { useClearData } from "./useClearData";

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -24,13 +23,13 @@ interface MergeSourceDialogProps {
   onConfirm: () => void;
 }
 
-const MergeSourceDialog = ({ 
-  sourceToEdit, 
-  duplicateSource, 
-  affectedDishesCount, 
-  isOpen, 
+const MergeSourceDialog = ({
+  sourceToEdit,
+  duplicateSource,
+  affectedDishesCount,
+  isOpen,
   onOpenChange,
-  onConfirm
+  onConfirm,
 }: MergeSourceDialogProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -62,24 +61,30 @@ const MergeSourceDialog = ({
             Merge Sources
           </DialogTitle>
           <DialogDescription>
-            A source with the same name and type already exists.
-            Would you like to merge these sources?
+            A source with the same name and type already exists. Would you like
+            to merge these sources?
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-3">
           <div className="space-y-2">
             <h4 className="font-medium">What will happen:</h4>
             <ul className="list-disc ml-5 space-y-1 text-sm">
               <li>
-                All dishes ({affectedDishesCount}) currently linked to <strong>"{sourceToEdit.name}"</strong> will 
-                be linked to <strong>"{duplicateSource.name}"</strong> instead
+                All dishes ({affectedDishesCount}) currently linked to{" "}
+                <strong>"{sourceToEdit.name}"</strong> will be linked to{" "}
+                <strong>"{duplicateSource.name}"</strong> instead
               </li>
-              <li>The source <strong>"{sourceToEdit.name}"</strong> will be deleted</li>
-              <li>Any unique information in the description field will be lost</li>
+              <li>
+                The source <strong>"{sourceToEdit.name}"</strong> will be
+                deleted
+              </li>
+              <li>
+                Any unique information in the description field will be lost
+              </li>
             </ul>
           </div>
-          
+
           <div className="space-y-2 pt-2">
             <h4 className="font-medium">Source details:</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -88,7 +93,9 @@ const MergeSourceDialog = ({
                 <p>Name: {sourceToEdit.name}</p>
                 <p>Type: {sourceToEdit.type}</p>
                 {sourceToEdit.description && (
-                  <p className="truncate max-w-[200px]">Description: {sourceToEdit.description}</p>
+                  <p className="truncate max-w-[200px]">
+                    Description: {sourceToEdit.description}
+                  </p>
                 )}
               </div>
               <div className="space-y-1">
@@ -96,18 +103,20 @@ const MergeSourceDialog = ({
                 <p>Name: {duplicateSource.name}</p>
                 <p>Type: {duplicateSource.type}</p>
                 {duplicateSource.description && (
-                  <p className="truncate max-w-[200px]">Description: {duplicateSource.description}</p>
+                  <p className="truncate max-w-[200px]">
+                    Description: {duplicateSource.description}
+                  </p>
                 )}
               </div>
             </div>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             variant="default"
             onClick={handleConfirm}
             disabled={isProcessing}

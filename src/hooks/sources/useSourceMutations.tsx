@@ -1,6 +1,9 @@
-
 import { Source } from "@/types";
-import { supabase, mapSourceFromDB, mapSourceToDB } from "@/integrations/supabase/client";
+import {
+  supabase,
+  mapSourceFromDB,
+  mapSourceToDB,
+} from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Error types for better error handling
@@ -11,12 +14,22 @@ export interface SourceMutationError extends Error {
 }
 
 // Type guard for error objects
-const isErrorWithCode = (error: unknown): error is { code?: string; details?: string; hint?: string; message?: string } => {
-  return error !== null && typeof error === 'object';
+const isErrorWithCode = (
+  error: unknown
+): error is {
+  code?: string;
+  details?: string;
+  hint?: string;
+  message?: string;
+} => {
+  return error !== null && typeof error === "object";
 };
 
 // Helper function to create standardized error objects
-const createSourceMutationError = (message: string, originalError?: unknown): SourceMutationError => {
+const createSourceMutationError = (
+  message: string,
+  originalError?: unknown
+): SourceMutationError => {
   const error = new Error(message) as SourceMutationError;
   if (originalError && isErrorWithCode(originalError)) {
     error.code = originalError.code;
@@ -29,9 +42,14 @@ const createSourceMutationError = (message: string, originalError?: unknown): So
 
 // Helper function to handle authentication errors
 const handleAuthError = (error: unknown): never => {
-  if (isErrorWithCode(error) && 
-      (error.message?.includes('JWT') || error.code === 'PGRST301')) {
-    throw createSourceMutationError('Authentication failed. Please log in again.', error);
+  if (
+    isErrorWithCode(error) &&
+    (error.message?.includes("JWT") || error.code === "PGRST301")
+  ) {
+    throw createSourceMutationError(
+      "Authentication failed. Please log in again.",
+      error
+    );
   }
   throw error;
 };
@@ -41,57 +59,71 @@ export function useSourceMutations() {
 
   // Add a new source
   const addSource = useMutation({
-    mutationFn: async (source: Omit<Source, 'id' | 'createdAt' | 'user_id'>) => {
+    mutationFn: async (
+      source: Omit<Source, "id" | "createdAt" | "user_id">
+    ) => {
       // Validate input
       if (!source.name || !source.name.trim()) {
-        throw createSourceMutationError('Source name is required');
+        throw createSourceMutationError("Source name is required");
       }
 
       try {
-        const { data: userData, error: authError } = await supabase.auth.getUser();
-        
+        const { data: userData, error: authError } =
+          await supabase.auth.getUser();
+
         if (authError) {
           handleAuthError(authError);
         }
-        
+
         const user_id = userData.user?.id;
-        
+
         if (!user_id) {
-          throw createSourceMutationError('User not authenticated');
+          throw createSourceMutationError("User not authenticated");
         }
-        
+
         const sourceToInsert = {
           ...source,
           name: source.name.trim(),
-          user_id
+          user_id,
         };
-        
+
         const { data, error } = await supabase
-          .from('sources')
+          .from("sources")
           .insert(sourceToInsert)
           .select()
           .single();
-          
+
         if (error) {
           // Handle specific database errors
-          if (error.code === '23505') { // Unique constraint violation
-            throw createSourceMutationError('A source with this name already exists', error);
+          if (error.code === "23505") {
+            // Unique constraint violation
+            throw createSourceMutationError(
+              "A source with this name already exists",
+              error
+            );
           }
-          throw createSourceMutationError(`Failed to add source: ${error.message}`, error);
+          throw createSourceMutationError(
+            `Failed to add source: ${error.message}`,
+            error
+          );
         }
-        
+
         return mapSourceFromDB(data);
       } catch (error) {
-        console.error('Error adding source:', error);
-        throw error instanceof Error ? error : createSourceMutationError('Unknown error occurred while adding source');
+        console.error("Error adding source:", error);
+        throw error instanceof Error
+          ? error
+          : createSourceMutationError(
+              "Unknown error occurred while adding source"
+            );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sources'] });
+      queryClient.invalidateQueries({ queryKey: ["sources"] });
     },
-    onError: (error) => {
-      console.error('Source addition failed:', error);
-    }
+    onError: error => {
+      console.error("Source addition failed:", error);
+    },
   });
 
   // Update an existing source
@@ -99,63 +131,79 @@ export function useSourceMutations() {
     mutationFn: async (source: Partial<Source> & { id: string }) => {
       // Validate input
       if (!source.id) {
-        throw createSourceMutationError('Source ID is required for update');
+        throw createSourceMutationError("Source ID is required for update");
       }
-      
+
       if (source.name !== undefined && (!source.name || !source.name.trim())) {
-        throw createSourceMutationError('Source name cannot be empty');
+        throw createSourceMutationError("Source name cannot be empty");
       }
 
       try {
-        const { data: userData, error: authError } = await supabase.auth.getUser();
-        
+        const { data: userData, error: authError } =
+          await supabase.auth.getUser();
+
         if (authError) {
           handleAuthError(authError);
         }
-        
+
         const user_id = userData.user?.id;
-        
+
         if (!user_id) {
-          throw createSourceMutationError('User not authenticated');
+          throw createSourceMutationError("User not authenticated");
         }
-        
+
         // Only include properties that are present and trim name if provided
         const sourceToUpdate = mapSourceToDB({
           ...source,
-          name: source.name ? source.name.trim() : source.name
+          name: source.name ? source.name.trim() : source.name,
         });
-        
+
         const { data, error } = await supabase
-          .from('sources')
+          .from("sources")
           .update(sourceToUpdate)
-          .eq('id', source.id)
-          .eq('user_id', user_id)
+          .eq("id", source.id)
+          .eq("user_id", user_id)
           .select()
           .single();
-          
+
         if (error) {
           // Handle specific database errors
-          if (error.code === '23505') { // Unique constraint violation
-            throw createSourceMutationError('A source with this name already exists', error);
+          if (error.code === "23505") {
+            // Unique constraint violation
+            throw createSourceMutationError(
+              "A source with this name already exists",
+              error
+            );
           }
-          if (error.code === 'PGRST116') { // No rows affected
-            throw createSourceMutationError('Source not found or you do not have permission to update it', error);
+          if (error.code === "PGRST116") {
+            // No rows affected
+            throw createSourceMutationError(
+              "Source not found or you do not have permission to update it",
+              error
+            );
           }
-          throw createSourceMutationError(`Failed to update source: ${error.message}`, error);
+          throw createSourceMutationError(
+            `Failed to update source: ${error.message}`,
+            error
+          );
         }
-        
+
         return mapSourceFromDB(data);
       } catch (error) {
-        console.error('Error updating source:', error);
-        throw error instanceof Error ? error : createSourceMutationError('Unknown error occurred while updating source');
+        console.error("Error updating source:", error);
+        throw error instanceof Error
+          ? error
+          : createSourceMutationError(
+              "Unknown error occurred while updating source"
+            );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sources'] });
+      queryClient.invalidateQueries({ queryKey: ["sources"] });
     },
-    onError: (error) => {
-      console.error('Source update failed:', error);
-    }
+    onError: error => {
+      console.error("Source update failed:", error);
+    },
   });
 
   // Delete a source
@@ -163,60 +211,75 @@ export function useSourceMutations() {
     mutationFn: async (id: string) => {
       // Validate input
       if (!id) {
-        throw createSourceMutationError('Source ID is required for deletion');
+        throw createSourceMutationError("Source ID is required for deletion");
       }
 
       try {
-        const { data: userData, error: authError } = await supabase.auth.getUser();
-        
+        const { data: userData, error: authError } =
+          await supabase.auth.getUser();
+
         if (authError) {
           handleAuthError(authError);
         }
-        
+
         const user_id = userData.user?.id;
-        
+
         if (!user_id) {
-          throw createSourceMutationError('User not authenticated');
+          throw createSourceMutationError("User not authenticated");
         }
-        
+
         // First update any dishes that reference this source
         const { error: dishUpdateError } = await supabase
-          .from('dishes')
+          .from("dishes")
           .update({ source_id: null })
-          .eq('source_id', id)
-          .eq('user_id', user_id);
-          
+          .eq("source_id", id)
+          .eq("user_id", user_id);
+
         if (dishUpdateError) {
-          throw createSourceMutationError(`Failed to update linked dishes: ${dishUpdateError.message}`, dishUpdateError);
+          throw createSourceMutationError(
+            `Failed to update linked dishes: ${dishUpdateError.message}`,
+            dishUpdateError
+          );
         }
-        
+
         // Then delete the source
         const { error } = await supabase
-          .from('sources')
+          .from("sources")
           .delete()
-          .eq('id', id)
-          .eq('user_id', user_id);
-          
+          .eq("id", id)
+          .eq("user_id", user_id);
+
         if (error) {
-          if (error.code === 'PGRST116') { // No rows affected
-            throw createSourceMutationError('Source not found or you do not have permission to delete it', error);
+          if (error.code === "PGRST116") {
+            // No rows affected
+            throw createSourceMutationError(
+              "Source not found or you do not have permission to delete it",
+              error
+            );
           }
-          throw createSourceMutationError(`Failed to delete source: ${error.message}`, error);
+          throw createSourceMutationError(
+            `Failed to delete source: ${error.message}`,
+            error
+          );
         }
-        
+
         return id;
       } catch (error) {
-        console.error('Error deleting source:', error);
-        throw error instanceof Error ? error : createSourceMutationError('Unknown error occurred while deleting source');
+        console.error("Error deleting source:", error);
+        throw error instanceof Error
+          ? error
+          : createSourceMutationError(
+              "Unknown error occurred while deleting source"
+            );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sources'] });
-      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      queryClient.invalidateQueries({ queryKey: ["sources"] });
+      queryClient.invalidateQueries({ queryKey: ["dishes"] });
     },
-    onError: (error) => {
-      console.error('Source deletion failed:', error);
-    }
+    onError: error => {
+      console.error("Source deletion failed:", error);
+    },
   });
 
   return {
@@ -224,13 +287,13 @@ export function useSourceMutations() {
     addSource: addSource.mutateAsync,
     updateSource: updateSource.mutateAsync,
     deleteSource: deleteSource.mutateAsync,
-    
+
     // Mutation state
     isAddingSource: addSource.isPending,
     isUpdatingSource: updateSource.isPending,
     isDeletingSource: deleteSource.isPending,
-    
+
     // Error utilities
-    createSourceMutationError
+    createSourceMutationError,
   };
 }

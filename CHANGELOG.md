@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.6] - 2025-07-05
 
 ### Technical Debt Reduction - Phase 2 Completion ✅
+
 **Phase 2 officially completed with three major technical debt issues resolved:**
 
 - **PERFORMANCE: Database Query Optimization** (#55, #39): Eliminated N+1 query patterns and enhanced performance monitoring
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Performance Logging**: Added specialized performance logging for monitoring query times and operations
 
 ### Technical Infrastructure
+
 - **Validation System**: Full entity validation system implemented but temporarily disabled pending test fixture updates
 - **Performance Utilities**: Comprehensive timing and monitoring utilities for database operations
 - **Type Safety**: Enhanced type safety with centralized entity definitions and mapping functions
@@ -39,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.5] - 2025-07-04
 
 ### Technical Debt Reduction - Phase 2 Foundation
+
 - **TypeScript Strict Mode**: Enhanced type safety and code quality (#38, #48)
   - **Compiler Strictness**: Enabled noUnusedLocals, noUnusedParameters, noImplicitReturns, and noImplicitAny flags
   - **Field Naming Standardization**: Consistent camelCase field naming (user_id → userId, created_at → createdAt)
@@ -46,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Backward Compatibility**: Maintained database mapping compatibility during transition
 
 ### Dashboard & Analytics
+
 - **Stats Functionality Restoration**: Fixed critical dashboard stats after TypeScript migration (#49, #50)
   - **Database Mapper Fixes**: Corrected field mapping inconsistencies in all three mappers (dish, meal history, source)
   - **useStats Hook**: Fixed TypeScript typing for joined dish data and proper field mapping
@@ -56,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Scrollable Interface**: Added max-height container with scroll for long meal lists
   - **Better Planning**: Enhanced meal planning visibility with complete future schedule
 
-### Continuous Integration & Deployment  
+### Continuous Integration & Deployment
+
 - **GitHub Actions CI**: Comprehensive automated testing pipeline for quality assurance
   - **Automated Testing**: Runs all Vitest tests on every push and pull request (160 tests passing, 18 skipped)
   - **Code Quality Checks**: ESLint linting and TypeScript type checking on every change
@@ -67,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Environment Security**: Mock environment variables for secure builds without exposing credentials
 
 ### Technical Infrastructure
+
 - **Test Framework Enhancement**: Added missing coverage dependency and improved test reliability
   - **Comprehensive Test Suite**: 91 new tests for database mappers, stats functionality, and field consistency
   - **Vitest Configuration**: Proper mock setup for complex hook testing scenarios
@@ -77,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Repository Cleanup**: Removed 97K+ lines of accidentally committed HTML coverage files
 
 ### Developer Experience
+
 - **CI Documentation**: Added comprehensive workflow documentation in `.github/README.md`
 - **Automated Quality Gates**: All code changes now require passing tests, linting, and type checking
 - **Fast Feedback Loop**: Developers get immediate feedback on code quality and test status
@@ -85,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.4] - 2025-06-30
 
 ### Technical Debt Reduction - Phase 2
+
 - **Hook Architecture Consolidation**: Major refactoring to improve code organization and maintainability (#37)
   - **Domain-Specific Organization**: Reorganized hooks into logical directories (`meal-history/`, `auth/`, `stats/`, `data/`, `ui/`, `tags/`, `import-export/`)
   - **Enhanced Error Handling**: Applied consistent error handling patterns with retry logic and proper error classification across all hooks
@@ -93,13 +101,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Code Quality**: Removed duplicate files, improved TypeScript type safety, and enhanced separation of concerns
   - **Testing**: Verified build system and core functionality (91/106 tests passing with enhanced error coverage)
 
-### Developer Experience  
+### Developer Experience
+
 - **Architecture Documentation**: Enhanced project structure with clear domain boundaries and consistent patterns
 - **Error Handling Framework**: Established robust error handling foundation building on comprehensive error handling from Issue #35
 
 ## [0.2.3] - 2025-06-28
 
 ### Security
+
 - **Environment Variables**: Fixed critical security vulnerability by replacing hardcoded Supabase credentials with environment variables (#45)
   - Moved production credentials from source code to `.env.local` configuration
   - Added `.env.example` template for easy developer setup
@@ -107,11 +117,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced security without breaking existing functionality
 
 ### Technical Debt Analysis
+
 - **Comprehensive Audit**: Conducted thorough technical debt analysis identifying 23 issues across 4 severity levels
 - **GitHub Issue Tracking**: Created systematic tracking with parent issue #33 and child issues #34-#44 organized by implementation phases
 - **Priority Framework**: Established Critical/High/Medium/Low priority system for systematic debt reduction
 
 ### User Interface
+
 - **Dashboard Redesign**: Complete mobile-first redesign of the main dashboard (#31, #32)
   - **Mobile-First Layout**: Redesigned dashboard with responsive card-based layout optimized for mobile devices
   - **Today's Menu Enhancement**: Improved Today's Menu section with compact DishCard variants and better visual hierarchy
@@ -120,12 +132,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Responsive Grid**: Implemented flexible grid system that adapts seamlessly from mobile to desktop
 
 ### Developer Experience
+
 - **Project Documentation**: Enhanced `CLAUDE.md` with environment setup instructions and Git workflow guidelines
 - **Issue Templates**: Created detailed GitHub issues with implementation guidance for future technical debt resolution
 
 ## [0.2.2] - 2025-06-25
 
 ### Performance
+
 - **Database Query Optimization**: Significantly improved application performance through comprehensive database optimizations
   - **RLS Performance**: Optimized Row Level Security policies to prevent `auth.uid()` re-evaluation per row across all tables
   - **Missing Indexes**: Added critical foreign key indexes for `dishes.source_id`, `dishes.user_id`, `meal_history.dishid`, and `meal_history.user_id`
@@ -133,22 +147,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Policy Cleanup**: Removed duplicate permissive policies on sources table that caused multiple policy evaluations
 
 ### User Experience
+
 - **Mobile Keyboard Handling**: Fixed omnisearch keyboard not closing properly on mobile devices for better touch interaction
 - **Date Picker Modal**: Fixed date picker modal not closing when date is clicked, improving form workflow
 - **Tag Interface Cleanup**: Removed unused "(type # for tags)" functionality that was confusing users
 - **Automatic Data Refresh**: Restored automatic refresh of dish summary data after database security migration
 
 ### Security
+
 - **Security Definer View**: Resolved security definer view warnings while maintaining secure access to materialized views
   - Updated `dish_summary_secure` view to provide secure, performant access to aggregated dish data
   - Documented accepted security patterns in `SECURITY.md` for future reference
   - Maintained user data isolation while optimizing query performance
 
 ### Documentation
+
 - **Security Documentation**: Added comprehensive `SECURITY.md` documenting security patterns and accepted exceptions
 - **Database Index Documentation**: Added detailed comments explaining purpose of database indexes to prevent unnecessary removal
 
 ### Fixed
+
 - **Direct Materialized View Access**: Updated all application code to use secure view wrappers instead of direct materialized view access
 - **React Query Cache**: Fixed cache invalidation keys to match actual query patterns
 - **Supabase Performance Warnings**: Resolved all performance warnings from Supabase database linter
@@ -156,6 +174,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.1] - 2025-06-21
 
 ### Security
+
 - **Row Level Security (RLS)**: Enabled comprehensive database-level security policies
   - Added RLS policies to `dishes`, `sources`, `meal_history`, and `profiles` tables
   - Enforces user-level data isolation at the PostgreSQL level
@@ -164,7 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Database Function Security**: Fixed search_path vulnerabilities in 5 database functions
   - `handle_new_user`: Added `SET search_path = 'public'` to prevent injection attacks
   - `increment_times_cooked`: Added search_path security + user access validation
-  - `increment_by`: Added search_path security + user access validation  
+  - `increment_by`: Added search_path security + user access validation
   - `refresh_dish_summary_secure`: Added search_path security for materialized view refresh
   - `clear_user_data`: Added search_path security + user access control
 - **Materialized View Protection**: Secured `dish_summary` materialized view API access
@@ -172,12 +191,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Applications now use RLS-protected base tables instead
 
 ### Fixed
+
 - **Security Vulnerabilities**: Resolved 6 of 8 Supabase dashboard security warnings
   - Eliminated search path injection attack vectors in database functions
   - Closed potential data access loopholes in materialized views
   - Strengthened overall database security posture
 
 ### Developer Experience
+
 - **Migration Safety**: All security migrations include existence checks to prevent conflicts
 - **Backward Compatibility**: Existing application queries continue to work unchanged
 - **Database Integrity**: User access validation added to increment and clear functions
@@ -187,6 +208,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2025-06-19
 
 ### Added
+
 - **Hybrid Cuisine-Tag System**: Unified architecture treating cuisines as a special category of tags
   - Added category and color fields to tags table for cuisine categorization
   - Created smart migration system to convert existing cuisines to cuisine tags
@@ -214,6 +236,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Eliminated technical debt from unused features
 
 ### Changed
+
 - **Tag System Architecture**: Complete overhaul to support categorized tags
   - Extended Tag interface with category ('cuisine' | 'general') and color fields
   - Updated all tag-related hooks to support category filtering
@@ -229,6 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Proper separation of concerns between cuisine and tag categories
 
 ### Fixed
+
 - **Tag Filter Issues**: Resolved cuisines appearing in general tag filters
   - Updated TagFilter component to use useGeneralTags instead of useAllTags
   - Proper category-based filtering throughout the application
@@ -241,6 +265,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced type definitions for new tag category system
 
 ### Removed
+
 - **Legacy CSV Import**: Completely removed outdated CSV import functionality
   - Eliminated CSVImport component and related utilities
   - Removed CSV parsing dependencies and file handling code
@@ -248,6 +273,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Simplified codebase by removing unmaintained features
 
 ### Developer Experience
+
 - **Database Schema**: Added new fields to support hybrid system
   - category field with CHECK constraint for data integrity
   - color field for cuisine tag styling
@@ -262,6 +288,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Clean TypeScript interfaces and type safety
 
 ### Migration Notes
+
 - **Backward Compatibility**: Existing data safely migrated to new system
 - **Zero Downtime**: Migration designed to work alongside existing functionality
 - **Data Integrity**: Comprehensive validation and duplicate detection
@@ -272,6 +299,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-06-14
 
 ### Added
+
 - **Comprehensive Testing Framework**: Complete Vitest + React Testing Library setup with 44 passing tests
   - Component tests for DishCard, SearchInput, ViewToggle, LoadingSpinner, ErrorBoundary
   - Utility tests for dishUtils (sorting, filtering, validation)
@@ -286,6 +314,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Development Workflow**: Mandatory PR-based workflow with branch naming conventions
 
 ### Changed
+
 - **Performance Optimization**: 67% bundle size reduction (1.35MB → 443KB main chunk)
   - Implemented code splitting with lazy loading for all major routes
   - Added React.memo optimizations for expensive components
@@ -297,24 +326,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Codebase Quality**: Enabled stricter TypeScript settings and resolved all linting issues
 
 ### Fixed
+
 - **Temporal Dead Zone Errors**: Fixed function declaration order in WeeklyMenu and MealDetail components
 - **PWA Install Button Responsiveness**: Button now hides text on small screens like other nav buttons
 - **Browser Cache Issues**: Added development cache busting to prevent stale builds
 - **Social Media Previews**: Updated Open Graph images and meta tags for proper link previews
 
 ### Removed
+
 - **Lovable Platform Dependencies**: Complete migration away from Lovable branding and tooling
   - Removed lovable-tagger dependency and all platform references
   - Updated all documentation to focus on MenuMaker
   - Cleaned up old build artifacts containing Lovable branding
 
 ### Developer Experience
+
 - **Development Tools**: Created professional PWA icon generation tools (stored in `/tools/`)
 - **Documentation**: Comprehensive setup and contribution guidelines in README
 - **Git Workflow**: Established proper branching strategy and PR requirements
 - **Code Quality**: All 44 tests passing with comprehensive coverage
 
 ### Technical Debt Cleanup
+
 - **Code Quality**: Reduced ESLint problems from 46 to 8 acceptable warnings
 - **Type Safety**: Eliminated all TypeScript 'any' usage with proper types
 - **Performance**: Multiple optimization strategies implemented
@@ -325,7 +358,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## How to Read This Changelog
 
 - **Added** for new features
-- **Changed** for changes in existing functionality  
+- **Changed** for changes in existing functionality
 - **Deprecated** for soon-to-be removed features
 - **Removed** for now removed features
 - **Fixed** for any bug fixes

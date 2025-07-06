@@ -41,12 +41,15 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
     cuisineTagsCreated: 0,
     dishesUpdated: 0,
     dishTagRelationsCreated: 0,
-    errors: []
+    errors: [],
   };
 
   try {
     // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
     if (userError || !user) {
       throw new Error("User not authenticated");
     }
@@ -55,9 +58,9 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
 
     // Step 1: Create cuisine tags for all cuisines the user has used
     const { data: dishes, error: dishesError } = await supabase
-      .from('dishes')
-      .select('cuisines')
-      .eq('user_id', user.id);
+      .from("dishes")
+      .select("cuisines")
+      .eq("user_id", user.id);
 
     if (dishesError) {
       throw new Error(`Failed to fetch dishes: ${dishesError.message}`);
@@ -65,13 +68,13 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
 
     // Get unique cuisines from user's dishes + their profile cuisines
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('cuisines')
-      .eq('id', user.id)
+      .from("profiles")
+      .select("cuisines")
+      .eq("id", user.id)
       .single();
 
     const allUserCuisines = new Set<string>();
-    
+
     // Add cuisines from dishes
     dishes?.forEach(dish => {
       dish.cuisines?.forEach(cuisine => allUserCuisines.add(cuisine));
@@ -89,31 +92,34 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
 
     // Step 2: Check which cuisine tags already exist
     const { data: existingTags } = await supabase
-      .from('tags')
-      .select('id, name')
-      .eq('user_id', user.id)
-      .eq('category', 'cuisine');
+      .from("tags")
+      .select("id, name")
+      .eq("user_id", user.id)
+      .eq("category", "cuisine");
 
-    const existingCuisineNames = new Set(existingTags?.map(tag => tag.name) || []);
-    
+    const existingCuisineNames = new Set(
+      existingTags?.map(tag => tag.name) || []
+    );
+
     // Only create tags that don't already exist
     const cuisineTagsToCreate = Array.from(allUserCuisines)
       .filter(cuisine => !existingCuisineNames.has(cuisine))
       .map(cuisine => ({
         name: cuisine,
-        category: 'cuisine' as const,
-        color: cuisineColors[cuisine] || "bg-gray-100 text-gray-800 border-gray-200",
+        category: "cuisine" as const,
+        color:
+          cuisineColors[cuisine] || "bg-gray-100 text-gray-800 border-gray-200",
         user_id: user.id,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       }));
 
     let allCuisineTags = existingTags || [];
 
     if (cuisineTagsToCreate.length > 0) {
       const { data: createdTags, error: tagsError } = await supabase
-        .from('tags')
+        .from("tags")
         .insert(cuisineTagsToCreate)
-        .select('id, name');
+        .select("id, name");
 
       if (tagsError) {
         throw new Error(`Failed to create cuisine tags: ${tagsError.message}`);
@@ -123,7 +129,9 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
     }
 
     stats.cuisineTagsCreated = cuisineTagsToCreate.length;
-    console.log(`Created ${stats.cuisineTagsCreated} new cuisine tags (${allCuisineTags.length} total)`);
+    console.log(
+      `Created ${stats.cuisineTagsCreated} new cuisine tags (${allCuisineTags.length} total)`
+    );
 
     // Step 3: Create a mapping from cuisine names to tag IDs
     const cuisineToTagId = new Map<string, string>();
@@ -135,9 +143,9 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
     const dishTagRelations: Array<{ dish_id: string; tag_id: string }> = [];
 
     const { data: allDishes, error: allDishesError } = await supabase
-      .from('dishes')
-      .select('id, cuisines')
-      .eq('user_id', user.id);
+      .from("dishes")
+      .select("id, cuisines")
+      .eq("user_id", user.id);
 
     if (allDishesError) {
       throw new Error(`Failed to fetch all dishes: ${allDishesError.message}`);
@@ -149,7 +157,7 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
         if (tagId) {
           dishTagRelations.push({
             dish_id: dish.id,
-            tag_id: tagId
+            tag_id: tagId,
           });
         }
       });
@@ -158,14 +166,18 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
     // Insert dish-tag relationships
     if (dishTagRelations.length > 0) {
       const { error: relationsError } = await supabase
-        .from('dish_tags')
+        .from("dish_tags")
         .insert(dishTagRelations);
 
       if (relationsError) {
-        stats.errors.push(`Failed to create some dish-tag relations: ${relationsError.message}`);
+        stats.errors.push(
+          `Failed to create some dish-tag relations: ${relationsError.message}`
+        );
       } else {
         stats.dishTagRelationsCreated = dishTagRelations.length;
-        console.log(`Created ${stats.dishTagRelationsCreated} dish-tag relationships`);
+        console.log(
+          `Created ${stats.dishTagRelationsCreated} dish-tag relationships`
+        );
       }
     }
 
@@ -173,9 +185,9 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
 
     console.log("Migration completed successfully!", stats);
     return stats;
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     stats.errors.push(errorMessage);
     console.error("Migration failed:", error);
     return stats;
@@ -185,18 +197,24 @@ export async function migrateCuisinesToTags(): Promise<MigrationStats> {
 /**
  * Checks if the migration has already been run by looking for cuisine tags
  */
-export async function checkMigrationStatus(): Promise<{ needsMigration: boolean; cuisineTagCount: number }> {
+export async function checkMigrationStatus(): Promise<{
+  needsMigration: boolean;
+  cuisineTagCount: number;
+}> {
   try {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
     if (userError || !user) {
       return { needsMigration: true, cuisineTagCount: 0 };
     }
 
     const { data: cuisineTags, error } = await supabase
-      .from('tags')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('category', 'cuisine');
+      .from("tags")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("category", "cuisine");
 
     if (error) {
       console.error("Error checking migration status:", error);
@@ -206,7 +224,7 @@ export async function checkMigrationStatus(): Promise<{ needsMigration: boolean;
     const cuisineTagCount = cuisineTags?.length || 0;
     return {
       needsMigration: cuisineTagCount === 0,
-      cuisineTagCount
+      cuisineTagCount,
     };
   } catch (error) {
     console.error("Error checking migration status:", error);

@@ -1,4 +1,3 @@
-
 import SortSelect from "./SortSelect";
 import { OmniSearch } from "./OmniSearch";
 
@@ -32,13 +31,10 @@ const SearchAndFilterBar = ({
             setSelectedTags={setSelectedTags}
           />
         </div>
-        
+
         {viewMode === "cards" && (
           <div className="sm:col-span-1">
-            <SortSelect 
-              sortOption={sortOption} 
-              setSortOption={setSortOption} 
-            />
+            <SortSelect sortOption={sortOption} setSortOption={setSortOption} />
           </div>
         )}
       </div>

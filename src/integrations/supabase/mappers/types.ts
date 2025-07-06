@@ -1,11 +1,10 @@
-
-import { Database } from '../types';
-import { Dish, MealHistory, Source } from '@/types';
+import { Database } from "../types";
+import { Dish, MealHistory, Source } from "@/types";
 
 // Define types for the tables we've created - moved from client.ts
-export type DBDish = Database['public']['Tables']['dishes']['Row'];
-export type DBMealHistory = Database['public']['Tables']['meal_history']['Row'];
-export type DBSource = Database['public']['Tables']['sources']['Row'];
+export type DBDish = Database["public"]["Tables"]["dishes"]["Row"];
+export type DBMealHistory = Database["public"]["Tables"]["meal_history"]["Row"];
+export type DBSource = Database["public"]["Tables"]["sources"]["Row"];
 
 // Type for our materialized view
 export type DishSummary = {

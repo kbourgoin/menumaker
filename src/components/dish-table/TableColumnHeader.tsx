@@ -1,4 +1,3 @@
-
 import { Column, SortDirection } from "@/components/dish-table/types";
 import { cn } from "@/lib/utils";
 import { TableHead } from "@/components/ui/table";
@@ -19,14 +18,14 @@ const TableColumnHeader = ({
   className,
   currentSort,
   sortDirection,
-  onSort
+  onSort,
 }: TableColumnHeaderProps) => {
   const isActive = currentSort === column;
-  
+
   return (
-    <TableHead 
+    <TableHead
       className={cn(
-        "cursor-pointer select-none", 
+        "cursor-pointer select-none",
         isActive && "text-primary",
         className
       )}

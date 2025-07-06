@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Calendar as CalendarIcon, Utensils } from "lucide-react";
 import { format } from "date-fns";
@@ -25,7 +24,7 @@ import { useDishes } from "@/hooks/useMeals";
 import { useToast } from "@/hooks/use-toast";
 
 interface CookDishDialogProps {
-  dish: Pick<Dish, 'id' | 'name'>;
+  dish: Pick<Dish, "id" | "name">;
   variant?: "default" | "outline" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   compact?: boolean;
@@ -37,9 +36,9 @@ interface CookDishDialogProps {
   onSuccess?: () => void;
 }
 
-export default function CookDishDialog({ 
+export default function CookDishDialog({
   dish,
-  variant = "outline", 
+  variant = "outline",
   size = "default",
   compact = false,
   children,
@@ -47,7 +46,7 @@ export default function CookDishDialog({
   historyEntryId,
   initialDate,
   initialNotes = "",
-  onSuccess
+  onSuccess,
 }: CookDishDialogProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>(initialDate || new Date());
@@ -66,21 +65,25 @@ export default function CookDishDialog({
       if (editMode && historyEntryId) {
         await updateMealHistory(historyEntryId, {
           date: date.toISOString(),
-          notes: notes.trim() || null // Use null instead of undefined for empty strings
+          notes: notes.trim() || null, // Use null instead of undefined for empty strings
         });
         toast({
           title: "Entry updated",
           description: "The cooking history entry has been updated.",
         });
       } else {
-        await recordDishCooked(dish.id, date.toISOString(), notes.trim() || null);
+        await recordDishCooked(
+          dish.id,
+          date.toISOString(),
+          notes.trim() || null
+        );
         toast({
           title: "Dish cooked!",
           description: `${dish.name} has been recorded in your meal history.`,
         });
       }
       setOpen(false);
-      
+
       // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
@@ -113,26 +116,27 @@ export default function CookDishDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant={variant} 
+        <Button
+          variant={variant}
           size={size}
           className={cn(
             "text-terracotta-500 border-terracotta-200 hover:bg-terracotta-50 hover:text-terracotta-600",
             { "w-full": size === "icon" }
           )}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {triggerContent}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{editMode ? "Edit Cooking Entry" : `Cook ${dish.name}`}</DialogTitle>
+          <DialogTitle>
+            {editMode ? "Edit Cooking Entry" : `Cook ${dish.name}`}
+          </DialogTitle>
           <DialogDescription>
-            {editMode 
+            {editMode
               ? "Update when you cooked this dish and any notes about your experience."
-              : "Record when you cooked this dish and add any notes about your experience."
-            }
+              : "Record when you cooked this dish and add any notes about your experience."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -169,7 +173,7 @@ export default function CookDishDialog({
               id="notes"
               placeholder="Any variations or notes about this meal..."
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={e => setNotes(e.target.value)}
             />
           </div>
         </div>
@@ -177,7 +181,7 @@ export default function CookDishDialog({
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSubmit}
             className="bg-terracotta-500 hover:bg-terracotta-600"
           >

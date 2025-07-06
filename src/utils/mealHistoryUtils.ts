@@ -1,4 +1,3 @@
-
 import { Dish } from "@/types";
 import { getStorageItem, saveStorageItem } from "./storageUtils";
 
@@ -8,24 +7,33 @@ const saveDishes = (dishes: Dish[]): void => {};
 const getDishById = (id: string): Dish | undefined => undefined;
 
 // Get meal history from localStorage or initialize with empty array
-export const getMealHistory = (): { date: string; dishId: string; notes?: string }[] => {
-  return getStorageItem<{ date: string; dishId: string; notes?: string }[]>("mealHistory", []);
+export const getMealHistory = (): {
+  date: string;
+  dishId: string;
+  notes?: string;
+}[] => {
+  return getStorageItem<{ date: string; dishId: string; notes?: string }[]>(
+    "mealHistory",
+    []
+  );
 };
 
 // Save meal history to localStorage
-export const saveMealHistory = (history: { date: string; dishId: string; notes?: string }[]): void => {
+export const saveMealHistory = (
+  history: { date: string; dishId: string; notes?: string }[]
+): void => {
   saveStorageItem("mealHistory", history);
 };
 
 // Log that a dish was cooked (updates lastMade and timesCooked)
 export const logDishCooked = (
-  dishId: string, 
+  dishId: string,
   date: string = new Date().toISOString(),
   notes?: string
 ): void => {
   // Update dish stats
   const dishes = getDishes();
-  const updatedDishes = dishes.map((dish) => {
+  const updatedDishes = dishes.map(dish => {
     if (dish.id === dishId) {
       return {
         ...dish,
@@ -39,12 +47,12 @@ export const logDishCooked = (
   // Update history
   const history = getMealHistory();
   const updatedHistory = [
-    ...history, 
-    { 
-      date, 
-      dishId, 
-      notes 
-    }
+    ...history,
+    {
+      date,
+      dishId,
+      notes,
+    },
   ];
 
   saveDishes(updatedDishes);

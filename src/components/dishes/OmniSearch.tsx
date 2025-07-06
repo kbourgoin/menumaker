@@ -1,8 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Search, X, Hash, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTagQueries } from "@/hooks/tags";
@@ -21,7 +32,7 @@ interface OmniSearchProps {
 interface SuggestionItem {
   id: string;
   name: string;
-  type: 'tag' | 'cuisine';
+  type: "tag" | "cuisine";
   description?: string;
 }
 
@@ -43,34 +54,34 @@ export const OmniSearch = ({
   // Get matching suggestions (both tags and cuisines) based on current search query
   const getMatchingSuggestions = (): SuggestionItem[] => {
     if (!searchQuery || searchQuery.length < 2) return [];
-    
+
     const suggestions: SuggestionItem[] = [];
-    
+
     // Add matching general tags
     const matchingTags = availableTags
-      .filter(tag => 
-        !selectedTags.includes(tag.name) && 
-        tag.name.toLowerCase().includes(searchQuery.toLowerCase())
+      .filter(
+        tag =>
+          !selectedTags.includes(tag.name) &&
+          tag.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
       .map(tag => ({
         id: `tag-${tag.id}`,
         name: tag.name,
-        type: 'tag' as const,
-        description: tag.description
+        type: "tag" as const,
+        description: tag.description,
       }));
-    
+
     // Add matching cuisines
-    const matchingCuisines = CUISINES
-      .filter(cuisine => 
-        !selectedTags.includes(cuisine) && 
+    const matchingCuisines = CUISINES.filter(
+      cuisine =>
+        !selectedTags.includes(cuisine) &&
         cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .map(cuisine => ({
-        id: `cuisine-${cuisine}`,
-        name: cuisine,
-        type: 'cuisine' as const
-      }));
-    
+    ).map(cuisine => ({
+      id: `cuisine-${cuisine}`,
+      name: cuisine,
+      type: "cuisine" as const,
+    }));
+
     // Combine and sort by relevance (exact matches first)
     suggestions.push(...matchingTags, ...matchingCuisines);
     suggestions.sort((a, b) => {
@@ -80,7 +91,7 @@ export const OmniSearch = ({
       if (!aExact && bExact) return 1;
       return a.name.localeCompare(b.name);
     });
-    
+
     return suggestions.slice(0, 6); // Limit to 6 suggestions
   };
 
@@ -88,9 +99,13 @@ export const OmniSearch = ({
 
   // Utility to detect if we're on a mobile device
   const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           ('ontouchstart' in window) ||
-           (window.innerWidth <= 768);
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) ||
+      "ontouchstart" in window ||
+      window.innerWidth <= 768
+    );
   };
 
   const handleTagSelect = (tagName: string) => {
@@ -100,7 +115,7 @@ export const OmniSearch = ({
     setSearchQuery(""); // Clear search when selecting a tag
     setShowTagSuggestions(false);
     setShowInlineSuggestions(false);
-    
+
     // On mobile, blur the input to close the keyboard
     // On desktop, keep focus for better UX
     if (isMobile()) {
@@ -143,14 +158,17 @@ export const OmniSearch = ({
         <label htmlFor="omni-search" className="sr-only">
           Search dishes by name, cuisine, or add tags for filtering
         </label>
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+        <Search
+          className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"
+          aria-hidden="true"
+        />
         <Input
           ref={inputRef}
           id="omni-search"
           type="search"
           placeholder="Search dishes..."
           value={searchQuery}
-          onChange={(e) => {
+          onChange={e => {
             setSearchQuery(e.target.value);
             setShowInlineSuggestions(true);
           }}
@@ -164,8 +182,8 @@ export const OmniSearch = ({
               setShowInlineSuggestions(false);
             }, 200);
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
+          onKeyDown={e => {
+            if (e.key === "Enter") {
               e.preventDefault();
               handleSearchSubmit();
             }
@@ -174,10 +192,13 @@ export const OmniSearch = ({
           aria-describedby="omni-search-help"
           autoComplete="off"
         />
-        
+
         {/* Quick action buttons */}
         <div className="absolute right-2 top-2 flex items-center gap-1">
-          <Popover open={showTagSuggestions} onOpenChange={setShowTagSuggestions}>
+          <Popover
+            open={showTagSuggestions}
+            onOpenChange={setShowTagSuggestions}
+          >
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
@@ -196,7 +217,7 @@ export const OmniSearch = ({
                   <CommandGroup>
                     {availableTags
                       .filter(tag => !selectedTags.includes(tag.name))
-                      .map((tag) => (
+                      .map(tag => (
                         <CommandItem
                           key={tag.id}
                           value={tag.name}
@@ -216,7 +237,7 @@ export const OmniSearch = ({
               </Command>
             </PopoverContent>
           </Popover>
-          
+
           {hasFilters && (
             <Button
               variant="ghost"
@@ -229,11 +250,12 @@ export const OmniSearch = ({
             </Button>
           )}
         </div>
-        
+
         <div id="omni-search-help" className="sr-only">
-          Type to search through your dishes by name or cuisine. Use the # button to add tags for filtering.
+          Type to search through your dishes by name or cuisine. Use the #
+          button to add tags for filtering.
         </div>
-        
+
         {/* Inline suggestions */}
         {showInlineSuggestions && matchingSuggestions.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50">
@@ -243,17 +265,19 @@ export const OmniSearch = ({
                 <span>Add as filter:</span>
               </div>
               <div className="space-y-1">
-                {matchingSuggestions.map((suggestion) => (
+                {matchingSuggestions.map(suggestion => (
                   <button
                     key={suggestion.id}
                     onClick={() => handleTagSelect(suggestion.name)}
                     className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-gray-100 flex items-center gap-2"
                   >
-                    {suggestion.type === 'cuisine' ? (
+                    {suggestion.type === "cuisine" ? (
                       <div className="flex items-center gap-2 flex-1">
                         <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-200 flex-shrink-0" />
                         <span>{suggestion.name}</span>
-                        <span className="ml-auto text-xs text-muted-foreground">cuisine</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          cuisine
+                        </span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 flex-1">
@@ -281,14 +305,11 @@ export const OmniSearch = ({
             <Filter className="h-3 w-3" />
             <span>Filters:</span>
           </div>
-          {selectedTags.map((tag) => {
+          {selectedTags.map(tag => {
             const isCuisine = CUISINES.includes(tag);
             return isCuisine ? (
               <div key={tag} className="relative">
-                <CuisineTag 
-                  cuisine={tag}
-                  size="sm"
-                />
+                <CuisineTag cuisine={tag} size="sm" />
                 <button
                   onClick={() => handleTagRemove(tag)}
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
@@ -320,15 +341,19 @@ export const OmniSearch = ({
       )}
 
       {/* Search suggestions helper */}
-      {inputFocused && searchQuery.length === 0 && selectedTags.length === 0 && (
-        <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
-          <div className="flex items-center gap-4">
-            <span>💡 Tips:</span>
-            <span>Search by dish name or cuisine</span>
-            <span>Click <Hash className="inline h-3 w-3 mx-1" /> to add tags</span>
+      {inputFocused &&
+        searchQuery.length === 0 &&
+        selectedTags.length === 0 && (
+          <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
+            <div className="flex items-center gap-4">
+              <span>💡 Tips:</span>
+              <span>Search by dish name or cuisine</span>
+              <span>
+                Click <Hash className="inline h-3 w-3 mx-1" /> to add tags
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

@@ -5,6 +5,7 @@ This directory contains all React components organized by domain and functionali
 ## Directory Structure
 
 ### Domain-Based Organization
+
 Components are organized by their primary domain or context:
 
 - **`auth/`** - Authentication related components (login, signup, providers)
@@ -15,6 +16,7 @@ Components are organized by their primary domain or context:
 - **`shared/`** - Reusable components used across multiple domains
 
 ### Feature-Specific Directories
+
 Components specific to particular features are grouped together:
 
 - **`dish-card/`** - All components related to displaying dish cards
@@ -27,6 +29,7 @@ Components specific to particular features are grouped together:
 - **`tags/`** - Tag and cuisine management components
 
 ### Framework Components
+
 - **`ui/`** - Base UI components from shadcn/ui
 - **`dev/`** - Development utilities and debugging components
 
@@ -36,31 +39,37 @@ Each domain directory includes a barrel export (`index.ts`) for clean imports:
 
 ```typescript
 // ✅ Good - Use barrel exports
-import { Layout, Header } from '@/components/layout'
-import { AddSourceDialog, EditSourceDialog } from '@/components/dialogs'
-import { ErrorBoundary, LoadingSpinner } from '@/components/shared'
+import { Layout, Header } from "@/components/layout";
+import { AddSourceDialog, EditSourceDialog } from "@/components/dialogs";
+import { ErrorBoundary, LoadingSpinner } from "@/components/shared";
 
 // ❌ Avoid - Direct file imports for organized components
-import Layout from '@/components/layout/Layout'
-import { AddSourceDialog } from '@/components/dialogs/AddSourceDialog'
+import Layout from "@/components/layout/Layout";
+import { AddSourceDialog } from "@/components/dialogs/AddSourceDialog";
 ```
 
 ## Component Guidelines
 
 ### Shared Components
+
 Place components in `shared/` if they:
+
 - Are used in 3+ different domains
 - Provide core functionality (error handling, loading states)
 - Are utility components without domain-specific logic
 
 ### Domain Components
+
 Place components in domain directories if they:
+
 - Have domain-specific business logic
 - Are primarily used within one context
 - Contain domain-specific data structures
 
 ### When to Create New Directories
+
 Create new domain directories when:
+
 - You have 3+ components related to a new feature
 - The feature has distinct business logic
 - Components would benefit from co-location

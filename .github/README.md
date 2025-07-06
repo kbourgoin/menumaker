@@ -21,6 +21,7 @@ Runs on every push to `main` and on all pull requests.
    - Coverage upload to Codecov (optional)
 
 **Features:**
+
 - Uses Bun package manager for fast installs
 - Dependency caching for improved performance
 - Concurrent job execution for faster CI

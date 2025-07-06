@@ -1,4 +1,3 @@
-
 import { Source } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +19,11 @@ interface DeleteSourceDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const DeleteSourceDialog = ({ source, isOpen, onOpenChange }: DeleteSourceDialogProps) => {
+const DeleteSourceDialog = ({
+  source,
+  isOpen,
+  onOpenChange,
+}: DeleteSourceDialogProps) => {
   const { toast } = useToast();
   const { getDishesBySource } = useSources();
   const queryClient = useQueryClient();
@@ -28,39 +31,36 @@ const DeleteSourceDialog = ({ source, isOpen, onOpenChange }: DeleteSourceDialog
   // Mutation for deleting a source
   const deleteSourceMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('sources')
-        .delete()
-        .eq('id', id);
-      
+      const { error } = await supabase.from("sources").delete().eq("id", id);
+
       if (error) throw error;
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sources'] });
+      queryClient.invalidateQueries({ queryKey: ["sources"] });
       onOpenChange(false);
-      
+
       toast({
         title: "Source deleted",
         description: `The source has been deleted.`,
       });
     },
-    onError: (error) => {
+    onError: error => {
       toast({
         title: "Error deleting source",
         description: error.message,
         variant: "destructive",
       });
-    }
+    },
   });
 
   const handleDelete = async () => {
     if (!source) return;
-    
+
     // Check if source has linked dishes
     try {
       const linkedDishes = await getDishesBySource(source.id);
-      
+
       if (linkedDishes.length > 0) {
         toast({
           title: "Cannot delete source",
@@ -87,15 +87,16 @@ const DeleteSourceDialog = ({ source, isOpen, onOpenChange }: DeleteSourceDialog
         <DialogHeader>
           <DialogTitle>Delete Source</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete {source?.name}? This action cannot be undone.
+            Are you sure you want to delete {source?.name}? This action cannot
+            be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={handleDelete}
             disabled={deleteSourceMutation.isPending}
           >
