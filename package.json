@@ -26,7 +26,15 @@
     "dev:db:seed": "supabase db seed",
     "dev:db:status": "supabase status",
     "dev:db:logs": "supabase logs db",
-    "dev:db:studio": "supabase studio"
+    "dev:db:studio": "supabase studio",
+    "db:create-migration": "./scripts/create-migration.sh",
+    "db:validate-migration": "./scripts/validate-migration.sh",
+    "db:validate-migrations": "./scripts/validate-migration.sh",
+    "db:migrate": "supabase db migrate up",
+    "db:migrate-down": "supabase db migrate down",
+    "db:rollback": "supabase db migrate down 1",
+    "db:migration-status": "supabase migration list",
+    "db:lint": "supabase db lint"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

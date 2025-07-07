@@ -1,1 +1,7 @@
 bunx lint-staged
+
+# Validate database migrations
+if git diff --cached --name-only | grep -q "supabase/migrations/.*\.sql$"; then
+  echo "🔍 Validating database migrations..."
+  bun run db:validate-migrations || exit 1
+fi
