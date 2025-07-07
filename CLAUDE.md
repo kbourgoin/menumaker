@@ -510,6 +510,359 @@ supabase migration list
 
 **Security Note**: The schema files contain no actual user data, only table structures and policies.
 
+## Enhanced Database Development Tooling
+
+Advanced database development tools for schema management, type generation, testing, and performance monitoring.
+
+### Daily Database Development Workflow
+
+```bash
+# 1. Start local database
+bun run dev:db:start
+
+# 2. Check for schema changes
+bun run db:diff
+
+# 3. Update types if needed
+bun run db:update-types
+
+# 4. Run database tests
+bun run db:test
+
+# 5. Check performance
+bun run db:benchmark
+```
+
+### Schema Diffing Tools
+
+Compare schema differences between local and production environments:
+
+```bash
+# Compare all schema components
+bun run db:diff
+
+# Compare specific components
+bun run db:diff-tables      # Tables only
+bun run db:diff-functions   # Functions only
+bun run db:diff-policies    # RLS policies only
+bun run db:diff-indexes     # Indexes only
+
+# Advanced diffing options
+./scripts/schema-diff.sh --production-to-local
+./scripts/schema-diff.sh --output=report.html --format=html
+```
+
+**Output Example**:
+
+```
+Schema Differences: Local → Production
+
+TABLES:
+  + user_preferences (new table)
+  - old_settings (removed table)
+  ~ dishes (modified):
+    + dietary_restrictions (new column)
+    ~ name (varchar(100) → varchar(255))
+
+FUNCTIONS:
+  ~ search_dishes() (modified)
+  + get_user_preferences() (new function)
+```
+
+### TypeScript Type Generation
+
+Automatically generate TypeScript types from database schema:
+
+```bash
+# Generate types from current schema
+bun run db:generate-types
+
+# Force regeneration (overwrites existing)
+bun run db:update-types
+
+# Validate existing types
+bun run db:validate-types
+
+# Check for schema drift
+bun run db:check-drift
+```
+
+**Features**:
+
+- ✅ Automatic type generation from Supabase schema
+- ✅ Schema drift detection and warnings
+- ✅ TypeScript compilation validation
+- ✅ Backup of existing types before regeneration
+- ✅ Integration with existing type system
+
+**Generated Types Structure**:
+
+```typescript
+// Auto-generated from database schema
+export interface Database {
+  public: {
+    Tables: {
+      dishes: {
+        Row: { id: string; name: string; user_id: string /* ... */ };
+        Insert: { id?: string; name: string; user_id: string /* ... */ };
+        Update: { id?: string; name?: string /* ... */ };
+      };
+      // ... other tables
+    };
+    Functions: {
+      search_dishes: {
+        Args: { query: string; user_id: string };
+        Returns: Array<Database["public"]["Tables"]["dishes"]["Row"]>;
+      };
+      // ... other functions
+    };
+  };
+}
+```
+
+### Database Testing Framework
+
+Comprehensive testing for database functions and performance:
+
+```bash
+# Run all database tests
+bun run db:test
+
+# Run SQL-based tests (requires pg_prove)
+bun run db:test-sql
+
+# Run performance tests
+bun run db:benchmark
+
+# Combined performance testing
+bun run db:performance
+```
+
+**Test Categories**:
+
+1. **Function Tests** (`tests/database/test_search_functions.sql`):
+   - Search functionality validation
+   - User isolation testing
+   - SQL injection prevention
+   - Input validation
+
+2. **Security Tests** (`tests/database/test_rls_policies.sql`):
+   - RLS policy verification
+   - Permission validation
+   - Data isolation checks
+
+3. **Performance Tests** (`tests/database/performance.test.ts`):
+   - Query execution time benchmarks
+   - Performance regression detection
+   - Load testing simulation
+
+### Performance Monitoring
+
+Monitor and benchmark database performance:
+
+```bash
+# Full performance benchmark
+bun run db:benchmark
+
+# Specific benchmark categories
+bun run db:benchmark-search    # Search queries
+bun run db:benchmark-stats     # Statistics calculations
+bun run db:benchmark-crud      # CRUD operations
+
+# Advanced benchmarking options
+./scripts/benchmark-queries.sh --iterations=10 --verbose
+./scripts/benchmark-queries.sh --timeout=60 --no-report
+```
+
+**Performance Thresholds**:
+
+- Search queries: < 100ms
+- Statistics: < 500ms
+- CRUD operations: < 50ms
+- Complex queries: < 1000ms
+
+**Benchmark Output**:
+
+```
+=== Search Performance Tests ===
+
+Testing: Basic dish search
+  ✓ Average: 45ms | Min: 32ms | Max: 67ms | Success: 5/5
+
+Testing: Complex search query
+  ⚠ Average: 234ms | Min: 198ms | Max: 289ms | Success: 5/5
+    Performance warning: Consider optimization
+```
+
+### Production Sync Tools
+
+Safely sync schema and data from production to local development:
+
+```bash
+# Full production sync (schema + anonymized data)
+bun run db:sync-production
+
+# Schema only (no data)
+bun run db:sync-schema
+
+# Data only (no schema changes)
+bun run db:sync-data
+
+# Advanced sync options
+./scripts/sync-production.sh --dry-run
+./scripts/sync-production.sh --no-anonymize --force
+```
+
+**Safety Features**:
+
+- 🔒 **Read-only access** to production
+- 🔒 **Automatic data anonymization** for development
+- 🔒 **Local backup** before sync
+- 🔒 **Confirmation prompts** for safety
+
+**Data Anonymization**:
+
+- User emails → `user12345@example.com`
+- User names → `Test User 12345`
+- Dish names → `Sample Italian Dish A`
+- Source URLs → `https://example.com/source/12345`
+- Notes and descriptions → Generic placeholder text
+
+### Database Backup & Restore
+
+Local database backup and restore operations:
+
+```bash
+# Create local database backup
+bun run db:backup
+
+# Manual restore (follow printed instructions)
+bun run db:restore
+
+# Direct database console access
+bun run db:console
+```
+
+### Comprehensive Database Validation
+
+Run complete database health check:
+
+```bash
+# Full database validation suite
+bun run db:full-check
+
+# This runs:
+# 1. Migration validation
+# 2. Schema drift detection
+# 3. Database tests
+# 4. Performance benchmarks
+```
+
+### Pre-commit Integration
+
+Database validations run automatically on commit:
+
+```bash
+# .husky/pre-commit includes:
+if git diff --cached --name-only | grep -q "supabase/migrations/.*\.sql$"; then
+  echo "🔍 Validating database migrations..."
+  bun run db:validate-migrations || exit 1
+fi
+```
+
+### IDE Integration
+
+**Recommended VS Code Extensions**:
+
+- SQLTools (database exploration)
+- PostgreSQL Syntax Highlighting
+- Database Client (query execution)
+
+**VS Code Settings** (`.vscode/settings.json`):
+
+```json
+{
+  "sqltools.connections": [
+    {
+      "name": "Local Supabase",
+      "driver": "PostgreSQL",
+      "server": "localhost",
+      "port": 54322,
+      "database": "postgres",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ]
+}
+```
+
+### Development Best Practices
+
+#### Making Schema Changes
+
+1. **Create Migration**: `bun run db:create-migration table "add feature"`
+2. **Test Locally**: Apply and test in local environment
+3. **Update Types**: `bun run db:update-types`
+4. **Run Tests**: `bun run db:test` and `bun run db:performance`
+5. **Validate**: `bun run db:validate-migrations`
+6. **Commit**: Include migration and updated types
+
+#### Performance Optimization
+
+1. **Benchmark Before**: `bun run db:benchmark` to establish baseline
+2. **Make Changes**: Apply schema or query optimizations
+3. **Benchmark After**: Compare performance metrics
+4. **Regression Testing**: Ensure no performance degradation
+
+#### Troubleshooting
+
+**Schema Drift Issues**:
+
+```bash
+# Check what's different
+bun run db:diff
+
+# Update types to match current schema
+bun run db:update-types
+
+# Sync from production if needed
+bun run db:sync-schema
+```
+
+**Performance Issues**:
+
+```bash
+# Identify slow queries
+bun run db:benchmark --verbose
+
+# Check for missing indexes
+./scripts/schema-diff.sh --indexes
+
+# Run performance analysis
+bun run db:performance
+```
+
+**Type Mismatches**:
+
+```bash
+# Regenerate types from current schema
+bun run db:update-types
+
+# Validate types compile correctly
+bun run db:validate-types
+
+# Check for drift between schema and types
+bun run db:check-drift
+```
+
+### Security Considerations
+
+- 🔒 **Production Access**: All tools use read-only access to production
+- 🔒 **Data Anonymization**: Sensitive data automatically anonymized
+- 🔒 **Local Only**: Development tools only affect local database
+- 🔒 **Backup Safety**: Local backups created before destructive operations
+- 🔒 **Access Control**: Database credentials managed through environment variables
+
 ## Git Workflow
 
 **IMPORTANT**: Always create a feature branch before making any changes. Never develop directly on the main branch.
