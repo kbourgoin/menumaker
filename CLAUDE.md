@@ -74,6 +74,115 @@ bun install
 
 **Note**: The anon key is safe for client-side use and is designed to be exposed in frontend applications.
 
+## Local Development Setup
+
+**IMPORTANT**: This project includes a complete local Supabase environment for safe development without affecting production data.
+
+### Quick Start (First-time Setup)
+
+```bash
+# 1. Install dependencies
+bun install
+
+# 2. Set up local environment
+cp .env.local.example .env.local
+
+# 3. Start local Supabase stack
+bun run dev:db:start
+
+# 4. Start development server
+bun run dev
+```
+
+### Local Database Management
+
+#### Available Commands
+
+- `bun run dev:db:start` - Start local Supabase stack (PostgreSQL, Auth, Storage)
+- `bun run dev:db:stop` - Stop all local services
+- `bun run dev:db:restart` - Restart with fresh data
+- `bun run dev:db:reset` - Reset to baseline schema and re-seed
+- `bun run dev:db:status` - Check service status and get connection details
+- `bun run dev:db:studio` - Open Supabase Studio UI (database admin)
+
+#### Local Services
+
+| Service       | URL                                                     | Purpose                    |
+| ------------- | ------------------------------------------------------- | -------------------------- |
+| API & Auth    | http://127.0.0.1:54321                                  | Main Supabase API endpoint |
+| Database      | postgresql://postgres:postgres@127.0.0.1:54322/postgres | Direct database access     |
+| Studio        | http://127.0.0.1:54323                                  | Database admin interface   |
+| Email Testing | http://127.0.0.1:54324                                  | Inbucket email testing     |
+
+#### Environment Configuration
+
+**For Local Development**: Copy `.env.local.example` to `.env.local` (already configured for local services)
+
+**For Production**: Use `.env.example` template with your production Supabase credentials
+
+#### Sample Data
+
+The local database comes pre-seeded with realistic sample data:
+
+- **2 test users**: `test@menumaker.dev` and `chef@menumaker.dev` (password: `password123`)
+- **12 sample dishes** across Italian, Mexican, Asian, American, French, and Mediterranean cuisines
+- **6 recipe sources** including cookbooks and websites
+- **15+ meal history entries** with realistic cooking dates and notes
+- **Cuisine and general tags** for categorization
+- **Complete relationships** between dishes, tags, sources, and meal history
+
+#### Development Workflow
+
+1. **Start fresh**: `bun run dev:db:reset` - Resets database and reloads seed data
+2. **Monitor changes**: Use `bun run dev:db:studio` to inspect data in real-time
+3. **Test features**: All app functionality works with local data
+4. **Switch environments**: Change `.env.local` to test against different configurations
+
+#### Authentication in Local Development
+
+- **Test accounts** are automatically created with known credentials
+- **Email verification** is handled by Inbucket (no real emails sent)
+- **Password reset** flows work completely offline
+- **JWT tokens** are generated with local secrets (not production-safe)
+
+#### Troubleshooting Local Setup
+
+- **"Connection refused"**: Ensure Docker is running and `bun run dev:db:start` completed successfully
+- **"Migration errors"**: Run `bun run dev:db:reset` to start with clean database
+- **"Authentication issues"**: Check that you're using local environment variables in `.env.local`
+- **"No data showing"**: Verify materialized view is populated with `bun run dev:db:studio`
+
+### Environment Switching
+
+**Switch to Local Development**:
+
+```bash
+# 1. Update .env.local to use local settings
+# Edit .env.local and set:
+# VITE_SUPABASE_URL=http://127.0.0.1:54321
+# VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+
+# 2. Start local database
+bun run dev:db:start
+
+# 3. Restart development server to pick up new environment
+bun run dev
+```
+
+**Switch to Production Testing**:
+
+```bash
+# 1. Update .env.local to use production settings
+# Edit .env.local and set:
+# VITE_SUPABASE_URL=https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY=your-production-anon-key
+
+# 2. Restart development server
+bun run dev
+```
+
+**⚠️ Important**: Always restart your development server (`bun run dev`) after changing environment variables in `.env.local`. Vite only reads environment variables at startup.
+
 ## Database Schema Management
 
 **IMPORTANT**: This project uses Supabase for database management with a structured migration system.

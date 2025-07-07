@@ -18,7 +18,15 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:db:start": "supabase start",
+    "dev:db:stop": "supabase stop",
+    "dev:db:restart": "supabase restart",
+    "dev:db:reset": "supabase db reset",
+    "dev:db:seed": "supabase db seed",
+    "dev:db:status": "supabase status",
+    "dev:db:logs": "supabase logs db",
+    "dev:db:studio": "supabase studio"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
