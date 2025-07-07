@@ -199,6 +199,242 @@ The database consists of several main tables:
 - `dish_tags` - Many-to-many junction table linking dishes to tags
 - `dish_summary` - Materialized view with aggregated dish data
 
+## Database Migration Workflow
+
+**IMPORTANT**: This project follows a standardized migration workflow for safe, traceable database changes.
+
+### Migration Naming Convention
+
+All migrations follow the format: `YYYYMMDD_HHMMSS_operation_description.sql`
+
+**Examples**:
+
+- `20250707_120000_add_user_preferences_table.sql`
+- `20250707_130000_update_dish_search_function.sql`
+- `20250707_140000_create_meal_planning_indexes.sql`
+- `20250707_150000_migrate_legacy_cuisine_data.sql`
+
+### Creating Migrations
+
+#### Quick Start
+
+```bash
+# Create a new table
+bun run db:create-migration table "add user preferences table"
+
+# Update a function
+bun run db:create-migration function "update dish search function"
+
+# Add indexes
+bun run db:create-migration index "optimize meal history queries"
+
+# Migrate data
+bun run db:create-migration data "migrate legacy cuisine data"
+```
+
+#### Migration Types
+
+**Table Creation**:
+
+- Creates new table with RLS policies
+- Includes standard columns (id, user_id, created_at, updated_at)
+- Adds appropriate indexes and permissions
+- Template: `table_creation_template.sql`
+
+**Function Updates**:
+
+- Drops existing function safely
+- Creates updated function with proper security
+- Includes permission grants and documentation
+- Template: `function_update_template.sql`
+
+**Index Creation**:
+
+- Adds performance indexes with comments
+- Supports composite, partial, and full-text indexes
+- Documents expected performance improvements
+- Template: `index_creation_template.sql`
+
+**Data Migration**:
+
+- Includes validation and rollback strategy
+- Creates backup tables when needed
+- Validates results before completion
+- Template: `data_migration_template.sql`
+
+### Migration Validation
+
+#### Automatic Validation
+
+```bash
+# Validate all migrations
+bun run db:validate-migrations
+
+# Validate specific migration
+bun run db:validate-migration 20250707_120000_add_user_preferences.sql
+```
+
+#### Validation Checks
+
+- ✅ **Naming Convention**: Enforces YYYYMMDD_HHMMSS_description.sql format
+- ✅ **SQL Syntax**: Validates against local database
+- ✅ **Metadata**: Requires migration header, description, author
+- ✅ **RLS Security**: Warns about tables without Row Level Security
+- ✅ **Anti-patterns**: Catches unsafe DROP statements
+- ✅ **Performance**: Warns about missing indexes on foreign keys
+
+#### Pre-commit Validation
+
+All migrations are automatically validated before commit. The pre-commit hook will:
+
+1. Detect changed migration files
+2. Run validation checks
+3. Block commit if validation fails
+
+### Development Workflow
+
+#### 1. Create Migration
+
+```bash
+# Generate migration from template
+bun run db:create-migration table "add notification preferences"
+
+# Edit generated file and replace placeholders
+# File opens automatically in your editor
+```
+
+#### 2. Test Locally
+
+```bash
+# Ensure local database is running
+bun run dev:db:start
+
+# Apply migration to local database
+bun run db:migrate
+
+# Verify in Supabase Studio
+bun run dev:db:studio
+```
+
+#### 3. Validate and Commit
+
+```bash
+# Validate migration
+bun run db:validate-migration [filename]
+
+# Commit (validation runs automatically)
+git add supabase/migrations/[filename]
+git commit -m "feat: add notification preferences table"
+```
+
+#### 4. Create Rollback (if needed)
+
+```bash
+# Generate rollback script
+bun run db:create-migration rollback "20250707_120000_add_notification_preferences"
+
+# Edit rollback script to safely undo changes
+# Test rollback on local database
+```
+
+### Migration Templates
+
+#### Table Creation Template
+
+- Standard columns: id, user_id, created_at, updated_at
+- Row Level Security enabled by default
+- User-scoped policies for all operations
+- Performance indexes on user_id and created_at
+- Proper permissions and documentation
+
+#### Function Update Template
+
+- Safe function replacement with IF EXISTS
+- Security definer with search_path protection
+- Proper parameter and return type documentation
+- Permission grants for all roles
+
+#### Data Migration Template
+
+- Pre-migration validation
+- Backup table creation
+- Step-by-step transformation
+- Post-migration verification
+- Rollback instructions
+
+### Rollback Procedures
+
+#### Automatic Rollback
+
+```bash
+# Rollback last migration
+bun run db:rollback
+
+# Rollback multiple migrations
+bun run db:migrate-down [number]
+```
+
+#### Manual Rollback
+
+1. Create rollback migration using template
+2. Test rollback on local database copy
+3. Apply rollback migration
+4. Verify application functionality
+
+#### Rollback Safety
+
+- Always test on database copy first
+- Document data preservation strategy
+- Verify no dependent objects exist
+- Include validation checks
+
+### Migration Best Practices
+
+#### Required Elements
+
+- ✅ **Header Comment**: Migration name, description, author, date
+- ✅ **Dependencies**: List dependent migrations or "None"
+- ✅ **Breaking Changes**: Document any breaking changes
+- ✅ **Rollback Plan**: How to safely undo the migration
+
+#### Security Requirements
+
+- 🔒 **RLS Enabled**: All new tables must have Row Level Security
+- 🔒 **User Policies**: Tables must have user-scoped access policies
+- 🔒 **Function Security**: Use SECURITY DEFINER with search_path
+- 🔒 **Permission Grants**: Explicit grants for anon, authenticated, service_role
+
+#### Performance Considerations
+
+- 📈 **Index Foreign Keys**: Always index foreign key columns
+- 📈 **Composite Indexes**: For multi-column WHERE clauses
+- 📈 **Partial Indexes**: For conditional queries (WHERE status = 'active')
+- 📈 **Impact Assessment**: Document expected performance changes
+
+#### Data Safety
+
+- 💾 **Backup Critical Data**: Create backup tables for destructive changes
+- 💾 **Validate Results**: Include post-migration verification
+- 💾 **Atomic Operations**: Use transactions for multi-step changes
+- 💾 **Test Locally**: Always test against local database first
+
+### Emergency Procedures
+
+#### Failed Migration Recovery
+
+1. **Assess Impact**: Check application functionality
+2. **Rollback Decision**: Determine if rollback is safe
+3. **Execute Rollback**: Use prepared rollback migration
+4. **Verify Recovery**: Confirm application stability
+5. **Post-Incident**: Document cause and prevention
+
+#### Production Migration Guidelines
+
+1. **Staging First**: Test on staging environment
+2. **Off-Peak Timing**: Deploy during low-traffic periods
+3. **Monitor Closely**: Watch for errors and performance impact
+4. **Rollback Ready**: Have tested rollback procedure ready
+
 ### Migration Management
 
 **Directory Structure**:

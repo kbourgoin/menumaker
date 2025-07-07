@@ -1,5 +1,6 @@
 -- Migration: Complete baseline schema from production
--- This migration creates the complete database schema as extracted from production
+-- Description: This migration creates the complete database schema as extracted from production
+-- Author: Keith Bourgoin
 -- Date: 2025-07-06
 -- Source: Complete schema dump from production database
 
