@@ -34,3 +34,6 @@ coverage/
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase temporary files
+supabase/.temp/
