@@ -1,3 +1,11 @@
+# Menumaker
+
+A fully vibe-coded app to track menu planning for my household. Not intended as production software, but an experiment to see how far I can take this.
+
+Running live at menu.bourgoin.casa.
+
+---
+
 # GitHub Actions Configuration
 
 This directory contains GitHub Actions workflows for automated CI/CD.
