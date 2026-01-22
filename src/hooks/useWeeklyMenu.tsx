@@ -1,10 +1,17 @@
-import { Dish } from "@/types";
+import { useState, useCallback } from "react";
 import { supabase, mapDishFromSummary } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDishesOriginalMethod } from "./dish";
+import {
+  getCategorizedSuggestions,
+  refreshCategory,
+  SuggestionCategory,
+} from "@/utils/suggestionUtils";
 
 export function useWeeklyMenu() {
-  // Get dish data using React Query and the materialized view (READ ONLY)
+  const [categories, setCategories] = useState<SuggestionCategory[]>([]);
+
+  // Get dish data using React Query and the materialized view
   const { data: allDishes = [], isLoading } = useQuery({
     queryKey: ["dishes"],
     queryFn: async () => {
@@ -16,7 +23,6 @@ export function useWeeklyMenu() {
       }
 
       try {
-        // Use the secure materialized view for much faster performance (READ ONLY)
         const { data: summaryData, error: summaryError } = await supabase
           .from("dish_summary_secure")
           .select("*");
@@ -26,12 +32,9 @@ export function useWeeklyMenu() {
             "Error fetching from dish_summary_secure:",
             summaryError
           );
-
-          // Use the fallback method imported from useDishQueries
           return await fetchDishesOriginalMethod(user_id);
         }
 
-        // Map the summary data to our Dish type
         return summaryData
           ? summaryData.map(summary => mapDishFromSummary(summary))
           : [];
@@ -40,82 +43,49 @@ export function useWeeklyMenu() {
         return [];
       }
     },
-    // Shorter stale time for better responsiveness
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
 
-  // Get weekly dish suggestions
-  const getWeeklyDishSuggestions = async (
-    count: number = 7
-  ): Promise<Dish[]> => {
-    if (!allDishes || allDishes.length === 0) return [];
-    if (allDishes.length <= count) return [...allDishes];
-
-    // Weight calculations and suggestion logic - READ ONLY, no writes
-    const today = new Date();
-
-    // Weight calculations
-    const dishesWithWeights = allDishes.map(dish => {
-      const frequencyWeight =
-        dish.timesCooked === 0 ? 5 : 10 / (dish.timesCooked + 1);
-
-      let recencyWeight = 5; // Default for never made
-      if (dish.lastMade) {
-        const daysSinceLastMade = Math.max(
-          1,
-          Math.floor(
-            (today.getTime() - new Date(dish.lastMade).getTime()) /
-              (1000 * 60 * 60 * 24)
-          )
-        );
-        recencyWeight = Math.min(10, daysSinceLastMade / 7);
-      }
-
-      const oldFavoriteBonus =
-        dish.timesCooked > 3 &&
-        dish.lastMade &&
-        today.getTime() - new Date(dish.lastMade).getTime() >
-          90 * 24 * 60 * 60 * 1000
-          ? 5
-          : 0;
-
-      return {
-        dish,
-        weight: frequencyWeight + recencyWeight + oldFavoriteBonus,
-      };
-    });
-
-    // Sort by weight (higher weights first)
-    dishesWithWeights.sort((a, b) => b.weight - a.weight);
-
-    // Get the top dishes by weight with some randomness
-    const topDishes = dishesWithWeights.slice(
-      0,
-      Math.max(count * 2, Math.floor(allDishes.length * 0.6))
-    );
-
-    const suggestions: Dish[] = [];
-    const selectedIndexes = new Set<number>();
-
-    while (
-      suggestions.length < count &&
-      suggestions.length < topDishes.length
-    ) {
-      const randomIndex = Math.floor(Math.random() * topDishes.length);
-      if (!selectedIndexes.has(randomIndex)) {
-        selectedIndexes.add(randomIndex);
-        suggestions.push(topDishes[randomIndex].dish);
-      }
+  // Generate categorized suggestions
+  const generateSuggestions = useCallback(() => {
+    if (!allDishes || allDishes.length === 0) {
+      setCategories([]);
+      return;
     }
+    const newCategories = getCategorizedSuggestions(allDishes, 3);
+    setCategories(newCategories);
+  }, [allDishes]);
 
-    return suggestions;
-  };
+  // Refresh a single category with new random picks
+  const shuffleCategory = useCallback(
+    (categoryId: string) => {
+      if (!allDishes || allDishes.length === 0) return;
+
+      setCategories(prev =>
+        prev.map(cat =>
+          cat.id === categoryId
+            ? { ...cat, dishes: refreshCategory(allDishes, categoryId, 3) }
+            : cat
+        )
+      );
+    },
+    [allDishes]
+  );
+
+  // Check if suggestions have been generated
+  const hasCategories = categories.length > 0;
 
   return {
     allDishes,
     isLoading,
-    getWeeklyDishSuggestions,
+    categories,
+    hasCategories,
+    generateSuggestions,
+    shuffleCategory,
   };
 }
+
+// Re-export the type for convenience
+export type { SuggestionCategory };

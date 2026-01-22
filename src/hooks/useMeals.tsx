@@ -34,9 +34,11 @@ export function useMeals() {
     deleteMealHistory,
     updateMealHistory,
 
-    // Weekly Menu
-    getWeeklyDishSuggestions: weeklyMenuHook.getWeeklyDishSuggestions,
+    // Suggestions (What to Cook)
     allDishes: weeklyMenuHook.allDishes,
+    categories: weeklyMenuHook.categories,
+    generateSuggestions: weeklyMenuHook.generateSuggestions,
+    shuffleCategory: weeklyMenuHook.shuffleCategory,
 
     // Sources
     getSources: sourcesHook.getSources,

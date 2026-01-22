@@ -107,9 +107,9 @@ export const getPageSEO = (page: string, data?: { dishName?: string }) => {
       break;
 
     case "weekly-menu":
-      seoData.title = "Weekly Menu - MenuMaker";
+      seoData.title = "What to Cook - MenuMaker";
       seoData.description =
-        "Plan your weekly meals with AI-powered suggestions based on your cooking history.";
+        "Get personalized dish suggestions based on your cooking history and preferences.";
       break;
 
     case "settings":
