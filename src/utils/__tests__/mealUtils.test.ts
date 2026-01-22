@@ -17,7 +17,7 @@ import {
   updateSource,
   deleteSource,
   getSourceById,
-  getRandomDishSuggestions,
+  getCategorizedSuggestions,
   getDishStats,
 } from "../mealUtils";
 
@@ -53,7 +53,7 @@ describe("mealUtils", () => {
     });
 
     it("should export suggestion utilities", () => {
-      expect(typeof getRandomDishSuggestions).toBe("function");
+      expect(typeof getCategorizedSuggestions).toBe("function");
     });
 
     it("should export stats utilities", () => {

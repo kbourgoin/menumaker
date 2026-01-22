@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight, Edit, Plus, Shuffle } from "lucide-react";
+import { ChevronRight, Edit, Lightbulb, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -39,8 +39,8 @@ const QuickActions = () => {
               className="w-full flex justify-between items-center text-left border-terracotta-200 hover:bg-terracotta-50 hover:border-terracotta-300"
             >
               <div className="flex items-center">
-                <Shuffle className="mr-2 h-4 w-4 text-terracotta-500" />
-                <span>Create Weekly Menu</span>
+                <Lightbulb className="mr-2 h-4 w-4 text-terracotta-500" />
+                <span>What to Cook</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Button>

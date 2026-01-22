@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, List, Settings, Utensils } from "lucide-react";
+import { Calendar, Lightbulb, List, Settings, Utensils } from "lucide-react";
 import { AddCookedDishDialog } from "@/components/dialogs";
 import { PWAInstallButton } from "@/components/shared";
 
@@ -63,8 +63,8 @@ const Header = () => {
                     : "hover:bg-terracotta-50 hover:text-terracotta-500"
                 }`}
               >
-                <Calendar className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Weekly Menu</span>
+                <Lightbulb className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">What to Cook</span>
               </Button>
             </Link>
 

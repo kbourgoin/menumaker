@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Calendar, ChevronRight } from "lucide-react";
+import { Lightbulb, ChevronRight } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,7 +15,7 @@ const QuickAction = () => {
     <Card className="animate-slide-down delay-150">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Quick Action</CardTitle>
-        <CardDescription>Plan your week</CardDescription>
+        <CardDescription>Get inspired</CardDescription>
       </CardHeader>
       <CardContent>
         <Link to="/weekly-menu" className="block">
@@ -24,11 +24,11 @@ const QuickAction = () => {
             className="w-full flex justify-between items-center text-left border-terracotta-200 hover:bg-terracotta-50 hover:border-terracotta-300 h-auto py-4"
           >
             <div className="flex items-center">
-              <Calendar className="mr-3 h-5 w-5 text-terracotta-500" />
+              <Lightbulb className="mr-3 h-5 w-5 text-terracotta-500" />
               <div>
-                <div className="font-medium">Weekly Menu</div>
+                <div className="font-medium">What to Cook</div>
                 <div className="text-xs text-muted-foreground">
-                  Plan your meals
+                  Get suggestions
                 </div>
               </div>
             </div>

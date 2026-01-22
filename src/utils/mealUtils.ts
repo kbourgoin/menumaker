@@ -29,7 +29,7 @@ export {
 } from "./sourceUtils";
 
 // Suggestion utilities
-export { getRandomDishSuggestions } from "./suggestionUtils";
+export { getCategorizedSuggestions } from "./suggestionUtils";
 
 // Stats utilities
 export { getDishStats } from "./statsUtils";
