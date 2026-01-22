@@ -1,0 +1,62 @@
+{
+  "id": "menumaker-2",
+  "title": "Redesign Weekly Menu page with category-based suggestions",
+  "type": "feature",
+  "status": "in_progress",
+  "priority": 1,
+  "created": "2026-01-21T22:30:00Z",
+  "updated": "2026-01-21T22:45:00Z",
+  "description": "Replace the day-based weekly menu with category-based dish suggestions that help users discover what to cook.\n\n## Categories\n\n1. **Reliable Favorites** - timesCooked >= 5, made within last 60 days\n2. **Blast from the Past** - timesCooked >= 3, last made 60+ days ago\n3. **Give It Another Shot** - timesCooked 1-2, last made 30+ days ago\n4. **Cuisine You're Missing** - Cuisine not cooked in 14+ days\n\n## Requirements\n\n- Show 2-3 dishes per category\n- Shuffle button per category to get different suggestions\n- \"Plan this meal\" button on each dish to schedule it\n- Remove all day-based UI elements\n- Keep the page useful for planning a week's meals",
+  "labels": ["ui", "feature"],
+  "dependencies": [],
+  "subtasks": [
+    {
+      "id": "menumaker-2.1",
+      "title": "Create category suggestion utility functions",
+      "status": "completed",
+      "description": "Add utility functions to categorize dishes: getReliableFavorites(), getBlastFromPast(), getGiveItAnotherShot(), getCuisineYoureMissing()"
+    },
+    {
+      "id": "menumaker-2.2",
+      "title": "Update useWeeklyMenu hook with category-based logic",
+      "status": "completed",
+      "description": "Replace getWeeklyDishSuggestions with getCategorizedSuggestions that returns { reliableFavorites, blastFromPast, giveItAnotherShot, cuisineYoureMissing }"
+    },
+    {
+      "id": "menumaker-2.3",
+      "title": "Create SuggestionCategory UI component",
+      "status": "completed",
+      "description": "New component showing category title, description, 2-3 dish cards, and shuffle button"
+    },
+    {
+      "id": "menumaker-2.4",
+      "title": "Add PlanMealDialog component",
+      "status": "completed",
+      "description": "Dialog to schedule a dish - pick a date and optionally add notes, creates meal_history entry"
+    },
+    {
+      "id": "menumaker-2.5",
+      "title": "Redesign WeeklyMenu page layout",
+      "status": "completed",
+      "description": "Replace day-based grid with category sections, update header text, remove week date references"
+    },
+    {
+      "id": "menumaker-2.6",
+      "title": "Clean up unused day-based code",
+      "status": "completed",
+      "description": "Remove weekDates, refreshDayDish, day index logic, and related state"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-01-21T22:30:00Z",
+      "action": "created",
+      "details": "Issue created with 6 subtasks"
+    },
+    {
+      "timestamp": "2026-01-21T22:45:00Z",
+      "action": "implementation_complete",
+      "details": "All subtasks completed. Files changed: suggestionUtils.ts, useWeeklyMenu.tsx, SuggestionCategory.tsx (new), PlanMealDialog.tsx (new), WeeklyMenu.tsx. Tests updated and passing."
+    }
+  ]
+}

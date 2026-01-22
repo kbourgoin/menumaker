@@ -2,10 +2,11 @@
   "id": "menumaker-1",
   "title": "Fix column alignment on date picker",
   "type": "bug",
-  "status": "in_progress",
+  "status": "closed",
   "priority": 2,
   "created": "2026-01-21T00:00:00Z",
-  "updated": "2026-01-21T22:05:00Z",
+  "updated": "2026-01-21T22:10:00Z",
+  "closed": "2026-01-21T22:10:00Z",
   "description": "The alignment on the date picker to select the date of when a dish is cooked is off. The day-of-week headers (Su, Mo, Tu, We, Th, Fr, Sa) are misaligned - 'Su' appears in the middle while 'Mo Tu We Th Fr Sa' are scrunched all the way to the right. The date numbers below are properly aligned in a 7-column grid, but the headers don't match up with their respective columns.\n\nScreenshot: Screenshot 2026-01-21 at 21.58.08.png",
   "labels": [],
   "dependencies": [],
@@ -24,6 +25,11 @@
       "timestamp": "2026-01-21T22:05:00Z",
       "action": "fix_applied",
       "details": "Updated calendar.tsx to use react-day-picker v9 classNames API (weekdays, weekday, week, day, etc.) instead of deprecated v8 names (head_row, head_cell, row, cell)"
+    },
+    {
+      "timestamp": "2026-01-21T22:10:00Z",
+      "action": "closed",
+      "details": "Merged to main in PR #81"
     }
   ]
 }
