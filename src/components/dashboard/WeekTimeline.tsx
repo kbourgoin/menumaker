@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, ChevronRight } from "lucide-react";
+import { Calendar, Clock, ChevronRight, ArrowUp, History } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -115,24 +115,30 @@ const WeekTimeline = ({
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {hasUpcoming && (
               <div className="space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-terracotta-500 uppercase tracking-wide">
+                  <ArrowUp className="h-3 w-3" />
+                  Coming up
+                </div>
                 {upcomingMeals.map(group => (
                   <DaySection key={group.date} group={group} />
                 ))}
               </div>
             )}
 
-            {hasRecent && hasUpcoming && (
-              <div className="border-t border-dashed my-2" />
-            )}
-
             {hasRecent && (
-              <div className="space-y-3 opacity-75">
-                {recentMeals.map(group => (
-                  <DaySection key={group.date} group={group} />
-                ))}
+              <div className="space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-2 border-t">
+                  <History className="h-3 w-3" />
+                  Recently cooked
+                </div>
+                <div className="space-y-3 text-muted-foreground">
+                  {recentMeals.map(group => (
+                    <DaySection key={group.date} group={group} />
+                  ))}
+                </div>
               </div>
             )}
           </div>
