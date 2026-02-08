@@ -213,6 +213,7 @@ export function useDishMutations() {
       // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       queryClient.invalidateQueries({ queryKey: ["mealHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["mealHistoryByDate"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedDishes"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });

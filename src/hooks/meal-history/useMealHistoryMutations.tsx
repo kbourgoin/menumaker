@@ -101,6 +101,7 @@ export function useMealHistoryMutations() {
       // Invalidate multiple queries to ensure all related data is refreshed
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       queryClient.invalidateQueries({ queryKey: ["mealHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["mealHistoryByDate"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedDishes"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
@@ -160,6 +161,7 @@ export function useMealHistoryMutations() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       queryClient.invalidateQueries({ queryKey: ["mealHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["mealHistoryByDate"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedDishes"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
@@ -247,6 +249,7 @@ export function useMealHistoryMutations() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dishes"] });
       queryClient.invalidateQueries({ queryKey: ["mealHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["mealHistoryByDate"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedDishes"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });

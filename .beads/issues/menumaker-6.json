@@ -1,0 +1,10 @@
+{
+  "id": "menumaker-6",
+  "title": "Replace Coming Up with unified week timeline showing recent and upcoming",
+  "type": "feature",
+  "status": "open",
+  "priority": 2,
+  "description": "Replace the current 'Coming Up' card on the dashboard with a unified chronological timeline that shows both recent meals (past few days) and upcoming meals this week, with today as the natural divider.\n\n## Design\n- Single card replacing 'Coming Up' in the existing two-column grid\n- Timeline flows chronologically: recent past at top, upcoming at bottom (or vice versa — upcoming first may feel more actionable)\n- Today is visually distinct as the divider/anchor point (handled by the existing TodaysMenu hero card above)\n- Compact card design optimized for mobile — this is the primary use case\n- Reuse the existing RecentlyCooked component logic or the useStats hook's recentlyCooked data for the 'recent' portion\n- Reuse getUpcomingMeals() from useMealHistoryByDate() for the upcoming portion, filtered to this week only\n\n## Scope\n- Show ~3 days back and remainder of the current week ahead\n- Each entry: dish name, cuisine badge, date label (e.g. 'Yesterday', 'Mon', 'Wed')\n- Keep items compact — single line per dish where possible\n- Skip today (already shown in TodaysMenu hero card)\n- Empty states for both sections if no data\n\n## Context\n- Existing unused RecentlyCooked.tsx component may be a starting point\n- useMealHistoryByDate() hook already provides getUpcomingMeals() and getMealsForDate()\n- Primary app usage is mobile, so compact layout is critical\n- This sets groundwork for upcoming user feedback features",
+  "created": "2026-02-08T12:00:03Z",
+  "updated": "2026-02-08T12:00:03Z"
+}
