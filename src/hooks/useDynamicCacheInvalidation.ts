@@ -56,7 +56,8 @@ export function useDynamicCacheInvalidation(
         break;
       case "meal_logged":
         queryClient.invalidateQueries({ queryKey: ["dishes"] });
-        queryClient.invalidateQueries({ queryKey: ["meal-history"] });
+        queryClient.invalidateQueries({ queryKey: ["mealHistory"] });
+        queryClient.invalidateQueries({ queryKey: ["mealHistoryByDate"] });
         break;
       case "source_created":
         queryClient.invalidateQueries({ queryKey: ["sources"] });
