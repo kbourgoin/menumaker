@@ -1,0 +1,10 @@
+{
+  "id": "menumaker-5",
+  "title": "Add delete button to dish detail page",
+  "type": "feature",
+  "status": "open",
+  "priority": 2,
+  "description": "There is currently no way to delete a dish. Add a delete button to the dish detail page. Should include a confirmation dialog to prevent accidental deletions. On successful delete, navigate back to the dish list.",
+  "created": "2026-02-08T12:00:02Z",
+  "updated": "2026-02-08T12:00:02Z"
+}

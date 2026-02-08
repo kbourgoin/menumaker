@@ -1,0 +1,10 @@
+{
+  "id": "menumaker-3",
+  "title": "Cooking a dish doesn't update UI until page reload",
+  "type": "bug",
+  "status": "open",
+  "priority": 2,
+  "description": "When you click to cook something on the main page, the UI doesn't reflect the change. The data is persisted correctly (reloading the page shows updated data), but the UI state doesn't automatically update after the mutation. Likely a TanStack Query cache invalidation issue — the mutation probably isn't invalidating the relevant queries after success.",
+  "created": "2026-02-08T12:00:00Z",
+  "updated": "2026-02-08T12:00:00Z"
+}

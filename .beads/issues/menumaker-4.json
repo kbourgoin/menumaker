@@ -1,0 +1,10 @@
+{
+  "id": "menumaker-4",
+  "title": "Today's dishes appear in both Today's Menu and Coming Up after 8pm ET",
+  "type": "bug",
+  "status": "open",
+  "priority": 2,
+  "description": "After 8pm ET, today's dishes show up in both the \"Today's Menu\" section and the \"Coming Up\" section. This is almost certainly a timezone bug where UTC is being used inconsistently — after 8pm ET (which is midnight UTC), date comparisons using UTC would consider 'today' as the next day, causing today's meals to also appear in the upcoming list.",
+  "created": "2026-02-08T12:00:01Z",
+  "updated": "2026-02-08T12:00:01Z"
+}
