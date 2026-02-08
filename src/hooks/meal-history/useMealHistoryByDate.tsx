@@ -83,6 +83,31 @@ export function useMealHistoryByDate() {
     return getMealsForDate(todayKey);
   };
 
+  const getRecentMeals = (days: number = 3): Array<{ date: string; dishes: Dish[] }> => {
+    const today = new Date();
+    const todayKey = getLocalDateString(today);
+    const cutoff = new Date(today);
+    cutoff.setDate(today.getDate() - days);
+    const cutoffKey = getLocalDateString(cutoff);
+    const recentMap = new Map<string, Dish[]>();
+
+    mealHistoryWithDishes.forEach(meal => {
+      const mealDate = getLocalDateString(new Date(meal.date));
+
+      // Include meals from recent past, excluding today
+      if (mealDate >= cutoffKey && mealDate < todayKey && meal.dish) {
+        if (!recentMap.has(mealDate)) {
+          recentMap.set(mealDate, []);
+        }
+        recentMap.get(mealDate)!.push(meal.dish);
+      }
+    });
+
+    return Array.from(recentMap.entries())
+      .map(([date, dishes]) => ({ date, dishes }))
+      .sort((a, b) => b.date.localeCompare(a.date));
+  };
+
   const getUpcomingMeals = (): Array<{ date: string; dishes: Dish[] }> => {
     const today = new Date();
     const todayKey = getLocalDateString(today);
@@ -90,7 +115,7 @@ export function useMealHistoryByDate() {
 
     // Get all future meals from meal history
     mealHistoryWithDishes.forEach(meal => {
-      const mealDate = meal.date.split("T")[0]; // Get date part only
+      const mealDate = getLocalDateString(new Date(meal.date));
 
       // Only include meals that are in the future (after today)
       if (mealDate > todayKey && meal.dish) {
@@ -114,6 +139,7 @@ export function useMealHistoryByDate() {
     isLoading,
     getMealsForDate,
     getTodaysMeals,
+    getRecentMeals,
     getUpcomingMeals,
   };
 }

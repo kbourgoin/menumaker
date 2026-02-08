@@ -5,8 +5,19 @@ import { useDishes } from "@/hooks/useMeals";
 import DishForm from "@/components/dish-form";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Card } from "@/components/ui/card";
 import { Dish, MealHistory } from "@/types";
 import {
@@ -20,7 +31,7 @@ import {
 const MealDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getDish, getMealHistoryForDish } = useDishes();
+  const { getDish, getMealHistoryForDish, deleteDish } = useDishes();
   const { toast } = useToast();
   const [dish, setDish] = useState<Dish | null>(null);
   const [history, setHistory] = useState<MealHistory[]>([]);
@@ -107,6 +118,25 @@ const MealDetail = () => {
     setHistoryLastUpdated(Date.now());
   };
 
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteDish(id);
+      toast({
+        title: "Dish deleted",
+        description: `${dish?.name || "Dish"} has been deleted.`,
+      });
+      navigate("/all-meals");
+    } catch (err) {
+      console.error("Error deleting dish:", err);
+      toast({
+        title: "Error",
+        description: "Failed to delete the dish. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -129,10 +159,34 @@ const MealDetail = () => {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto animate-slide-down">
-        <Button variant="ghost" onClick={handleBack} className="mb-4">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
+        <div className="flex items-center justify-between mb-4">
+          <Button variant="ghost" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete {dish.name}?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete this dish and all its cooking history. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
         <DishDetailsCard dish={dish} />
 

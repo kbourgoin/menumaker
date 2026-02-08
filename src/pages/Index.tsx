@@ -10,13 +10,14 @@ import { isNetworkError } from "@/utils/errorHandling";
 
 // Import our new component files
 import TodaysMenu from "@/components/dashboard/TodaysMenu";
-import ComingUp from "@/components/dashboard/ComingUp";
+import WeekTimeline from "@/components/dashboard/WeekTimeline";
 import StatsCard from "@/components/dashboard/StatsCard";
 
 const Home = () => {
   const { isLoading: dishesLoading, error: dishesError } = useDishes();
   const {
     getTodaysMeals,
+    getRecentMeals,
     getUpcomingMeals,
     isLoading: mealHistoryLoading,
   } = useMealHistoryByDate();
@@ -25,9 +26,10 @@ const Home = () => {
 
   const isLoading = dishesLoading || mealHistoryLoading;
 
-  // Get today's and upcoming dishes from meal history
+  // Get today's, recent, and upcoming dishes from meal history
   const todaysDishes = getTodaysMeals();
-  const upcomingDishes = getUpcomingMeals();
+  const recentMeals = getRecentMeals(3);
+  const upcomingMeals = getUpcomingMeals();
 
   // Handle critical errors that prevent page from loading
   if (dishesError && !isLoading) {
@@ -69,7 +71,7 @@ const Home = () => {
 
         {/* Secondary Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ComingUp upcomingDishes={upcomingDishes} isLoading={isLoading} />
+          <WeekTimeline recentMeals={recentMeals} upcomingMeals={upcomingMeals} isLoading={isLoading} />
           <StatsCard stats={stats} isLoading={statsLoading} />
         </div>
       </div>
