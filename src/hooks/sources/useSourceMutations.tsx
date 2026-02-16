@@ -81,10 +81,23 @@ export function useSourceMutations() {
           throw createSourceMutationError("User not authenticated");
         }
 
+        // Get user's household_id
+        // @ts-expect-error - household_id not in auto-generated profile types yet
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("household_id")
+          .eq("id", user_id)
+          .single();
+
+        if (profileError || !profile?.household_id) {
+          throw new Error("Could not determine household");
+        }
+
         const sourceToInsert = {
           ...source,
           name: source.name.trim(),
           user_id,
+          household_id: profile.household_id,
         };
 
         const { data, error } = await supabase
