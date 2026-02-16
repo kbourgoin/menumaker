@@ -11,7 +11,7 @@
  * - Validation: Ensure required fields, type safety, data integrity
  */
 
-import { Dish, MealHistory, Source, Tag, Profile, Household } from "@/types/entities";
+import { Dish, MealHistory, Source, Tag, Profile } from "@/types/entities";
 
 import {
   DBDish,
@@ -26,7 +26,6 @@ import {
   DBTagInsert,
   DBProfileInsert,
   DBSourceExtended,
-  DBHousehold,
 } from "@/types/database";
 
 import { mapHouseholdFromDB } from "@/integrations/supabase/mappers/householdMappers";
