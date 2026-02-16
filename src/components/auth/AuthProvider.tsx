@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setSession(data.session);
 
         // If user is not authenticated and not on the auth page, redirect to auth
-        if (!data.session && location.pathname !== "/auth") {
+        if (!data.session && location.pathname !== "/auth" && !location.pathname.startsWith("/join/")) {
           navigate("/auth", { replace: true });
         }
       } catch (error) {
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSession(session);
 
       // If session ends and user isn't on auth page, redirect to auth
-      if (!session && location.pathname !== "/auth") {
+      if (!session && location.pathname !== "/auth" && !location.pathname.startsWith("/join/")) {
         navigate("/auth", { replace: true });
       }
     });
