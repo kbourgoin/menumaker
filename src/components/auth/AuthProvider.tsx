@@ -62,6 +62,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
 
+      if (session) {
+        // Check for pending invite code from /join redirect
+        const params = new URLSearchParams(window.location.search);
+        const inviteCode = params.get("invite");
+        if (inviteCode) {
+          navigate(`/join/${inviteCode}`, { replace: true });
+          return;
+        }
+      }
+
       // If session ends and user isn't on auth page, redirect to auth
       if (!session && location.pathname !== "/auth" && !location.pathname.startsWith("/join/")) {
         navigate("/auth", { replace: true });
