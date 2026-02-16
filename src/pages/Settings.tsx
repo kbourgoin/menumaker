@@ -2,6 +2,7 @@ import React from "react";
 import { Layout } from "@/components/layout";
 import { SourceManager } from "@/components/shared";
 import { AccountSettings } from "@/components/settings";
+import { HouseholdSettings } from "@/components/household";
 import { DataManagement } from "@/components/data/DataManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -36,6 +37,7 @@ const Settings = () => {
             <TabsTrigger value="data">Data Management</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
+            <TabsTrigger value="household">Household</TabsTrigger>
           </TabsList>
 
           <TabsContent value="data" className="mt-6">
@@ -114,6 +116,20 @@ const Settings = () => {
                     <CuisineSettings />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="household" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Household</CardTitle>
+                <CardDescription>
+                  Manage your shared household and invite members
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <HouseholdSettings />
               </CardContent>
             </Card>
           </TabsContent>
