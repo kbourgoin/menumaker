@@ -22,3 +22,4 @@ export const supabase = createClient<Database>(
 export * from "./mappers/dishMappers";
 export * from "./mappers/mealHistoryMappers";
 export * from "./mappers/sourceMappers";
+export * from "./mappers/householdMappers";
