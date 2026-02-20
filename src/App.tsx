@@ -18,6 +18,7 @@ const MealDetail = lazy(() => import("./pages/MealDetail"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+const JoinHousehold = lazy(() => import("./pages/JoinHousehold"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,14 @@ const App = () => (
                     element={
                       <ErrorBoundary context="settings-page">
                         <Settings />
+                      </ErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/join/:inviteCode"
+                    element={
+                      <ErrorBoundary context="join-household-page">
+                        <JoinHousehold />
                       </ErrorBoundary>
                     }
                   />

@@ -28,6 +28,15 @@ export type DBTag = Tables<"tags">;
 export type DBProfile = Tables<"profiles">;
 export type DBDishTag = Tables<"dish_tags">;
 
+// Manual household types (will be replaced by Tables<"households"> after type regeneration)
+export type DBHousehold = {
+  id: string;
+  name: string;
+  invite_code: string;
+  created_by: string;
+  created_at: string;
+};
+
 // Insert types for creating new records
 export type DBDishInsert = TablesInsert<"dishes">;
 export type DBMealHistoryInsert = TablesInsert<"meal_history">;

@@ -28,7 +28,10 @@ import {
   DBSourceExtended,
 } from "@/types/database";
 
+import { mapHouseholdFromDB } from "@/integrations/supabase/mappers/householdMappers";
 import { ValidationError } from "./validation";
+
+export { mapHouseholdFromDB };
 
 /**
  * DISH MAPPING FUNCTIONS
@@ -390,6 +393,7 @@ export const mapProfileFromDB = (dbProfile: DBProfile): Profile => {
       avatarUrl: dbProfile.avatar_url || undefined,
       cuisines: dbProfile.cuisines || undefined,
       updatedAt: dbProfile.updated_at || undefined,
+      householdId: (dbProfile as any).household_id || "",
     };
 
     // Skip validation for now to maintain backward compatibility
@@ -414,7 +418,7 @@ export const mapProfileToDB = (profile: Partial<Profile>): DBProfileInsert => {
       );
     }
 
-    const dbProfile: DBProfileInsert = {
+    const dbProfile: DBProfileInsert & { household_id?: string } = {
       id: profile.id,
       username: profile.username || null,
       avatar_url: profile.avatarUrl || null,
@@ -422,7 +426,11 @@ export const mapProfileToDB = (profile: Partial<Profile>): DBProfileInsert => {
       updated_at: profile.updatedAt || null,
     };
 
-    return dbProfile;
+    if (profile.householdId) {
+      dbProfile.household_id = profile.householdId;
+    }
+
+    return dbProfile as DBProfileInsert;
   } catch (error) {
     throw new ValidationError(
       `Failed to map profile to database: ${error instanceof Error ? error.message : "Unknown error"}`
@@ -493,6 +501,9 @@ export const TypeMappers = {
   // Profile mappers
   mapProfileFromDB,
   mapProfileToDB,
+
+  // Household mappers
+  mapHouseholdFromDB,
 
   // Batch mappers
   mapArrayFromDB,

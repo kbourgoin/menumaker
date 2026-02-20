@@ -16,9 +16,22 @@ export const useTagMutations = () => {
     mutationFn: async (tagData: Omit<TagInsert, "user_id">): Promise<void> => {
       if (!session?.user?.id) throw new Error("User not authenticated");
 
+      // Get user's household_id
+      // @ts-expect-error - household_id not in auto-generated profile types yet
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("household_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profileError || !profile?.household_id) {
+        throw new Error("Could not determine household");
+      }
+
       const { error } = await supabase.from("tags").insert({
         ...tagData,
         user_id: session.user.id,
+        household_id: profile.household_id,
       });
 
       if (error) throw error;

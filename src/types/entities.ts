@@ -73,10 +73,21 @@ export interface ProfileEntity {
   avatarUrl?: string;
   cuisines?: string[];
   updatedAt?: string;
+  householdId: string;
 }
 
 // Alias for consistency
 export type Profile = ProfileEntity;
+
+export interface HouseholdEntity {
+  id: string;
+  name: string;
+  inviteCode: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export type Household = HouseholdEntity;
 
 // Type definitions
 export type TagCategory = "cuisine" | "general";

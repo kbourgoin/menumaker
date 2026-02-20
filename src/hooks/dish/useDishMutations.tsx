@@ -37,6 +37,18 @@ export function useDishMutations() {
           throw new Error("User not authenticated");
         }
 
+        // Get user's household_id
+        // @ts-expect-error - household_id not in auto-generated profile types yet
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("household_id")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError || !profile?.household_id) {
+          throw new Error("Could not determine household");
+        }
+
         // Validate required fields
         if (!dish.name?.trim()) {
           const validationError = classifyError(
@@ -53,6 +65,7 @@ export function useDishMutations() {
           source_id: dish.sourceId,
           location: dish.location,
           user_id: user.id,
+          household_id: profile.household_id,
         };
 
         // Insert with retry for transient failures
